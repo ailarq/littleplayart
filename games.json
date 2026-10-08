@@ -1,11 +1,13 @@
 {
   "daughter": {
     "name": "Saish",
-    "age": 12,
-    "bio": "I'm 12 years old and I love creating fun games using HTML, CSS, and JavaScript! Game development is my passion.",
+    "age": 8,
+    "school": "Ballart Grammar School",
+    "grade": "3rd Grade",
+    "bio": "I'm 8 years old and I love creating fun games using HTML with my friend Claude, Gemini, CoPilot, and ChatGPT! Game development is my passion.",
     "photo": "/images/saish-photo.jpg",
     "interests": ["Game Design", "Coding", "Web Development", "Creative Thinking"],
-    "skills": ["HTML5", "CSS3", "JavaScript", "Game Logic", "Problem Solving"]
+    "skills": ["HTML5", "Prompt Engineering", "AI Integration", "Game Logic", "Problem Solving"]
   },
   "games": [
     {

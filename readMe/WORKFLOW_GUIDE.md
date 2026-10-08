@@ -111,11 +111,11 @@ Choose one emoji per game from this list:
 {
   "daughter": {
     "name": "Saish",
-    "age": 12,
-    "bio": "I'm 12 years old and I love creating fun games using HTML, CSS, and JavaScript!",
+    "age": 8,
+    "bio": "I'm 8 Years old and I love creating fun games using HTML, CSS, and JavaScript!",
     "photo": "/images/saish-photo.jpg",
     "interests": ["Game Design", "Coding", "Web Development"],
-    "skills": ["HTML5", "CSS3", "JavaScript", "Game Logic"]
+    "skills": ["HTML5", "Prompt Engineering", "AI Integration", "Game Logic"]
   },
   "games": [
     {
@@ -129,7 +129,7 @@ Choose one emoji per game from this list:
       "date": "2024-01-15"
     },
     {
-      "id": "memory-game",
+      "id": "memorygame",
       "title": "Number Memory",
       "icon": "🧠",
       "description": "Test your memory by remembering sequences of increasing numbers. Each round adds one more number!",
@@ -137,36 +137,6 @@ Choose one emoji per game from this list:
       "difficulty": "Intermediate",
       "playTime": "5-15 minutes",
       "date": "2024-02-20"
-    },
-    {
-      "id": "snake-game",
-      "title": "Snake Game",
-      "icon": "🐍",
-      "description": "Classic snake game with modern styling. Eat food, grow longer, but don't hit yourself!",
-      "category": "Action",
-      "difficulty": "Intermediate",
-      "playTime": "5-20 minutes",
-      "date": "2024-03-10"
-    },
-    {
-      "id": "rock-paper-scissors",
-      "title": "Rock Paper Scissors",
-      "icon": "✂️",
-      "description": "Play the classic game against the computer. Best of 3 rounds!",
-      "category": "Puzzle",
-      "difficulty": "Beginner",
-      "playTime": "5 minutes",
-      "date": "2024-03-15"
-    },
-    {
-      "id": "word-scramble",
-      "title": "Word Scramble",
-      "icon": "🔤",
-      "description": "Unscramble the letters to find the hidden word. Complete 5 rounds to win!",
-      "category": "Educational",
-      "difficulty": "Intermediate",
-      "playTime": "10-15 minutes",
-      "date": "2024-04-01"
     }
   ]
 }
