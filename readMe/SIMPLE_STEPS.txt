@@ -1,0 +1,180 @@
+╔════════════════════════════════════════════════════════════════════════════╗
+║                                                                            ║
+║            HOW TO ADD HTML GAMES - SIMPLE 3 STEP GUIDE                    ║
+║                                                                            ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+📍 WHERE TO PUT FILES: public/games/
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 THE 3 STEPS:
+
+  Step 1: Create Folder in public/games/
+  Step 2: Copy Game Files Into That Folder
+  Step 3: Edit games.json with Game Info
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📂 STEP 1: CREATE FOLDER
+
+  Location:
+  /Users/lana/Claude/Projects/Saish_Page/public/games/
+
+  Example: For "Flappy Bird" game
+
+  Using Terminal:
+  $ mkdir public/games/flappy-bird
+
+  Or: Right-click in Finder → New Folder → Name it "flappy-bird"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📄 STEP 2: COPY FILES INTO FOLDER
+
+  Saish gives you:
+  ├── flappy-bird.html          (the main game)
+  ├── flappy-bird.css           (styles, optional)
+  └── flappy-bird.js            (code, optional)
+
+  Copy to:
+  public/games/flappy-bird/
+  ├── index.html                (RENAME game.html to this!)
+  ├── style.css                 (RENAME game.css to this!)
+  └── script.js                 (RENAME game.js to this!)
+
+  IMPORTANT: Main file MUST be named "index.html"!
+
+  Using Terminal:
+  $ cp flappy-bird.html public/games/flappy-bird/index.html
+  $ cp flappy-bird.css public/games/flappy-bird/style.css
+  $ cp flappy-bird.js public/games/flappy-bird/script.js
+
+  Or: Drag and drop in Finder (rename as needed)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📝 STEP 3: EDIT games.json
+
+  Open file:
+  /Users/lana/Claude/Projects/Saish_Page/games.json
+
+  Find the "games" array and ADD this:
+
+  {
+    "id": "flappy-bird",
+    "title": "Flappy Bird Clone",
+    "icon": "🐦",
+    "description": "Navigate through pipes and avoid obstacles",
+    "category": "Action",
+    "difficulty": "Beginner",
+    "playTime": "5-10 minutes",
+    "date": "2026-10-09"
+  },
+
+  IMPORTANT RULES:
+  • "id" must match your folder name exactly!
+  • "title" is what users see
+  • "icon" must be an emoji from the emoji list
+  • "description" explains what the game does
+  • "category" must be: Action, Puzzle, or Educational
+  • "difficulty" must be: Beginner, Intermediate, or Advanced
+  • "playTime" is estimated duration
+  • "date" is YYYY-MM-DD format
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✨ EMOJI OPTIONS:
+
+  Action:        🐦 🐍 🎯 🚀 ⚡ 💥 🔥 ⭐ 🚗 🏎️
+  Puzzle:        🧩 🧠 🎲 🔑 💡 🎪 🎨
+  Educational:   📚 🔤 🔢 🌍 🧪 ✏️ 🎓
+  Other:         🎮 🎭 🎬 🎵 ✂️ ⭕ ❓
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ THAT'S IT!
+
+  Now test locally:
+  $ npm run dev
+
+  Then visit:
+  http://localhost:3000/games
+
+  See your new game? 
+  Click it and play! ✓
+
+  If it works, deploy:
+  $ git add .
+  $ git commit -m "Add: Flappy Bird"
+  $ git push origin main
+
+  Website updates automatically! 🎉
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⚠️ COMMON MISTAKES:
+
+  WRONG:                              CORRECT:
+  ❌ RockPaperScissors               ✓ rock-paper-scissors
+  ❌ rock_paper_scissors             ✓ rock-paper-scissors
+  ❌ game.html                       ✓ index.html
+  ❌ <link href="/style.css">        ✓ <link href="./style.css">
+  ❌ <img src="/bird.png">           ✓ <img src="./bird.png">
+  ❌ Folder: rock-paper-scissors    ✓ Folder: rock-paper-scissors
+      games.json: "rock_paper"           games.json: "rock-paper-scissors"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📋 QUICK CHECKLIST:
+
+  ☐ Folder created: public/games/game-id/
+  ☐ Main file: index.html (exact name!)
+  ☐ Other files in same folder (not scattered)
+  ☐ games.json entry added
+  ☐ "id" matches folder name
+  ☐ All fields filled (title, icon, description, etc.)
+  ☐ No JSON syntax errors
+  ☐ Tested locally: npm run dev works
+  ☐ Game shows in gallery
+  ☐ Can click and play game
+  ☐ Ready to deploy!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🚀 DEPLOY COMMANDS:
+
+  Test locally:
+  npm run dev
+
+  Deploy to live:
+  git add .
+  git commit -m "Add: Game Name"
+  git push origin main
+
+  Website updates in 5-10 minutes! ✨
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📂 FINAL FOLDER STRUCTURE (After Adding Game):
+
+  public/games/
+  ├── flappy-bird/
+  │   ├── index.html
+  │   ├── style.css
+  │   └── script.js
+  ├── memory-game/
+  │   └── index.html
+  ├── snake-game/
+  │   └── index.html
+  └── rock-paper-scissors/      ← NEW!
+      ├── index.html
+      ├── style.css
+      └── script.js
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+That's it! You're done! 🎉
+
+Every time Saish makes a new game, just follow these 3 steps
+and it appears on the website automatically!

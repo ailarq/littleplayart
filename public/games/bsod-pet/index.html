@@ -1,0 +1,1393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>BSOD 💙✨ Virtual Pet</title>
+<style>
+  :root{
+    --hot-pink:#ff5fa2;
+    --pastel-pink:#ffd6ea;
+    --baby-blue:#aee4ff;
+    --deep-blue:#4a8fe7;
+    --dark-blue:#2f5fb0;
+    --white:#fffdfd;
+    --cream:#fff5fa;
+    --text:#5a3a55;
+    --shadow-pink:rgba(255,95,162,.35);
+    --gold:#ffcd4a;
+    --happy:#8be3a1;
+    --warn:#ff8a8a;
+    /* rainbow accent palette */
+    --c-red:#ff6b6b;
+    --c-orange:#ffa552;
+    --c-yellow:#ffd93d;
+    --c-green:#6ee7a0;
+    --c-teal:#4fd6c4;
+    --c-blue:#5fb4ff;
+    --c-purple:#b98cff;
+    --c-magenta:#ff7fd6;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Trebuchet MS','Comic Sans MS',system-ui,-apple-system,sans-serif;
+    background:linear-gradient(160deg,
+      #ffd6ea 0%, #ffe1c2 18%, #fff3b0 34%, #d6f7cf 50%,
+      #c7f3ee 64%, #aee4ff 80%, #d9c9ff 100%);
+    background-attachment:fixed;
+    min-height:100vh;
+    color:var(--text);
+    overflow-x:hidden;
+    -webkit-tap-highlight-color:transparent;
+    user-select:none;
+  }
+  .app{
+    max-width:520px;
+    margin:0 auto;
+    padding:14px 14px 40px;
+    position:relative;
+    min-height:100vh;
+  }
+
+  /* ---------- HEADER ---------- */
+  .titlebar{
+    text-align:center;
+    padding:10px 0 4px;
+  }
+  .title{
+    font-size:30px;
+    font-weight:900;
+    background:linear-gradient(90deg,var(--c-red),var(--c-orange),var(--c-yellow),var(--c-green),var(--c-blue),var(--c-purple),var(--c-magenta));
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+    text-shadow: 0 3px 6px rgba(255,120,180,.25);
+    letter-spacing:.5px;
+    margin:0;
+  }
+  .title small{font-size:20px;}
+  .coins-row{
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    margin-top:4px; font-weight:700; color:var(--dark-blue);
+    font-size:15px;
+  }
+  .coins-pill{
+    background:#fff; border:2px solid var(--gold);
+    border-radius:20px; padding:4px 14px;
+    display:flex; align-items:center; gap:6px;
+    box-shadow:0 3px 0 rgba(0,0,0,.06);
+  }
+  .shop-btn-top{
+    background:linear-gradient(90deg,var(--c-magenta),var(--c-purple)); color:#fff; border:none;
+    border-radius:20px; padding:6px 14px; font-weight:800;
+    font-size:14px; box-shadow:0 3px 0 #a854c9; cursor:pointer;
+  }
+  .shop-btn-top:active{transform:translateY(2px); box-shadow:0 1px 0 #a854c9;}
+  .shop-btn-top.daily-variant{background:linear-gradient(90deg,var(--c-teal),var(--c-blue)); box-shadow:0 3px 0 #2f8fc9;}
+  .shop-btn-top.daily-variant:active{box-shadow:0 1px 0 #2f8fc9;}
+
+  /* ---------- METERS ---------- */
+  .meters{
+    display:flex; gap:8px; margin:10px 0 8px;
+  }
+  .meter{
+    flex:1; background:#fff; border-radius:16px; padding:8px 10px;
+    box-shadow:0 3px 0 rgba(0,0,0,.05);
+    border:2px solid #ffe3f0;
+  }
+  .meter-label{font-size:12px; font-weight:800; display:flex; align-items:center; gap:4px; margin-bottom:4px;}
+  .meter-bar-bg{
+    background:#f4e9f0; border-radius:10px; height:10px; overflow:hidden;
+  }
+  .meter-bar{
+    height:100%; border-radius:10px;
+    transition:width .5s ease;
+  }
+  .meter-bar.hunger{background:linear-gradient(90deg,var(--c-orange),var(--c-red));}
+  .meter-bar.happiness{background:linear-gradient(90deg,var(--c-magenta),var(--c-purple));}
+  .meter-bar.energy{background:linear-gradient(90deg,var(--c-teal),var(--c-blue));}
+  .meter-bar.low{animation:pulseLow 1s infinite;}
+  @keyframes pulseLow{ 0%,100%{opacity:1;} 50%{opacity:.45;} }
+
+  .buddy-wrap{
+    position:absolute; left:14%; bottom:60px; z-index:3;
+    display:flex; flex-direction:column; align-items:center;
+  }
+  .buddy-char{
+    font-size:34px;
+    animation:buddyBob 2.2s ease-in-out infinite;
+    cursor:pointer;
+    filter:drop-shadow(0 3px 3px rgba(0,0,0,.12));
+  }
+  @keyframes buddyBob{0%,100%{transform:translateY(0) rotate(-4deg);} 50%{transform:translateY(-10px) rotate(4deg);}}
+  .buddy-speech{
+    background:#fff; border:2px solid var(--c-purple); border-radius:14px;
+    padding:4px 10px; font-size:11px; font-weight:800; color:var(--c-purple);
+    white-space:nowrap; opacity:0; transition:opacity .25s, transform .25s;
+    margin-bottom:4px; box-shadow:0 2px 0 rgba(0,0,0,.06);
+  }
+  .buddy-speech.show{opacity:1; transform:translateY(-4px);}
+
+  /* ---------- ROOM ---------- */
+  .room{
+    position:relative;
+    background:
+      radial-gradient(circle at 15% 10%, #fff 0 3px, transparent 4px) 0 0/40px 40px,
+      linear-gradient(180deg,#fff0f7 0%, #fff7dd 30%, #eafff1 55%, #eafcff 78%, #f1eaff 100%);
+    border-radius:28px;
+    border:4px solid #fff;
+    box-shadow:0 8px 0 rgba(255,150,190,.25), inset 0 0 30px #fff;
+    height:340px;
+    overflow:hidden;
+    margin-bottom:12px;
+  }
+  .wall-deco{position:absolute; font-size:22px; filter:drop-shadow(0 2px 2px rgba(0,0,0,.08));}
+  .floor-line{
+    position:absolute; bottom:56px; left:0; right:0; height:2px;
+    background:rgba(255,255,255,.7);
+  }
+  .bed{position:absolute; left:10px; bottom:10px; font-size:46px;}
+  .plushie1{position:absolute; right:16px; bottom:10px; font-size:34px;}
+  .plushie2{position:absolute; right:56px; bottom:8px; font-size:26px;}
+  .flower1{position:absolute; left:70px; bottom:10px; font-size:26px;}
+  .flower2{position:absolute; left:100px; bottom:8px; font-size:20px;}
+  .computer{position:absolute; right:14px; top:14px; font-size:30px;}
+  .bow-deco{position:absolute; left:14px; top:12px; font-size:26px;}
+  .star1{position:absolute; top:10px; left:50%; font-size:18px; animation:twinkle 2s infinite; filter:hue-rotate(0deg);}
+  .star2{position:absolute; top:40px; right:40%; font-size:14px; animation:twinkle 2.4s infinite .3s; filter:hue-rotate(90deg);}
+  .star3{position:absolute; top:70px; left:20%; font-size:12px; animation:twinkle 1.8s infinite .6s; filter:hue-rotate(200deg);}
+  .star4{position:absolute; top:95px; right:16%; font-size:15px; animation:twinkle 2.2s infinite .15s; filter:hue-rotate(280deg);}
+  @keyframes twinkle{0%,100%{opacity:.3; transform:scale(.8);} 50%{opacity:1; transform:scale(1.15);}}
+
+  .pet-stage{
+    position:absolute; inset:0;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .pet-wrap{
+    position:relative;
+    cursor:pointer;
+    transition:transform .15s;
+  }
+  .pet-wrap:active{transform:scale(.95);}
+  .bsod{
+    width:150px; height:150px;
+    position:relative;
+    animation:idleBob 2.6s ease-in-out infinite;
+  }
+  @keyframes idleBob{0%,100%{transform:translateY(0);} 50%{transform:translateY(-8px);}}
+  .bsod.excited{animation:excitedShake .3s ease-in-out infinite;}
+  @keyframes excitedShake{0%,100%{transform:translateY(0) rotate(-3deg);} 50%{transform:translateY(-14px) rotate(3deg);}}
+  .bsod.sad{animation:sadSway 2.2s ease-in-out infinite;}
+  @keyframes sadSway{0%,100%{transform:translateY(0) rotate(-2deg);} 50%{transform:translateY(2px) rotate(2deg);}}
+  .bsod.sleepy{animation:sleepBreath 3.6s ease-in-out infinite;}
+  @keyframes sleepBreath{0%,100%{transform:scale(1) translateY(0);} 50%{transform:scale(1.03) translateY(2px);}}
+
+  .antenna{position:absolute; top:-16px; left:50%; transform:translateX(-50%); width:4px; height:20px; background:var(--dark-blue); border-radius:2px;}
+  .antenna::after{content:"✦"; position:absolute; top:-14px; left:-8px; font-size:16px; color:var(--gold);}
+
+  .body{
+    position:absolute; top:14px; left:15px; width:120px; height:110px;
+    background:linear-gradient(160deg,#7ab6ff, var(--deep-blue) 60%, var(--dark-blue));
+    border-radius:32px;
+    border:3px solid #fff;
+    box-shadow:0 6px 0 rgba(0,0,0,.08), inset 0 -10px 20px rgba(0,0,0,.08), inset 0 10px 14px rgba(255,255,255,.35);
+  }
+  .screen{
+    position:absolute; top:24px; left:20px; width:80px; height:60px;
+    background:linear-gradient(160deg,#dff2ff,#fff);
+    border-radius:16px;
+    display:flex; align-items:center; justify-content:center; flex-direction:column;
+    box-shadow:inset 0 2px 6px rgba(0,0,0,.08);
+  }
+  .eyes{display:flex; gap:14px;}
+  .eye{width:12px; height:16px; background:var(--dark-blue); border-radius:50% 50% 50% 50%/60% 60% 40% 40%; position:relative;}
+  .eye::after{content:""; position:absolute; top:2px; left:2px; width:4px; height:4px; background:#fff; border-radius:50%;}
+  .mouth{margin-top:6px; width:20px; height:10px; border-bottom:3px solid var(--dark-blue); border-radius:0 0 50% 50%;}
+  .blush{position:absolute; width:9px; height:6px; background:var(--hot-pink); opacity:.55; border-radius:50%;}
+  .blush.l{left:10px; bottom:16px;}
+  .blush.r{right:10px; bottom:16px;}
+
+  /* mood variants swap eye/mouth shape via classes */
+  .bsod.happy-face .eye{height:8px; border-radius:50% 50% 0 0/100% 100% 0 0; transform:translateY(4px);}
+  .bsod.happy-face .mouth{width:26px; height:14px; border:none; border-bottom:3px solid var(--dark-blue); border-radius:0 0 50% 50%;}
+  .bsod.sad-face .eye{height:16px; transform:rotate(0deg);}
+  .bsod.sad-face .mouth{width:16px; height:8px; border:3px solid transparent; border-top:3px solid var(--dark-blue); border-radius:50% 50% 0 0; margin-top:2px;}
+  .bsod.sleep-face .eye{height:2px; border-radius:2px; background:var(--dark-blue);}
+  .bsod.sleep-face .mouth{width:10px; height:6px; border:none; background:none;}
+  .bsod.excited-face .eye{height:14px; width:14px; border-radius:50%;}
+  .bsod.love-face .eye{width:14px; height:14px; border-radius:0; background:transparent;}
+  .bsod.love-face .eye::before{content:"♥"; color:var(--hot-pink); font-size:14px; position:absolute; top:-3px; left:-1px;}
+  .bsod.love-face .eye::after{content:none;}
+
+  .arm{position:absolute; width:10px; height:26px; background:var(--deep-blue); border-radius:8px; border:2px solid #fff; top:60px;}
+  .arm.l{left:2px; transform-origin:top center;}
+  .arm.r{right:2px; transform-origin:top center;}
+  .bsod.happy-face .arm{animation:wave .5s ease-in-out infinite alternate;}
+  @keyframes wave{0%{transform:rotate(-10deg);} 100%{transform:rotate(20deg);}}
+  .leg{position:absolute; width:12px; height:20px; background:var(--dark-blue); border-radius:6px; bottom:-8px; border:2px solid #fff;}
+  .leg.l{left:28px;}
+  .leg.r{right:28px;}
+
+  .accessory-hat, .accessory-glasses, .accessory-outfit{position:absolute; pointer-events:none;}
+  .accessory-hat{top:-14px; left:50%; transform:translateX(-50%); font-size:32px; z-index:5;}
+  .accessory-glasses{top:36px; left:50%; transform:translateX(-50%); font-size:26px; z-index:5;}
+  .accessory-outfit{top:46px; left:50%; transform:translateX(-50%); font-size:34px; z-index:4; opacity:.9;}
+
+  .speech-bubble{
+    position:absolute; top:-14px; left:50%; transform:translateX(-50%);
+    background:#fff; border:2px solid var(--hot-pink); border-radius:16px;
+    padding:6px 12px; font-size:13px; font-weight:800; color:var(--hot-pink);
+    white-space:nowrap; opacity:0; transition:opacity .25s, transform .25s;
+    box-shadow:0 3px 0 rgba(0,0,0,.06);
+    pointer-events:none;
+  }
+  .speech-bubble::after{
+    content:""; position:absolute; bottom:-8px; left:50%; transform:translateX(-50%);
+    border-width:8px 6px 0 6px; border-style:solid; border-color:var(--hot-pink) transparent transparent transparent;
+  }
+  .speech-bubble.show{opacity:1; transform:translateX(-50%) translateY(-8px);}
+
+  .zzz{position:absolute; top:-6px; right:-10px; font-weight:900; color:var(--dark-blue); opacity:0; font-size:18px;}
+  .bsod.sleepy .zzz{opacity:1; animation:zzzFloat 2.4s ease-in infinite;}
+  @keyframes zzzFloat{0%{opacity:0; transform:translateY(0) scale(.6);} 20%{opacity:1;} 100%{opacity:0; transform:translateY(-30px) scale(1.3);}}
+
+  .float-emoji{
+    position:absolute; font-size:20px; pointer-events:none;
+    animation:floatUp 1.1s ease-out forwards;
+    left:50%; top:40%;
+  }
+  @keyframes floatUp{
+    0%{opacity:1; transform:translate(-50%,0) scale(.6) rotate(0deg);}
+    100%{opacity:0; transform:translate(calc(-50% + var(--dx,0px)), -90px) scale(1.3) rotate(20deg);}
+  }
+
+  .bubble{
+    position:absolute; bottom:0; border-radius:50%;
+    background:radial-gradient(circle at 30% 30%, rgba(255,255,255,.9), rgba(174,228,255,.4));
+    border:1px solid rgba(255,255,255,.8);
+    animation:bubbleRise linear forwards;
+  }
+  @keyframes bubbleRise{
+    0%{transform:translateY(0) translateX(0); opacity:.9;}
+    100%{transform:translateY(-320px) translateX(var(--bx,0px)); opacity:0;}
+  }
+
+  .poop-layer{position:absolute; inset:0; z-index:2; pointer-events:none;}
+  .poop-item{
+    position:absolute; bottom:14px; font-size:26px; cursor:pointer;
+    pointer-events:auto;
+    animation:poopPlop .3s ease-out;
+  }
+  @keyframes poopPlop{0%{transform:scale(0) translateY(-10px); opacity:0;} 100%{transform:scale(1) translateY(0); opacity:1;}}
+
+  /* ---------- ACTION BUTTONS ---------- */
+  .actions{
+    display:grid; grid-template-columns:repeat(3,1fr); gap:10px;
+    margin-bottom:14px;
+  }
+  .act-btn{
+    background:#fff;
+    border:3px solid var(--pastel-pink);
+    border-radius:20px;
+    padding:12px 4px 8px;
+    display:flex; flex-direction:column; align-items:center; gap:4px;
+    font-weight:800; font-size:12px; color:var(--text);
+    box-shadow:0 4px 0 var(--pastel-pink);
+    cursor:pointer;
+    transition:transform .1s;
+  }
+  .act-btn .emoji{font-size:26px;}
+  .act-btn:active{transform:translateY(3px); box-shadow:0 1px 0 var(--pastel-pink);}
+  .act-btn.blue{border-color:var(--baby-blue); box-shadow:0 4px 0 var(--baby-blue);}
+  .act-btn.blue:active{box-shadow:0 1px 0 var(--baby-blue);}
+  .act-btn.c-feed{border-color:var(--c-red); box-shadow:0 4px 0 var(--c-red);}
+  .act-btn.c-feed:active{box-shadow:0 1px 0 var(--c-red);}
+  .act-btn.c-pet{border-color:var(--c-magenta); box-shadow:0 4px 0 var(--c-magenta);}
+  .act-btn.c-pet:active{box-shadow:0 1px 0 var(--c-magenta);}
+  .act-btn.c-play{border-color:var(--c-blue); box-shadow:0 4px 0 var(--c-blue);}
+  .act-btn.c-play:active{box-shadow:0 1px 0 var(--c-blue);}
+  .act-btn.c-sleep{border-color:var(--c-purple); box-shadow:0 4px 0 var(--c-purple);}
+  .act-btn.c-sleep:active{box-shadow:0 1px 0 var(--c-purple);}
+  .act-btn.c-dress{border-color:var(--c-orange); box-shadow:0 4px 0 var(--c-orange);}
+  .act-btn.c-dress:active{box-shadow:0 1px 0 var(--c-orange);}
+  .act-btn.c-clean{border-color:var(--c-teal); box-shadow:0 4px 0 var(--c-teal);}
+  .act-btn.c-clean:active{box-shadow:0 1px 0 var(--c-teal);}
+
+  /* ---------- MODALS ---------- */
+  .overlay{
+    position:fixed; inset:0; background:rgba(90,50,80,.35);
+    display:none; align-items:center; justify-content:center; z-index:100;
+    padding:16px;
+    backdrop-filter:blur(2px);
+  }
+  .overlay.open{display:flex;}
+  .modal{
+    background:var(--cream);
+    border-radius:26px;
+    border:4px solid #fff;
+    box-shadow:0 10px 30px rgba(255,120,180,.3);
+    max-width:440px; width:100%;
+    max-height:86vh; overflow-y:auto;
+    padding:18px;
+    position:relative;
+    animation:popIn .25s ease;
+  }
+  @keyframes popIn{0%{transform:scale(.85); opacity:0;} 100%{transform:scale(1); opacity:1;}}
+  .modal h2{
+    margin:0 0 10px; font-size:22px; text-align:center; font-weight:900;
+    background:linear-gradient(90deg,var(--c-magenta),var(--c-purple),var(--c-blue));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .modal-close{
+    position:absolute; top:12px; right:12px; background:var(--hot-pink); color:#fff;
+    border:none; width:30px; height:30px; border-radius:50%; font-weight:900; cursor:pointer;
+    box-shadow:0 2px 0 #c93f7c;
+  }
+  .grid-3{display:grid; grid-template-columns:repeat(3,1fr); gap:10px;}
+  .grid-2{display:grid; grid-template-columns:repeat(2,1fr); gap:10px;}
+  .pick-card{
+    background:#fff; border:2px solid var(--pastel-pink); border-radius:16px;
+    padding:10px 4px; text-align:center; cursor:pointer; font-weight:700; font-size:12px;
+    display:flex; flex-direction:column; align-items:center; gap:4px;
+    box-shadow:0 3px 0 var(--pastel-pink);
+    position:relative;
+  }
+  .pick-card:active{transform:translateY(2px); box-shadow:0 1px 0 var(--pastel-pink);}
+  .pick-card .big{font-size:28px;}
+  .pick-card.equipped{border-color:var(--happy); box-shadow:0 3px 0 var(--happy);}
+  .pick-card.locked{opacity:.5;}
+  .price-tag{
+    position:absolute; top:-8px; right:-8px; background:var(--gold); color:#7a5a00;
+    font-size:10px; border-radius:10px; padding:2px 6px; font-weight:900;
+  }
+
+  .minigame-list{display:flex; flex-direction:column; gap:10px;}
+  .mg-item{
+    display:flex; align-items:center; gap:12px; background:#fff; border:2px solid var(--baby-blue);
+    border-radius:16px; padding:10px 14px; cursor:pointer; box-shadow:0 3px 0 var(--baby-blue);
+  }
+  .mg-item[data-game="ttt"]{border-color:var(--c-orange); box-shadow:0 3px 0 var(--c-orange);}
+  .mg-item[data-game="memory"]{border-color:var(--c-purple); box-shadow:0 3px 0 var(--c-purple);}
+  .mg-item[data-game="snake"]{border-color:var(--c-green); box-shadow:0 3px 0 var(--c-green);}
+  .mg-item .emoji{font-size:26px;}
+  .mg-item div.txt{font-weight:800; font-size:14px;}
+  .mg-item div.sub{font-weight:500; font-size:11px; color:#8a7590;}
+
+  /* TicTacToe */
+  .ttt-board{display:grid; grid-template-columns:repeat(3,1fr); gap:8px; width:220px; margin:10px auto;}
+  .ttt-cell{
+    background:#fff; border:2px solid var(--pastel-pink); border-radius:12px;
+    height:64px; display:flex; align-items:center; justify-content:center; font-size:28px; cursor:pointer;
+  }
+  /* Memory */
+  .mem-board{display:grid; grid-template-columns:repeat(4,1fr); gap:8px; width:260px; margin:10px auto;}
+  .mem-card{
+    background:linear-gradient(160deg,var(--deep-blue),var(--dark-blue)); border-radius:10px;
+    height:56px; display:flex; align-items:center; justify-content:center; font-size:22px; cursor:pointer;
+    color:transparent; transition:transform .3s; border:2px solid #fff;
+  }
+  .mem-card.flipped, .mem-card.matched{background:#fff; color:#000;}
+  .mem-card.matched{border-color:var(--happy);}
+
+  .snake-wrap{display:flex; flex-direction:column; align-items:center; gap:8px;}
+  #snakeCanvas{background:#eaf6ff; border-radius:14px; border:3px solid var(--baby-blue); touch-action:none;}
+  .snake-controls{display:grid; grid-template-columns:44px 44px 44px; grid-template-rows:44px 44px 44px; gap:4px;}
+  .snake-controls button{border:none; background:var(--hot-pink); color:#fff; border-radius:10px; font-size:16px; font-weight:900;}
+
+  .game-status{text-align:center; font-weight:800; margin:6px 0; min-height:20px; color:var(--dark-blue);}
+
+  .food-emoji-btn{font-size:30px;}
+  .close-full{
+    display:block; margin:14px auto 0; background:var(--hot-pink); color:#fff; border:none;
+    border-radius:16px; padding:10px 24px; font-weight:800; cursor:pointer; box-shadow:0 3px 0 #c93f7c;
+  }
+
+  /* Chaos mode */
+  .chaos-overlay{
+    position:fixed; inset:0; z-index:999; display:none;
+    background:repeating-linear-gradient(45deg,
+      var(--c-red) 0, var(--c-orange) 8%, var(--c-yellow) 16%, var(--c-green) 24%,
+      var(--c-teal) 32%, var(--c-blue) 40%, var(--c-purple) 48%, var(--c-magenta) 56%);
+    background-size:200% 200%;
+    animation:chaosBg 1.2s ease-in-out infinite;
+    align-items:center; justify-content:center;
+    overflow:hidden;
+  }
+  .chaos-overlay.open{display:flex;}
+  @keyframes chaosBg{0%{filter:hue-rotate(0deg) brightness(1);} 50%{filter:hue-rotate(12deg) brightness(1.03);} 100%{filter:hue-rotate(0deg) brightness(1);}}
+  .chaos-text{
+    font-size:30px; font-weight:900; color:#fff; text-shadow:2px 2px 0 var(--hot-pink), -2px -2px 0 var(--deep-blue);
+    animation:chaosShake .5s ease-in-out infinite; text-align:center;
+  }
+  @keyframes chaosShake{0%,100%{transform:translate(0,0) rotate(0deg);} 50%{transform:translate(3px,-2px) rotate(1.5deg);}}
+  .chaos-bsod{
+    position:absolute; font-size:70px;
+    animation:chaosRun 2.2s ease-in-out infinite;
+  }
+  @keyframes chaosRun{
+    0%{left:5%; top:20%;} 25%{left:70%; top:60%;} 50%{left:20%; top:75%;} 75%{left:80%; top:15%;} 100%{left:5%; top:20%;}
+  }
+
+  .toast{
+    position:fixed; bottom:20px; left:50%; transform:translateX(-50%);
+    background:linear-gradient(90deg,var(--c-magenta),var(--c-purple),var(--c-blue));
+    color:#fff; padding:10px 20px; border-radius:20px;
+    font-weight:800; font-size:14px; box-shadow:0 4px 10px rgba(0,0,0,.15);
+    z-index:200; opacity:0; transition:opacity .3s, transform .3s;
+    pointer-events:none;
+  }
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(-8px);}
+
+  .footer-note{text-align:center; font-size:11px; color:#a288a0; margin-top:6px;}
+
+  @media (max-width:380px){
+    .title{font-size:24px;}
+    .room{height:300px;}
+    .act-btn{font-size:10.5px;}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="titlebar">
+    <h1 class="title">💙 BSOD 💙</h1>
+    <div class="coins-row">
+      <div class="coins-pill">⭐ <span id="coinCount">0</span></div>
+      <button class="shop-btn-top" id="openShopBtn">🛍️ Shop</button>
+      <button class="shop-btn-top daily-variant" id="openDailyBtn">🎁 Daily</button>
+    </div>
+  </div>
+
+  <div class="meters">
+    <div class="meter">
+      <div class="meter-label">🍓 Hunger</div>
+      <div class="meter-bar-bg"><div class="meter-bar hunger" id="hungerBar" style="width:100%"></div></div>
+    </div>
+    <div class="meter">
+      <div class="meter-label">💕 Happy</div>
+      <div class="meter-bar-bg"><div class="meter-bar happiness" id="happyBar" style="width:100%"></div></div>
+    </div>
+    <div class="meter">
+      <div class="meter-label">⚡ Energy</div>
+      <div class="meter-bar-bg"><div class="meter-bar energy" id="energyBar" style="width:100%"></div></div>
+    </div>
+  </div>
+
+  <div class="room" id="room">
+    <div class="poop-layer" id="poopLayer"></div>
+    <div class="wall-deco bow-deco">🎀</div>
+    <div class="wall-deco computer">💻</div>
+    <div class="wall-deco star1">✨</div>
+    <div class="wall-deco star2">⭐</div>
+    <div class="wall-deco star3">✨</div>
+    <div class="wall-deco star4">🌟</div>
+    <div class="floor-line"></div>
+    <div class="wall-deco bed">🛏️</div>
+    <div class="wall-deco plushie1">🧸</div>
+    <div class="wall-deco plushie2">🧸</div>
+    <div class="wall-deco flower1">🌸</div>
+    <div class="wall-deco flower2">🌷</div>
+
+    <div class="pet-stage">
+      <div class="buddy-wrap" id="buddyWrap">
+        <div class="buddy-speech" id="buddySpeech"></div>
+        <div class="buddy-char" id="buddyChar"></div>
+      </div>
+      <div class="pet-wrap" id="petWrap">
+        <div class="speech-bubble" id="speechBubble">hi!! 💙</div>
+        <div class="bsod idle-face" id="bsod">
+          <div class="zzz">Z</div>
+          <div class="antenna"></div>
+          <div class="body">
+            <div class="screen">
+              <div class="eyes">
+                <div class="eye"></div>
+                <div class="eye"></div>
+              </div>
+              <div class="mouth"></div>
+            </div>
+            <div class="blush l"></div>
+            <div class="blush r"></div>
+          </div>
+          <div class="arm l"></div>
+          <div class="arm r"></div>
+          <div class="leg l"></div>
+          <div class="leg r"></div>
+          <div class="accessory-hat" id="accHat"></div>
+          <div class="accessory-glasses" id="accGlasses"></div>
+          <div class="accessory-outfit" id="accOutfit"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="actions">
+    <div class="act-btn c-feed" data-action="feed"><span class="emoji">🍓</span>FEED</div>
+    <div class="act-btn c-pet" data-action="pet"><span class="emoji">🫳</span>PET</div>
+    <div class="act-btn c-play" data-action="play"><span class="emoji">🎮</span>PLAY</div>
+    <div class="act-btn c-sleep" data-action="sleep"><span class="emoji">😴</span><span id="sleepLabel">SLEEP</span></div>
+    <div class="act-btn c-dress" data-action="dress"><span class="emoji">👗</span>DRESS UP</div>
+    <div class="act-btn c-clean" data-action="clean"><span class="emoji">🛁</span>CLEAN</div>
+  </div>
+
+  <div class="footer-note">tip: BSOD's antenna sparkle holds a secret... ✨🤫</div>
+</div>
+
+<!-- FEED MODAL -->
+<div class="overlay" id="feedOverlay">
+  <div class="modal">
+    <button class="modal-close" data-close>✕</button>
+    <h2>🍓 Feed BSOD</h2>
+    <div class="grid-3" id="foodGrid"></div>
+    <button class="close-full" data-close>Done</button>
+  </div>
+</div>
+
+<!-- PLAY MODAL (game picker) -->
+<div class="overlay" id="playOverlay">
+  <div class="modal">
+    <button class="modal-close" data-close>✕</button>
+    <h2>🎮 Pick a Mini-Game</h2>
+    <div class="minigame-list">
+      <div class="mg-item" data-game="ttt"><span class="emoji">⭕</span><div><div class="txt">Tic-Tac-Toe</div><div class="sub">Beat BSOD! +🍓happy +⭐coins</div></div></div>
+      <div class="mg-item" data-game="memory"><span class="emoji">🧠</span><div><div class="txt">Memory Match</div><div class="sub">Find the pairs</div></div></div>
+      <div class="mg-item" data-game="snake"><span class="emoji">🐍</span><div><div class="txt">Snake</div><div class="sub">Eat the sparkles!</div></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- TIC TAC TOE -->
+<div class="overlay" id="tttOverlay">
+  <div class="modal">
+    <button class="modal-close" data-close>✕</button>
+    <h2>⭕ Tic-Tac-Toe</h2>
+    <div class="game-status" id="tttStatus">Your turn! You're 💙, BSOD is 💗</div>
+    <div class="ttt-board" id="tttBoard"></div>
+    <button class="close-full" id="tttRestart">Restart</button>
+  </div>
+</div>
+
+<!-- MEMORY -->
+<div class="overlay" id="memOverlay">
+  <div class="modal">
+    <button class="modal-close" data-close>✕</button>
+    <h2>🧠 Memory Match</h2>
+    <div class="game-status" id="memStatus">Find all the pairs!</div>
+    <div class="mem-board" id="memBoard"></div>
+    <button class="close-full" id="memRestart">Restart</button>
+  </div>
+</div>
+
+<!-- SNAKE -->
+<div class="overlay" id="snakeOverlay">
+  <div class="modal">
+    <button class="modal-close" data-close>✕</button>
+    <h2>🐍 Snake</h2>
+    <div class="game-status" id="snakeStatus">Score: 0</div>
+    <div class="snake-wrap">
+      <canvas id="snakeCanvas" width="240" height="240"></canvas>
+      <div class="snake-controls">
+        <div></div><button id="snUp">▲</button><div></div>
+        <button id="snLeft">◀</button><div></div><button id="snRight">▶</button>
+        <div></div><button id="snDown">▼</button><div></div>
+      </div>
+    </div>
+    <button class="close-full" id="snakeRestart">Restart</button>
+  </div>
+</div>
+
+<!-- DRESS UP -->
+<div class="overlay" id="dressOverlay">
+  <div class="modal">
+    <button class="modal-close" data-close>✕</button>
+    <h2>👗 Dress Up</h2>
+    <p style="text-align:center; font-weight:700; font-size:13px; color:#8a7590; margin-top:-6px;">Hats</p>
+    <div class="grid-3" id="hatGrid"></div>
+    <p style="text-align:center; font-weight:700; font-size:13px; color:#8a7590;">Glasses</p>
+    <div class="grid-3" id="glassesGrid"></div>
+    <p style="text-align:center; font-weight:700; font-size:13px; color:#8a7590;">Outfits</p>
+    <div class="grid-3" id="outfitGrid"></div>
+    <p style="text-align:center; font-weight:700; font-size:13px; color:#8a7590;">Buddies 🐾</p>
+    <div class="grid-3" id="buddyGrid"></div>
+    <button class="close-full" data-close>Done</button>
+  </div>
+</div>
+
+<!-- SHOP -->
+<div class="overlay" id="shopOverlay">
+  <div class="modal">
+    <button class="modal-close" data-close>✕</button>
+    <h2>🛍️ BSOD Shop</h2>
+    <p style="text-align:center; font-size:13px; color:#8a7590; margin-top:-8px;">Spend ⭐ stars earned from mini-games!</p>
+    <div class="grid-2" id="shopGrid"></div>
+    <button class="close-full" data-close>Done</button>
+  </div>
+</div>
+
+<!-- DAILY REWARD -->
+<div class="overlay" id="dailyOverlay">
+  <div class="modal" style="text-align:center;">
+    <button class="modal-close" data-close>✕</button>
+    <h2>🎁 Daily Reward</h2>
+    <div style="font-size:50px; margin:8px 0;">🎉⭐🎉</div>
+    <p id="dailyMsg" style="font-weight:700;"></p>
+    <button class="close-full" id="dailyClaimBtn">Claim</button>
+  </div>
+</div>
+
+<!-- CLEAN / BATH -->
+<div class="overlay" id="cleanOverlay">
+  <div class="modal" style="text-align:center;">
+    <button class="modal-close" data-close>✕</button>
+    <h2>🛁 Bubble Bath</h2>
+    <div class="room" id="bathRoom" style="height:220px; background:linear-gradient(180deg,#d7f0ff,#bfe6ff);">
+      <div class="pet-stage">
+        <div class="bsod" id="bathBsod" style="transform:scale(0.9);">
+          <div class="antenna"></div>
+          <div class="body">
+            <div class="screen">
+              <div class="eyes"><div class="eye"></div><div class="eye"></div></div>
+              <div class="mouth"></div>
+            </div>
+            <div class="blush l"></div><div class="blush r"></div>
+          </div>
+          <div class="arm l"></div><div class="arm r"></div>
+          <div class="leg l"></div><div class="leg r"></div>
+        </div>
+      </div>
+    </div>
+    <p style="font-weight:700; font-size:13px;">tap the water for bubbles! 🫧</p>
+    <button class="close-full" id="cleanDoneBtn">All Clean!</button>
+  </div>
+</div>
+
+<!-- CHAOS MODE -->
+<div class="chaos-overlay" id="chaosOverlay">
+  <div class="chaos-bsod">🤖💙</div>
+  <div class="chaos-text">wheee!! 🎉<br>😂🤖💨</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------------- STATE ---------------- */
+  const DEFAULT_STATE = {
+    hunger: 90, happiness: 90, energy: 90,
+    coins: 20,
+    sleeping: false,
+    equipped: { hat:'', glasses:'', outfit:'', buddy:'' },
+    owned: { hat:['none'], glasses:['none'], outfit:['none'], buddy:['none'] },
+    lastTick: Date.now(),
+    lastDaily: 0,
+    dailyStreak: 0,
+    poops: []
+  };
+  let state = JSON.parse(JSON.stringify(DEFAULT_STATE));
+
+  const STORAGE_KEY = 'bsod-pet-state-v1';
+  let storageReady = !!(window.storage && window.storage.get && window.storage.set);
+
+  async function loadState(){
+    if(!storageReady) return;
+    try{
+      const res = await window.storage.get(STORAGE_KEY, false);
+      if(res && res.value){
+        const loaded = JSON.parse(res.value);
+        const fresh = JSON.parse(JSON.stringify(DEFAULT_STATE));
+        state = Object.assign(fresh, loaded);
+
+        // Merge equipped: keep any new default keys the old save didn't have.
+        state.equipped = Object.assign({}, DEFAULT_STATE.equipped, loaded.equipped||{});
+
+        // Merge owned: union defaults with whatever the save had, per category,
+        // so new categories (like 'buddy') always exist as arrays.
+        state.owned = {};
+        Object.keys(DEFAULT_STATE.owned).forEach(k=>{
+          const defaults = DEFAULT_STATE.owned[k] || [];
+          const savedArr = (loaded.owned && Array.isArray(loaded.owned[k])) ? loaded.owned[k] : [];
+          state.owned[k] = Array.from(new Set([...defaults, ...savedArr]));
+        });
+
+        if(!Array.isArray(state.poops)) state.poops = [];
+      }
+    }catch(e){ /* no saved state yet */ }
+  }
+  let saveTimer=null;
+  function saveState(){
+    if(!storageReady) return;
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(()=>{ attemptSave(JSON.stringify(state), 0); }, 400);
+  }
+  async function attemptSave(payload, retryCount){
+    try{
+      await window.storage.set(STORAGE_KEY, payload, false);
+    }catch(e){
+      console.error('save failed (attempt '+(retryCount+1)+')', e);
+      if(retryCount < 2){
+        const delay = 800 * Math.pow(2, retryCount); // 800ms, then 1600ms
+        setTimeout(()=>attemptSave(payload, retryCount+1), delay);
+      } else {
+        console.error('save gave up after retries; progress may not have persisted this time');
+      }
+    }
+  }
+
+  function clamp(v){ return Math.max(0, Math.min(100, v)); }
+
+  /* ---------------- ACCESSORY CATALOG ---------------- */
+  const HATS = [
+    {id:'none', label:'None', emoji:''},
+    {id:'bow', label:'Bow', emoji:'🎀', price:0},
+    {id:'crown', label:'Crown', emoji:'👑', price:30},
+    {id:'partyhat', label:'Party', emoji:'🥳', price:20},
+    {id:'flower', label:'Flower', emoji:'🌸', price:15},
+    {id:'wizard', label:'Wizard', emoji:'🧙', price:40},
+  ];
+  const GLASSES = [
+    {id:'none', label:'None', emoji:''},
+    {id:'sun', label:'Shades', emoji:'🕶️', price:20},
+    {id:'star', label:'Star', emoji:'🤩', price:25},
+    {id:'nerd', label:'Nerdy', emoji:'🤓', price:15},
+  ];
+  const OUTFITS = [
+    {id:'none', label:'None', emoji:''},
+    {id:'bowtie', label:'Bowtie', emoji:'🎗️', price:10},
+    {id:'scarf', label:'Scarf', emoji:'🧣', price:20},
+    {id:'cape', label:'Cape', emoji:'🦸', price:35},
+  ];
+  const BUDDIES = [
+    {id:'none', label:'None', emoji:'', name:''},
+    {id:'cat', label:'Pixel the Cat', emoji:'🐱', price:25, line:'meow~ purr purr 💕'},
+    {id:'bunny', label:'Bit the Bunny', emoji:'🐰', price:25, line:'hop hop!! 🥕✨'},
+    {id:'butterfly', label:'Glitch the Butterfly', emoji:'🦋', price:20, line:'flutter flutter~ 🌸'},
+    {id:'chick', label:'Byte the Chick', emoji:'🐥', price:20, line:'peep peep!! 🐣'},
+    {id:'panda', label:'Static the Panda', emoji:'🐼', price:35, line:'*sleepy panda hug* 💤'},
+    {id:'dino', label:'Ping the Dino', emoji:'🦖', price:40, line:'RAWR (in a cute way) 💚'},
+    {id:'unicorn', label:'Sparkle the Unicorn', emoji:'🦄', price:50, line:'magic sparkles for you!! ✨🌈'},
+  ];
+  const FOODS = [
+    {id:'berry', label:'Berry', emoji:'🍓', restore:15},
+    {id:'cake', label:'Cake', emoji:'🍰', restore:25},
+    {id:'pizza', label:'Pizza', emoji:'🍕', restore:22},
+    {id:'icecream', label:'Ice Cream', emoji:'🍦', restore:18},
+    {id:'hotdog', label:'Hot Dog', emoji:'🌭', restore:20},
+    {id:'candy', label:'Candy', emoji:'🍬', restore:10},
+  ];
+  const SHOP_ITEMS = [
+    ...HATS.filter(h=>h.id!=='none').map(h=>({...h, kind:'hat'})),
+    ...GLASSES.filter(g=>g.id!=='none').map(g=>({...g, kind:'glasses'})),
+    ...OUTFITS.filter(o=>o.id!=='none').map(o=>({...o, kind:'outfit'})),
+    ...BUDDIES.filter(b=>b.id!=='none').map(b=>({...b, kind:'buddy'})),
+  ];
+
+  /* ---------------- DOM REFS ---------------- */
+  const $ = (id)=>document.getElementById(id);
+  const bsod = $('bsod');
+  const petWrap = $('petWrap');
+  const speechBubble = $('speechBubble');
+  const room = $('room');
+  const toastEl = $('toast');
+
+  function toast(msg){
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    clearTimeout(toastEl._t);
+    toastEl._t = setTimeout(()=>toastEl.classList.remove('show'), 1600);
+  }
+
+  function say(msg, ms){
+    speechBubble.textContent = msg;
+    speechBubble.classList.add('show');
+    clearTimeout(speechBubble._t);
+    speechBubble._t = setTimeout(()=>speechBubble.classList.remove('show'), ms||1800);
+  }
+
+  function setFaceMood(mood){
+    bsod.classList.remove('happy-face','sad-face','sleep-face','excited-face','love-face');
+    if(mood) bsod.classList.add(mood);
+  }
+  function setBodyAnim(anim){
+    bsod.classList.remove('excited','sad','sleepy');
+    if(anim) bsod.classList.add(anim);
+  }
+
+  function spawnFloat(container, emoji, count){
+    count = count||1;
+    for(let i=0;i<count;i++){
+      const el = document.createElement('div');
+      el.className='float-emoji';
+      el.textContent = emoji;
+      el.style.setProperty('--dx', (Math.random()*80-40)+'px');
+      el.style.left = (45+Math.random()*10)+'%';
+      el.style.top = (35+Math.random()*10)+'%';
+      el.style.animationDelay = (i*0.08)+'s';
+      container.appendChild(el);
+      setTimeout(()=>el.remove(), 1300+i*80);
+    }
+  }
+
+  /* ---------------- RENDER ---------------- */
+  function render(){
+    $('hungerBar').style.width = state.hunger+'%';
+    $('happyBar').style.width = state.happiness+'%';
+    $('energyBar').style.width = state.energy+'%';
+    $('coinCount').textContent = state.coins;
+
+    ['hungerBar','happyBar','energyBar'].forEach((id,i)=>{
+      const val = [state.hunger,state.happiness,state.energy][i];
+      $(id).classList.toggle('low', val<25);
+    });
+
+    const hat = HATS.find(h=>h.id===state.equipped.hat);
+    const glasses = GLASSES.find(g=>g.id===state.equipped.glasses);
+    const outfit = OUTFITS.find(o=>o.id===state.equipped.outfit);
+    $('accHat').textContent = hat? hat.emoji : '';
+    $('accGlasses').textContent = glasses? glasses.emoji : '';
+    $('accOutfit').textContent = outfit? outfit.emoji : '';
+
+    const buddy = BUDDIES.find(b=>b.id===state.equipped.buddy);
+    $('buddyChar').textContent = (buddy && buddy.id!=='none') ? buddy.emoji : '';
+    $('buddyWrap').style.display = (buddy && buddy.id!=='none') ? 'flex' : 'none';
+
+    $('sleepLabel').textContent = state.sleeping ? 'WAKE UP' : 'SLEEP';
+    room.style.filter = state.sleeping ? 'brightness(.75)' : 'none';
+
+    if(state.sleeping){
+      setBodyAnim('sleepy'); setFaceMood('sleep-face');
+    } else if(state.hunger<25 || state.happiness<25 || state.energy<25){
+      setBodyAnim('sad'); setFaceMood('sad-face');
+    } else {
+      setBodyAnim(''); setFaceMood('');
+    }
+  }
+
+  /* ---------------- MOOD LINES ---------------- */
+  function moodLine(){
+    if(state.sleeping) return 'System... sleepy... 😴💤';
+    if(state.hunger<25) return 'My pixels are hungry... 🍓😭';
+    if(state.energy<25) return 'System... sleepy... 😴💤';
+    if(state.happiness>80) return 'YAY!!! 💕';
+    return null;
+  }
+
+  function renderPoops(){
+    const layer = $('poopLayer');
+    layer.innerHTML='';
+    state.poops.forEach(p=>{
+      const el = document.createElement('div');
+      el.className='poop-item';
+      el.textContent='💩';
+      el.style.left = p.x+'%';
+      el.addEventListener('click', ()=>cleanPoop(p.id));
+      layer.appendChild(el);
+    });
+  }
+  function spawnPoop(){
+    if(state.sleeping) return;
+    if(state.poops.length >= 3) return;
+    state.poops.push({ id: Date.now()+Math.random(), x: 15+Math.random()*70 });
+    renderPoops(); saveState();
+  }
+  function cleanPoop(id){
+    state.poops = state.poops.filter(p=>p.id!==id);
+    state.happiness = clamp(state.happiness + 2);
+    state.coins += 1;
+    toast('Cleaned up! +⭐1');
+    renderPoops(); render(); saveState();
+  }
+
+  /* ---------------- TICKING / DECAY ---------------- */
+  function applyElapsedDecay(){
+    const now = Date.now();
+    const elapsedMin = (now - state.lastTick)/60000;
+    state.lastTick = now;
+    if(state.sleeping){
+      state.energy = clamp(state.energy + elapsedMin*1.2);
+      state.hunger = clamp(state.hunger - elapsedMin*0.15);
+      state.happiness = clamp(state.happiness - elapsedMin*0.1);
+    } else {
+      state.hunger = clamp(state.hunger - elapsedMin*0.4);
+      state.happiness = clamp(state.happiness - elapsedMin*0.3);
+      state.energy = clamp(state.energy - elapsedMin*0.25);
+    }
+  }
+
+  let tickInterval = setInterval(()=>{
+    applyElapsedDecay();
+    render();
+    if(Math.random() < 0.12) spawnPoop();
+    saveState();
+    const line = moodLine();
+    if(line && Math.random()<0.15) say(line, 2200);
+  }, 4000);
+
+  /* ---------------- ACTIONS ---------------- */
+  function addCoins(n){
+    state.coins += n;
+    render(); saveState();
+  }
+
+  function feed(food){
+    if(state.sleeping){ toast("BSOD is asleep! 💤"); return; }
+    state.hunger = clamp(state.hunger + food.restore);
+    state.happiness = clamp(state.happiness + 4);
+    setBodyAnim('excited'); setFaceMood('excited-face');
+    say('Yummy! '+food.emoji+' 💕', 1500);
+    spawnFloat(petWrap, food.emoji, 3);
+    render(); saveState();
+    setTimeout(()=>{ if(!state.sleeping) render(); }, 900);
+  }
+
+  function petBsod(){
+    if(state.sleeping){ say('zzz... 💤', 1200); return; }
+    state.happiness = clamp(state.happiness + 6);
+    setFaceMood('love-face');
+    say('hehehe 💙✨', 1400);
+    spawnFloat(petWrap, '💙', 1);
+    spawnFloat(petWrap, '✨', 1);
+    render(); saveState();
+    setTimeout(render, 1100);
+  }
+
+  function toggleSleep(){
+    state.sleeping = !state.sleeping;
+    if(state.sleeping){ say('Goodnight... 😴', 1600); }
+    else { say('BEEP BEEP! LETS GOOO! 🎉🤖', 1800); setBodyAnim('excited'); setFaceMood('excited-face'); setTimeout(render,900);}
+    render(); saveState();
+  }
+
+  function openOverlay(id){ $(id).classList.add('open'); }
+  function closeOverlay(id){ $(id).classList.remove('open'); }
+
+  document.querySelectorAll('[data-close]').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{
+      const ov = e.target.closest('.overlay');
+      if(ov) ov.classList.remove('open');
+    });
+  });
+  document.querySelectorAll('.overlay').forEach(ov=>{
+    ov.addEventListener('click', (e)=>{ if(e.target===ov) ov.classList.remove('open'); });
+  });
+
+  /* ---------------- ACTION BUTTONS ---------------- */
+  document.querySelectorAll('.act-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const action = btn.dataset.action;
+      if(action==='feed') { buildFoodGrid(); openOverlay('feedOverlay'); }
+      else if(action==='pet') petBsod();
+      else if(action==='play') openOverlay('playOverlay');
+      else if(action==='sleep') toggleSleep();
+      else if(action==='dress') { buildDressGrids(); openOverlay('dressOverlay'); }
+      else if(action==='clean') openOverlay('cleanOverlay');
+    });
+  });
+
+  petWrap.addEventListener('click', petBsod);
+
+  $('buddyChar').addEventListener('click', (e)=>{
+    e.stopPropagation();
+    const buddy = BUDDIES.find(b=>b.id===state.equipped.buddy);
+    if(!buddy || buddy.id==='none') return;
+    const bubble = $('buddySpeech');
+    bubble.textContent = buddy.line;
+    bubble.classList.add('show');
+    clearTimeout(bubble._t);
+    bubble._t = setTimeout(()=>bubble.classList.remove('show'), 1600);
+    spawnFloat($('buddyWrap'), '💫', 1);
+  });
+
+  /* ---------------- FEED GRID ---------------- */
+  function buildFoodGrid(){
+    const grid = $('foodGrid');
+    grid.innerHTML='';
+    FOODS.forEach(f=>{
+      const card = document.createElement('div');
+      card.className='pick-card';
+      card.innerHTML = `<div class="big">${f.emoji}</div><div>${f.label}</div>`;
+      card.addEventListener('click', ()=>feed(f));
+      grid.appendChild(card);
+    });
+  }
+
+  /* ---------------- DRESS UP ---------------- */
+  function buildDressGrids(){
+    buildCategoryGrid('hatGrid', HATS, 'hat');
+    buildCategoryGrid('glassesGrid', GLASSES, 'glasses');
+    buildCategoryGrid('outfitGrid', OUTFITS, 'outfit');
+    buildCategoryGrid('buddyGrid', BUDDIES, 'buddy');
+  }
+  function buildCategoryGrid(gridId, list, kind){
+    const grid = $(gridId);
+    grid.innerHTML='';
+    list.forEach(item=>{
+      const owned = item.id==='none' || state.owned[kind].includes(item.id);
+      const equipped = state.equipped[kind]===item.id;
+      const card = document.createElement('div');
+      card.className='pick-card'+(equipped?' equipped':'')+(owned?'':' locked');
+      card.innerHTML = `<div class="big">${item.emoji||'🚫'}</div><div>${item.label}</div>`;
+      if(!owned){
+        const tag = document.createElement('div');
+        tag.className='price-tag'; tag.textContent='⭐'+item.price;
+        card.appendChild(tag);
+      }
+      card.addEventListener('click', ()=>{
+        if(!owned){ toast('Buy this in the Shop! 🛍️'); return; }
+        state.equipped[kind] = item.id;
+        say('Cute! 💕', 1200);
+        render(); saveState();
+        buildCategoryGrid(gridId, list, kind);
+      });
+      grid.appendChild(card);
+    });
+  }
+
+  /* ---------------- SHOP ---------------- */
+  function buildShopGrid(){
+    const grid = $('shopGrid');
+    grid.innerHTML='';
+    SHOP_ITEMS.forEach(item=>{
+      const owned = state.owned[item.kind].includes(item.id);
+      const card = document.createElement('div');
+      card.className='pick-card'+(owned?' equipped':'');
+      card.innerHTML = `<div class="big">${item.emoji}</div><div>${item.label}</div><div style="font-size:11px; color:#8a7590;">${owned? 'Owned' : '⭐ '+item.price}</div>`;
+      card.addEventListener('click', ()=>{
+        if(owned){ toast('Already owned! ✅'); return; }
+        if(state.coins < item.price){ toast('Not enough stars! ⭐'); return; }
+        state.coins -= item.price;
+        state.owned[item.kind].push(item.id);
+        toast('Got '+item.emoji+' '+item.label+'!');
+        render(); saveState();
+        buildShopGrid();
+      });
+      grid.appendChild(card);
+    });
+  }
+  $('openShopBtn').addEventListener('click', ()=>{ buildShopGrid(); openOverlay('shopOverlay'); });
+
+  /* ---------------- DAILY REWARD ---------------- */
+  function checkDailyAvailable(){
+    const now = new Date();
+    const last = state.lastDaily ? new Date(state.lastDaily) : null;
+    if(!last) return true;
+    return now.toDateString() !== last.toDateString();
+  }
+  function openDaily(){
+    const available = checkDailyAvailable();
+    const msg = $('dailyMsg');
+    const btn = $('dailyClaimBtn');
+    if(available){
+      const reward = 10 + state.dailyStreak*2;
+      msg.textContent = `Come back today's reward: ⭐ ${reward} stars! (streak ${state.dailyStreak+1})`;
+      btn.style.display='inline-block';
+      btn.onclick = ()=>{
+        state.coins += reward;
+        state.lastDaily = Date.now();
+        state.dailyStreak = (state.dailyStreak||0)+1;
+        toast('Claimed ⭐'+reward+'!');
+        render(); saveState();
+        closeOverlay('dailyOverlay');
+      };
+    } else {
+      msg.textContent = "You already got today's reward! Come back tomorrow 💙";
+      btn.style.display='none';
+    }
+    openOverlay('dailyOverlay');
+  }
+  $('openDailyBtn').addEventListener('click', openDaily);
+
+  /* ---------------- CLEAN / BATH ---------------- */
+  const bathRoom = $('bathRoom');
+  bathRoom.addEventListener('click', (e)=>{
+    for(let i=0;i<5;i++){
+      const b = document.createElement('div');
+      b.className='bubble';
+      const size = 8+Math.random()*16;
+      b.style.width=size+'px'; b.style.height=size+'px';
+      b.style.left = (e.offsetX + (Math.random()*30-15))+'px';
+      b.style.setProperty('--bx', (Math.random()*40-20)+'px');
+      b.style.animationDuration = (1+Math.random())+'s';
+      bathRoom.appendChild(b);
+      setTimeout(()=>b.remove(), 2200);
+    }
+  });
+  $('cleanDoneBtn').addEventListener('click', ()=>{
+    state.happiness = clamp(state.happiness + 10);
+    say('So fresh and squeaky clean! 🫧💙', 1800);
+    closeOverlay('cleanOverlay');
+    render(); saveState();
+  });
+
+  /* ================= MINI GAMES ================= */
+  document.querySelectorAll('.mg-item').forEach(item=>{
+    item.addEventListener('click', ()=>{
+      closeOverlay('playOverlay');
+      const game = item.dataset.game;
+      if(game==='ttt'){ resetTTT(); openOverlay('tttOverlay'); }
+      else if(game==='memory'){ resetMemory(); openOverlay('memOverlay'); }
+      else if(game==='snake'){ resetSnake(); openOverlay('snakeOverlay'); }
+    });
+  });
+
+  function rewardFromGame(coins, happinessGain){
+    state.coins += coins;
+    state.happiness = clamp(state.happiness + happinessGain);
+    state.energy = clamp(state.energy - 6);
+    render(); saveState();
+  }
+
+  /* ---- Tic Tac Toe ---- */
+  let tttCells, tttOver;
+  function resetTTT(){
+    tttCells = Array(9).fill('');
+    tttOver = false;
+    $('tttStatus').textContent = "Your turn! You're 💙, BSOD is 💗";
+    const board = $('tttBoard');
+    board.innerHTML='';
+    for(let i=0;i<9;i++){
+      const cell = document.createElement('div');
+      cell.className='ttt-cell';
+      cell.dataset.i=i;
+      cell.addEventListener('click', ()=>tttPlay(i));
+      board.appendChild(cell);
+    }
+  }
+  function tttWinner(cells){
+    const lines=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+    for(const [a,b,c] of lines){
+      if(cells[a] && cells[a]===cells[b] && cells[b]===cells[c]) return cells[a];
+    }
+    if(cells.every(c=>c)) return 'draw';
+    return null;
+  }
+  function tttPlay(i){
+    if(tttOver || tttCells[i]) return;
+    tttCells[i]='💙';
+    renderTTT();
+    let w = tttWinner(tttCells);
+    if(w){ tttEnd(w); return; }
+    setTimeout(()=>{
+      const empty = tttCells.map((v,idx)=>v?null:idx).filter(v=>v!==null);
+      if(empty.length){
+        const choice = empty[Math.floor(Math.random()*empty.length)];
+        tttCells[choice]='💗';
+        renderTTT();
+        w = tttWinner(tttCells);
+        if(w){ tttEnd(w); return; }
+      }
+    }, 400);
+  }
+  function renderTTT(){
+    document.querySelectorAll('#tttBoard .ttt-cell').forEach((cell,i)=>{
+      cell.textContent = tttCells[i];
+    });
+  }
+  function tttEnd(w){
+    tttOver = true;
+    if(w==='💙'){ $('tttStatus').textContent = 'You win! 🎉 +⭐8'; rewardFromGame(8, 10); say('WOAH you win!! 🎉',1800); }
+    else if(w==='💗'){ $('tttStatus').textContent = 'BSOD wins! 🤖 +⭐2'; rewardFromGame(2, 4); }
+    else { $('tttStatus').textContent = "It's a draw! +⭐4"; rewardFromGame(4, 6); }
+  }
+  $('tttRestart').addEventListener('click', resetTTT);
+
+  /* ---- Memory Match ---- */
+  let memCards, memFlipped, memMatchedCount, memLock;
+  function resetMemory(){
+    const symbols = ['💙','⭐','🎀','🍓','🌸','💗','🦋','✨'];
+    let deck = [...symbols, ...symbols];
+    deck.sort(()=>Math.random()-0.5);
+    memCards = deck;
+    memFlipped = [];
+    memMatchedCount = 0;
+    memLock = false;
+    $('memStatus').textContent = 'Find all the pairs!';
+    const board = $('memBoard');
+    board.innerHTML='';
+    deck.forEach((sym,i)=>{
+      const card = document.createElement('div');
+      card.className='mem-card';
+      card.dataset.i=i;
+      card.textContent = sym;
+      card.addEventListener('click', ()=>memFlip(i, card));
+      board.appendChild(card);
+    });
+  }
+  function memFlip(i, el){
+    if(memLock || el.classList.contains('flipped') || el.classList.contains('matched')) return;
+    el.classList.add('flipped');
+    memFlipped.push({i, el});
+    if(memFlipped.length===2){
+      memLock = true;
+      const [a,b] = memFlipped;
+      if(memCards[a.i]===memCards[b.i]){
+        a.el.classList.add('matched'); b.el.classList.add('matched');
+        memMatchedCount++;
+        memFlipped=[]; memLock=false;
+        if(memMatchedCount===8){
+          $('memStatus').textContent = 'You found them all! 🎉 +⭐8';
+          rewardFromGame(8, 10);
+          say('Great memory!! 💕', 1800);
+        }
+      } else {
+        setTimeout(()=>{
+          a.el.classList.remove('flipped'); b.el.classList.remove('flipped');
+          memFlipped=[]; memLock=false;
+        }, 700);
+      }
+    }
+  }
+  $('memRestart').addEventListener('click', resetMemory);
+
+  /* ---- Snake ---- */
+  let snakeCtx, snakeBody, snakeDir, snakeFood, snakeGridSize, snakeCell, snakeLoopId, snakeScore, snakeOver;
+  function resetSnake(){
+    const canvas = $('snakeCanvas');
+    snakeCtx = canvas.getContext('2d');
+    snakeGridSize = 12;
+    snakeCell = canvas.width / snakeGridSize;
+    snakeBody = [{x:6,y:6},{x:5,y:6},{x:4,y:6}];
+    snakeDir = {x:1,y:0};
+    snakeScore = 0;
+    snakeOver = false;
+    placeSnakeFood();
+    $('snakeStatus').textContent = 'Score: 0';
+    if(snakeLoopId) clearInterval(snakeLoopId);
+    snakeLoopId = setInterval(snakeStep, 220);
+    drawSnake();
+  }
+  function placeSnakeFood(){
+    let pos;
+    do{
+      pos = {x:Math.floor(Math.random()*snakeGridSize), y:Math.floor(Math.random()*snakeGridSize)};
+    } while(snakeBody.some(s=>s.x===pos.x && s.y===pos.y));
+    snakeFood = pos;
+  }
+  function snakeStep(){
+    if(snakeOver) return;
+    const head = snakeBody[0];
+    const newHead = {x:head.x+snakeDir.x, y:head.y+snakeDir.y};
+    if(newHead.x<0||newHead.x>=snakeGridSize||newHead.y<0||newHead.y>=snakeGridSize||
+       snakeBody.some(s=>s.x===newHead.x && s.y===newHead.y)){
+      snakeEnd(); return;
+    }
+    snakeBody.unshift(newHead);
+    if(newHead.x===snakeFood.x && newHead.y===snakeFood.y){
+      snakeScore++;
+      $('snakeStatus').textContent = 'Score: '+snakeScore;
+      placeSnakeFood();
+    } else {
+      snakeBody.pop();
+    }
+    drawSnake();
+  }
+  function snakeEnd(){
+    snakeOver = true;
+    clearInterval(snakeLoopId);
+    $('snakeStatus').textContent = 'Game over! Score: '+snakeScore+' +⭐'+Math.min(10,snakeScore);
+    rewardFromGame(Math.min(10,snakeScore), Math.min(10,snakeScore));
+    if(snakeScore>0) say('BEEP BEEP! LETS GOOO! 🎉🤖', 1600);
+  }
+  function drawSnake(){
+    const ctx = snakeCtx;
+    ctx.clearRect(0,0,240,240);
+    ctx.fillStyle = '#ff5fa2';
+    ctx.font = (snakeCell*0.9)+'px sans-serif';
+    ctx.fillText('✨', snakeFood.x*snakeCell, (snakeFood.y+1)*snakeCell-2);
+    snakeBody.forEach((seg,i)=>{
+      ctx.fillStyle = i===0 ? '#4a8fe7' : '#aee4ff';
+      ctx.beginPath();
+      ctx.roundRect(seg.x*snakeCell+1, seg.y*snakeCell+1, snakeCell-2, snakeCell-2, 5);
+      ctx.fill();
+    });
+  }
+  function setSnakeDir(x,y){
+    if(snakeDir.x===-x && snakeDir.y===-y) return;
+    snakeDir = {x,y};
+  }
+  $('snUp').addEventListener('click', ()=>setSnakeDir(0,-1));
+  $('snDown').addEventListener('click', ()=>setSnakeDir(0,1));
+  $('snLeft').addEventListener('click', ()=>setSnakeDir(-1,0));
+  $('snRight').addEventListener('click', ()=>setSnakeDir(1,0));
+  document.addEventListener('keydown', (e)=>{
+    if(!$('snakeOverlay').classList.contains('open')) return;
+    if(e.key==='ArrowUp') setSnakeDir(0,-1);
+    if(e.key==='ArrowDown') setSnakeDir(0,1);
+    if(e.key==='ArrowLeft') setSnakeDir(-1,0);
+    if(e.key==='ArrowRight') setSnakeDir(1,0);
+  });
+  $('snakeRestart').addEventListener('click', resetSnake);
+  document.querySelectorAll('[data-close]').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{
+      if(e.target.closest('#snakeOverlay') && snakeLoopId) clearInterval(snakeLoopId);
+    });
+  });
+
+  /* ---------------- CHAOS MODE (secret) ---------------- */
+  document.querySelector('.antenna') && document.querySelector('.antenna').addEventListener('click', triggerAntennaClick);
+  function triggerAntennaClick(e){
+    e.stopPropagation();
+    antennaSecretClicks++;
+    clearTimeout(antennaSecretTimer);
+    antennaSecretTimer = setTimeout(()=>{ antennaSecretClicks = 0; }, 900);
+    if(antennaSecretClicks >= 3){
+      antennaSecretClicks = 0;
+      triggerChaosMode();
+    } else {
+      toast('✨');
+    }
+  }
+  let antennaSecretClicks = 0;
+  let antennaSecretTimer = null;
+  let chaosActive = false;
+  function triggerChaosMode(){
+    if(chaosActive) return;
+    chaosActive = true;
+    $('chaosOverlay').classList.add('open');
+    document.body.style.overflow='hidden';
+    setTimeout(()=>{
+      $('chaosOverlay').classList.remove('open');
+      document.body.style.overflow='';
+      chaosActive = false;
+      state.happiness = clamp(state.happiness + 20);
+      state.coins += 15;
+      say('phew... that was fun 💙😂', 2000);
+      render(); saveState();
+      toast('CHAOS MODE bonus: +⭐15 +💕20!');
+    }, 6000);
+  }
+
+  function ensureFreeItemsOwned(){
+    const cats = [[HATS,'hat'],[GLASSES,'glasses'],[OUTFITS,'outfit'],[BUDDIES,'buddy']];
+    cats.forEach(([list,kind])=>{
+      list.forEach(item=>{
+        if(item.id!=='none' && item.price===0 && !state.owned[kind].includes(item.id)){
+          state.owned[kind].push(item.id);
+        }
+      });
+    });
+  }
+
+  /* ---------------- INIT ---------------- */
+  async function init(){
+    await loadState();
+    if(!Array.isArray(state.poops)) state.poops = [];
+    ensureFreeItemsOwned();
+    applyElapsedDecay();
+    render();
+    renderPoops();
+    say('hi!! 💙', 2200);
+    if(checkDailyAvailable()){
+      setTimeout(openDaily, 900);
+    }
+  }
+  init();
+
+  window.addEventListener('beforeunload', ()=>{ state.lastTick = Date.now(); });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,32 @@
+{
+  "daughter": {
+    "name": "Saish",
+    "age": 12,
+    "bio": "I'm 12 years old and I love creating fun games using HTML, CSS, and JavaScript! Game development is my passion.",
+    "photo": "/images/saish-photo.jpg",
+    "interests": ["Game Design", "Coding", "Web Development", "Creative Thinking"],
+    "skills": ["HTML5", "CSS3", "JavaScript", "Game Logic", "Problem Solving"]
+  },
+  "games": [
+    {
+      "id": "bsod-pet",
+      "title": "Flappy Bird Clone",
+      "icon": "🐦",
+      "description": "Navigate your bird through pipes and avoid obstacles. Click or press spacebar to fly! How high can you go?",
+      "category": "Action",
+      "difficulty": "Beginner",
+      "playTime": "5-10 minutes",
+      "date": "2024-01-15"
+    },
+    {
+      "id": "memorygame",
+      "title": "Number Memory",
+      "icon": "🧠",
+      "description": "Test your memory by remembering sequences of increasing numbers. Each round adds one more number to remember!",
+      "category": "Puzzle",
+      "difficulty": "Intermediate",
+      "playTime": "5-15 minutes",
+      "date": "2024-02-20"
+    }
+  ]
+}
