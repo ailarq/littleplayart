@@ -44,12 +44,16 @@ export default function Footer() {
           {/* Tech Stack */}
           <div>
             <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">
-              Built With
+              Where I learn and create
             </h3>
             <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-              <li>✨ Next.js & React</li>
-              <li>🎨 Tailwind CSS</li>
-              <li>🚀 Deployed on Netlify</li>
+              <li> AILARQ Free Coding Camp for Kids</li>
+              <li> Ballart , VIC -3350 </li>
+              <li>
+                <a href="https://ailarq.com/" className="text-pink-600 dark:text-pink-400 hover:underline">
+                  www.ailarq.com
+                </a>
+              </li>
             </ul>
           </div>
         </div>
@@ -58,10 +62,12 @@ export default function Footer() {
         <div className="border-t border-gray-300 dark:border-gray-700 pt-8">
           <div className="text-center text-sm text-gray-600 dark:text-gray-400">
             <p className="mb-2">
-              Made with ❤️ by Saish | © {currentYear}
+              Made by Saish | © {currentYear} | Maintained by AILARQ
             </p>
             <p>
-              Created with HTML, CSS, and JavaScript
+              <a href="https://ailarq.com/" className="text-pink-600 dark:text-pink-400 hover:underline">
+                  www.ailarq.com
+                </a>
             </p>
           </div>
         </div>

@@ -5,18 +5,18 @@
     "school": "Ballart Grammar School",
     "grade": "3rd Grade",
     "bio": "I'm 8 years old , studying 3rd Grade at Ballart Grammar School",
-    "details": "I love playing games, coding, and exploring new ideas. I enjoy creating my own games and learning about how they work. My favorite subjects are Math and Science, and I like to solve puzzles and challenges.",
+    "details": "I love being creative and exploring new ideas. I enjoy creating my own games and learning about how they work. My favorite subjects are Math and Science, and I like to solve puzzles and challenges.",
     "photo": "/images/saish-photo.jpg",
-    "interests": ["Game Design", "Coding", "Web Development", "Creative Thinking"],
+    "interests": ["Game Design", "Prompt Engineering", "Creative Thinking"],
     "skills": ["HTML5", "Prompt Engineering", "AI Integration", "Game Logic", "Problem Solving"]
   },
   "games": [
     {
       "id": "bsod-pet",
-      "title": "BSOD Pet",
+      "title": "BOT Pet",
       "icon": "🐦",
-      "description": "Navigate your bird through pipes and avoid obstacles. Click or press spacebar to fly! How high can you go?",
-      "category": "Action",
+      "description": "Take care of your virtual pet and watch it grow!",
+      "category": "Strategy",
       "difficulty": "Beginner",
       "playTime": "5-10 minutes",
       "date": "2024-01-15"
@@ -30,6 +30,7 @@
       "difficulty": "Beginner",
       "playTime": "5-15 minutes",
       "date": "2024-02-20"
+      
     },
     {
       "id": "bestBuddies",
@@ -56,7 +57,7 @@
       "title": "Giggle Keepers",
       "icon": "🤣",
       "description": "Laugh out loud with these hilarious games and share the fun!",
-      "category": "Entertainment",
+      "category": "Adventure",
       "difficulty": "Beginner",
       "playTime": "5-15 minutes",
       "date": "2024-02-20"
@@ -76,7 +77,7 @@
       "title": "Pet Pets",
       "icon": "🐾",
       "description": "Take care of your virtual pets and watch them grow!",
-      "category": "Simulation",
+      "category": "Social",
       "difficulty": "Beginner",
       "playTime": "5-15 minutes",
       "date": "2024-02-20"
@@ -106,7 +107,7 @@
       "title": "Reading Buds",
       "icon": "📚",
       "description": "Discover new books and share your reading adventures!",
-      "category": "Education",
+      "category": "Educational",
       "difficulty": "Beginner",
       "playTime": "5-15 minutes",
       "date": "2024-02-20"
@@ -126,7 +127,7 @@
       "title": "VR Pets",
       "icon": "🐾",
       "description": "Experience the joy of having virtual pets in a VR environment!",
-      "category": "Simulation",
+      "category": "Social",
       "difficulty": "Beginner",
       "playTime": "5-15 minutes",
       "date": "2024-02-20"

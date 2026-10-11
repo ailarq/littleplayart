@@ -6,6 +6,7 @@ import gamesData from '../../games.json'
 
 export default function HomePage() {
   const [mounted, setMounted] = useState(false)
+  const [photoFailed, setPhotoFailed] = useState(false)
   const { daughter, games } = gamesData
 
   useEffect(() => {
@@ -24,8 +25,17 @@ export default function HomePage() {
           <div className="flex flex-col md:flex-row items-center justify-center gap-10">
             {/* Photo */}
             <div className="flex-shrink-0">
-              <div className="w-40 h-40 rounded-full bg-white bg-opacity-30 flex items-center justify-center text-7xl border-4 border-white">
-                👧
+              <div className="w-40 h-40 md:w-48 md:h-48 rounded-full bg-white bg-opacity-30 flex items-center justify-center text-7xl border-4 border-white overflow-hidden">
+                {photoFailed ? (
+                  '👧'
+                ) : (
+                  <img
+                    src={daughter.photo}
+                    alt={daughter.name}
+                    className="w-full h-full object-cover"
+                    onError={() => setPhotoFailed(true)}
+                  />
+                )}
               </div>
             </div>
 
@@ -75,38 +85,15 @@ export default function HomePage() {
             What's Inside?
           </h2>
           <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto mb-16 leading-relaxed">
-            I've created {games.length} fun games ranging from action-packed challenges to brain-teasing puzzles.
-            Each game is made from scratch with HTML, CSS, and JavaScript. Click on any game to play!
+            I've created {games.length} games from my own ideas, from creative and musical games to puzzles and adventures.
+            I love Math, Science and solving challenges, and I make each game by telling AI what I imagine, using prompt engineering. 
           </p>
-
-          {/* Featured Games */}
-          <div className="grid md:grid-cols-2 gap-8">
-            {featuredGames.map((game) => (
-              <Link
-                key={game.id}
-                href={`/games/${game.id}`}
-                className="group p-8 bg-gray-50 dark:bg-gray-700 rounded-lg hover:shadow-xl transition-all hover:-translate-y-2"
+           <Link
+                href="/games"
+                className="inline-block bg-white text-pink-600 font-bold py-3 px-8 rounded-full hover:shadow-lg hover:-translate-y-1 transition-all text-lg"
               >
-                <div className="text-7xl mb-6 transform group-hover:scale-110 transition-transform">
-                  {game.icon}
-                </div>
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
-                  {game.title}
-                </h3>
-                <p className="text-gray-600 dark:text-gray-300 mb-4">
-                  {game.description}
-                </p>
-                <div className="flex justify-center gap-3 flex-wrap">
-                  <span className="bg-pink-100 dark:bg-pink-900 text-pink-700 dark:text-pink-200 px-3 py-1 rounded-full text-sm font-medium">
-                    {game.category}
-                  </span>
-                  <span className="bg-pink-100 dark:bg-pink-900 text-pink-700 dark:text-pink-200 px-3 py-1 rounded-full text-sm font-medium">
-                    {game.difficulty}
-                  </span>
-                </div>
+                Let's Explore → 🎮
               </Link>
-            ))}
-          </div>
 
           {/* Stats */}
           <div className="mt-16 pt-12 border-t border-gray-200 dark:border-gray-700">

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import gamesData from '../../../games.json'
 
-const CATEGORIES = ['All', 'Action', 'Puzzle', 'Educational']
+const CATEGORIES = ['All', 'Creative', 'Music', 'Educational', 'Social', 'Adventure', 'Strategy']
 
 export default function GamesPage() {
   const [mounted, setMounted] = useState(false)

@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import './globals.css'
 import { ThemeProvider } from '@/components/ThemeProvider'
 import Header from '@/components/Header'
@@ -7,7 +7,6 @@ import Footer from '@/components/Footer'
 export const metadata: Metadata = {
   title: "Saish's Games - Play My HTML Games",
   description: 'A collection of fun HTML games created by Saish. Play action games, puzzles, and educational games.',
-  viewport: 'width=device-width, initial-scale=1',
   openGraph: {
     title: "Saish's Games",
     description: 'Play fun HTML games created by Saish',
@@ -20,6 +19,11 @@ export const metadata: Metadata = {
       },
     ],
   },
+}
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
 }
 
 export default function RootLayout({
