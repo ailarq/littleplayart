@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reading Buds</title>
+<style>
+  :root{
+    --cream:#FFF7EA;
+    --moss:#2F5D4C;
+    --moss-dark:#1E3F33;
+    --berry:#E4633B;
+    --sun:#F4B740;
+    --sky:#7EC4CF;
+    --ink:#2B2320;
+    --paper:#FFFDF8;
+    --line:#E8DDC8;
+    --lock:#B9AE9A;
+    --font-display:'Baloo 2','Comic Sans MS',system-ui,sans-serif;
+    --font-body:'Quicksand','Trebuchet MS',system-ui,sans-serif;
+    --font-read:'Lexend','Verdana',system-ui,sans-serif;
+  }
+  @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Quicksand:wght@500;600;700&family=Lexend:wght@400;500;600&display=swap');
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:var(--font-body);
+    background:var(--cream);
+    background-image:
+      radial-gradient(circle at 8% 12%, rgba(126,196,207,0.18) 0, transparent 40%),
+      radial-gradient(circle at 92% 88%, rgba(244,183,64,0.18) 0, transparent 40%);
+    color:var(--ink);
+    min-height:100vh;
+  }
+  h1,h2,h3,h4{font-family:var(--font-display); margin:0;}
+  button{font-family:var(--font-body); cursor:pointer;}
+  .hidden{display:none !important;}
+
+  /* ---------- App shell ---------- */
+  #app{max-width:1100px; margin:0 auto; padding:20px 20px 60px;}
+
+  .topbar{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:10px 4px 18px;
+  }
+  .brand{display:flex; align-items:center; gap:10px;}
+  .brand .logo{
+    width:44px;height:44px;border-radius:14px;
+    background:linear-gradient(145deg,var(--sun),var(--berry));
+    display:flex;align-items:center;justify-content:center;
+    font-size:22px; box-shadow:0 4px 0 rgba(0,0,0,0.12);
+  }
+  .brand h1{font-size:26px; color:var(--moss-dark); letter-spacing:0.2px;}
+  .brand span{display:block; font-size:12px; color:#7a6f5f; font-weight:600; margin-top:-2px;}
+
+  /* streak chart top right */
+  .streakbox{
+    background:var(--paper); border:2px solid var(--line); border-radius:16px;
+    padding:10px 14px; min-width:220px; box-shadow:0 3px 0 var(--line);
+  }
+  .streakbox-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;}
+  .streakbox-head b{font-size:13px; color:var(--moss-dark); font-family:var(--font-display);}
+  .flame{font-size:13px; color:var(--berry); font-weight:700;}
+  .streak-grid{display:grid; grid-template-columns:repeat(7,1fr); gap:4px;}
+  .streak-cell{
+    aspect-ratio:1/1; border-radius:5px; background:#EFE7D3; border:1px solid var(--line);
+  }
+  .streak-cell.filled{background:var(--moss); border-color:var(--moss-dark);}
+  .streak-cell.today{outline:2px solid var(--berry); outline-offset:1px;}
+
+  /* ---------- Screens ---------- */
+  .screen{animation:fadein .35s ease;}
+  @keyframes fadein{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;}}
+
+  .card{
+    background:var(--paper); border:2px solid var(--line); border-radius:22px;
+    padding:34px; box-shadow:0 6px 0 var(--line);
+  }
+
+  /* Age screen */
+  .center-wrap{display:flex; align-items:center; justify-content:center; min-height:70vh;}
+  .age-card{max-width:440px; width:100%; text-align:center;}
+  .age-card .mascot{font-size:60px; margin-bottom:6px;}
+  .age-card h2{font-size:28px; color:var(--moss-dark); margin-bottom:8px;}
+  .age-card p{color:#6b6152; font-size:15px; margin:0 0 22px;}
+  .age-input-row{display:flex; gap:10px; justify-content:center; align-items:center; margin-bottom:20px;}
+  .age-input-row input{
+    width:90px; text-align:center; font-size:28px; font-family:var(--font-display);
+    padding:10px; border-radius:14px; border:2px solid var(--line); background:var(--cream);
+    color:var(--moss-dark);
+  }
+  .age-input-row input:focus{outline:2px solid var(--sky);}
+  .big-btn{
+    display:inline-block; background:var(--berry); color:white; border:none;
+    font-family:var(--font-display); font-weight:700; font-size:17px;
+    padding:14px 30px; border-radius:16px; box-shadow:0 4px 0 #B5401F;
+    transition:transform .08s;
+  }
+  .big-btn:active{transform:translateY(3px); box-shadow:0 1px 0 #B5401F;}
+  .big-btn:disabled{background:#CDBFA4; box-shadow:0 4px 0 #A99A7C; cursor:not-allowed;}
+  .age-hint{font-size:13px; color:#8a8070; margin-top:14px;}
+
+  /* Buddy picker */
+  .section-head{margin-bottom:18px;}
+  .section-head h2{font-size:24px; color:var(--moss-dark);}
+  .section-head p{color:#6b6152; margin-top:4px; font-size:14.5px;}
+
+  .buddy-grid{
+    display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:16px;
+  }
+  .buddy-card{
+    background:var(--paper); border:2px solid var(--line); border-radius:18px;
+    padding:16px 12px; text-align:center; box-shadow:0 4px 0 var(--line);
+    transition:transform .1s;
+    position:relative;
+  }
+  .buddy-card.selectable:hover{transform:translateY(-3px);}
+  .buddy-card .emoji{font-size:44px; display:block; margin-bottom:6px;}
+  .buddy-card h3{font-size:16px; color:var(--moss-dark);}
+  .buddy-card .role{font-size:11.5px; color:#8a8070; margin-top:2px; font-weight:600; text-transform:uppercase; letter-spacing:.4px;}
+  .buddy-card.locked{opacity:0.55; filter:grayscale(55%);}
+  .buddy-card.locked .emoji{filter:blur(0.3px);}
+  .lockbadge{
+    position:absolute; top:8px; right:8px; background:var(--lock); color:white;
+    font-size:10px; font-weight:700; padding:2px 7px; border-radius:20px;
+  }
+  .buddy-card .req{font-size:11px; color:var(--berry); margin-top:6px; font-weight:700;}
+  .buddy-card.active-buddy{border-color:var(--moss); box-shadow:0 0 0 3px rgba(47,93,76,0.18), 0 4px 0 var(--moss);}
+  .pick-btn{
+    margin-top:10px; background:var(--moss); color:white; border:none; font-size:12.5px;
+    font-weight:700; padding:7px 14px; border-radius:12px; font-family:var(--font-body);
+  }
+  .pick-btn:hover{background:var(--moss-dark);}
+
+  /* current buddy strip */
+  .buddy-strip{
+    display:flex; align-items:center; gap:14px; background:var(--paper);
+    border:2px solid var(--line); border-radius:18px; padding:14px 18px; margin-bottom:22px;
+    box-shadow:0 4px 0 var(--line);
+  }
+  .buddy-strip .emoji{font-size:40px;}
+  .buddy-strip .info b{font-family:var(--font-display); color:var(--moss-dark); font-size:16px;}
+  .buddy-strip .info div{font-size:12.5px; color:#7a6f5f; margin-top:2px;}
+  .buddy-strip button{
+    margin-left:auto; background:var(--cream); border:2px solid var(--line); color:var(--moss-dark);
+    font-weight:700; font-size:12.5px; padding:8px 14px; border-radius:12px;
+  }
+
+  /* level tabs */
+  .level-tabs{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px;}
+  .level-tab{
+    border:2px solid var(--line); background:var(--paper); padding:9px 16px; border-radius:14px;
+    font-weight:700; font-size:13.5px; color:#6b6152; font-family:var(--font-display);
+  }
+  .level-tab.active{background:var(--moss); border-color:var(--moss-dark); color:white;}
+  .level-tab .dot{display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:6px;}
+
+  /* book grid */
+  .book-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:18px;}
+  .book-card{
+    background:var(--paper); border:2px solid var(--line); border-radius:16px; overflow:hidden;
+    box-shadow:0 4px 0 var(--line); display:flex; flex-direction:column;
+  }
+  .book-cover{
+    height:130px; display:flex; align-items:center; justify-content:center; font-size:46px;
+    color:white; position:relative;
+  }
+  .book-cover .pagepill{
+    position:absolute; bottom:8px; right:8px; background:rgba(0,0,0,0.28); color:white;
+    font-size:10.5px; padding:2px 8px; border-radius:20px; font-weight:700;
+  }
+  .book-body{padding:12px 14px 14px; display:flex; flex-direction:column; gap:6px; flex:1;}
+  .book-body h4{font-size:15px; color:var(--moss-dark); line-height:1.25;}
+  .book-body .author{font-size:11.5px; color:#8a8070; font-weight:600;}
+  .book-body .blurb{font-size:12px; color:#6b6152; line-height:1.4; flex:1;}
+  .book-body .progress-row{display:flex; align-items:center; gap:6px; margin-top:4px;}
+  .progress-bar{flex:1; height:6px; background:var(--line); border-radius:6px; overflow:hidden;}
+  .progress-bar>div{height:100%; background:var(--sun);}
+  .progress-txt{font-size:10.5px; color:#8a8070; font-weight:700; white-space:nowrap;}
+  .open-btn{
+    margin-top:8px; background:var(--berry); color:white; border:none; font-weight:700;
+    font-size:13px; padding:9px; border-radius:12px; font-family:var(--font-display);
+  }
+  .open-btn:hover{background:#C74E28;}
+
+  /* reader */
+  .reader-wrap{max-width:760px; margin:0 auto;}
+  .reader-top{display:flex; align-items:center; gap:12px; margin-bottom:14px;}
+  .back-link{background:none; border:none; color:var(--moss-dark); font-weight:700; font-size:14px; display:flex; align-items:center; gap:4px;}
+  .reader-title{flex:1;}
+  .reader-title h2{font-size:20px; color:var(--moss-dark);}
+  .reader-title .sub{font-size:12px; color:#8a8070; font-weight:600;}
+  .page-pos{font-size:12.5px; color:#8a8070; font-weight:700;}
+
+  .page-paper{
+    background:var(--paper); border:2px solid var(--line); border-radius:20px;
+    padding:40px 44px; min-height:340px; box-shadow:0 6px 0 var(--line);
+    font-family:var(--font-read); font-size:18px; line-height:1.85; color:#2c2419;
+  }
+  .page-paper .pnum{text-align:center; font-size:11px; color:#a49a86; margin-top:26px; font-weight:600;}
+  .page-paper h3{font-family:var(--font-display); font-size:22px; color:var(--moss-dark); margin-bottom:14px;}
+
+  .reader-nav{display:flex; align-items:center; justify-content:space-between; margin-top:16px; gap:10px;}
+  .nav-btn{
+    background:var(--moss); color:white; border:none; font-weight:700; font-size:14px;
+    padding:11px 22px; border-radius:14px; font-family:var(--font-display);
+  }
+  .nav-btn:disabled{background:#CDBFA4; cursor:not-allowed;}
+  .nav-btn.finish{background:var(--sun); color:var(--moss-dark);}
+  .nav-dots{display:flex; gap:4px; flex-wrap:wrap; max-width:340px; justify-content:center;}
+  .nav-dot{width:7px; height:7px; border-radius:50%; background:var(--line);}
+  .nav-dot.done{background:var(--moss);}
+  .nav-dot.current{background:var(--berry); width:9px; height:9px;}
+
+  /* celebration toast */
+  .toast{
+    position:fixed; bottom:26px; left:50%; transform:translateX(-50%) translateY(20px);
+    background:var(--moss-dark); color:white; padding:16px 24px; border-radius:16px;
+    font-family:var(--font-display); font-size:15px; box-shadow:0 8px 24px rgba(0,0,0,0.25);
+    opacity:0; transition:all .3s; z-index:50; text-align:center; max-width:320px;
+  }
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+
+  /* nav pills between age->buddy->books */
+  .crumb{display:flex; gap:8px; align-items:center; font-size:12.5px; color:#8a8070; font-weight:700; margin-bottom:16px;}
+  .crumb span.on{color:var(--moss-dark);}
+
+  footer.credit{text-align:center; color:#a89d87; font-size:11.5px; margin-top:40px;}
+
+  @media(max-width:640px){
+    .topbar{flex-direction:column; align-items:flex-start; gap:12px;}
+    .streakbox{width:100%;}
+    .page-paper{padding:26px 22px; font-size:16.5px;}
+  }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* =========================================================
+   READING BUDS — original content, single-file app
+   All books & their text below are original works written
+   for this app (not excerpts of any published/copyrighted book).
+   ========================================================= */
+
+/* ---------- Data: Reading Buddies ---------- */
+const BUDDIES = [
+  { id:'chloe',     name:'Chloe',     animal:'mouse',    emoji:'🐭', unlockDays:0,  role:'Starter buddy' },
+  { id:'waris',     name:'Waris',     animal:'otter',    emoji:'🦦', unlockDays:0,  role:'Starter buddy' },
+  { id:'haley',     name:'Haley',     animal:'panda',    emoji:'🐼', unlockDays:0,  role:'Starter buddy' },
+  { id:'thando',    name:'Thando',    animal:'owl',      emoji:'🦉', unlockDays:0,  role:'Starter buddy' },
+  { id:'ellaria',   name:'Ellaria',   animal:'hedgehog', emoji:'🦔', unlockDays:0,  role:'Starter buddy' },
+  { id:'alexander', name:'Alexander', animal:'panda',    emoji:'🐼', unlockDays:5,  role:'Unlocks at 5-day streak' },
+  { id:'evelyn',    name:'Evelyn',    animal:'bunny',    emoji:'🐰', unlockDays:10, role:'Unlocks at 10-day streak' },
+  { id:'zeke',      name:'Zeke',      animal:'dragon',   emoji:'🐉', unlockDays:15, role:'Unlocks at 15-day streak' },
+  { id:'macie',     name:'Macie',     animal:'penguin',  emoji:'🐧', unlockDays:25, role:'Unlocks at 25-day streak' },
+];
+
+/* ---------- Data: Levels ---------- */
+const LEVELS = [
+  { id:'phonics', label:'Phonics', color:'#7EC4CF' },
+  { id:'easy',    label:'Easy',    color:'#8FBF6B' },
+  { id:'medium',  label:'Medium',  color:'#F4B740' },
+  { id:'hard',    label:'Hard',    color:'#E4633B' },
+];
+
+/* ---------- helper to build a page-array from paragraphs ---------- */
+function pages(titleForHeader, chunks){
+  // chunks: array of {h: optional heading, p: array of paragraph strings}
+  return chunks.map(c => ({ heading: c.h || null, paras: c.p }));
+}
+
+/* =========================================================
+   ORIGINAL BOOK TEXTS
+   Each book has >= 25 "pages" (short reader-friendly pages).
+   Writing style/vocabulary matches the book's level & title.
+   ========================================================= */
+
+const BOOKS = [];
+
+/* ---------------- PHONICS LEVEL ---------------- */
+
+/* Book: My Five Senses (phonics, very simple, big simple sentences) */
+BOOKS.push({
+  id:'five-senses', level:'phonics', title:'My Five Senses', author:'Reading Buds Originals',
+  color:'#7EC4CF', emoji:'👀',
+  blurb:'A simple book about how we see, hear, smell, taste, and touch the world.',
+  pages: (function(){
+    const p = [];
+    p.push({heading:'My Five Senses', paras:['I have five senses.','They help me learn about the world.']});
+    p.push({heading:'Chapter One: I See', paras:['I see with my eyes.','I see the sun.','I see the moon.']});
+    p.push({paras:['I see a red ball.','I see a blue bird.','I see my mom and dad.']});
+    p.push({paras:['My eyes see near things.','My eyes see far things.','I am glad I can see!']});
+    p.push({heading:'Chapter Two: I Hear', paras:['I hear with my ears.','I hear a dog bark.','I hear a bell ring.']});
+    p.push({paras:['I hear the wind blow.','I hear my friend laugh.','I hear music play.']});
+    p.push({paras:['Some sounds are loud.','Some sounds are soft.','I like to listen.']});
+    p.push({heading:'Chapter Three: I Smell', paras:['I smell with my nose.','I smell fresh bread.','I smell a pink rose.']});
+    p.push({paras:['I smell rain outside.','I smell warm soup.','Some smells are sweet.']});
+    p.push({paras:['Some smells are not so nice.','But I still like to smell things!','My nose helps me a lot.']});
+    p.push({heading:'Chapter Four: I Taste', paras:['I taste with my tongue.','I taste a sweet apple.','I taste salty chips.']});
+    p.push({paras:['I taste sour lemons.','I taste warm cookies.','Yum, yum, yum!']});
+    p.push({paras:['My tongue tells my brain what I eat.','I try new foods every day.','Tasting is fun.']});
+    p.push({heading:'Chapter Five: I Touch', paras:['I touch with my hands.','I touch soft fur.','I touch a hard rock.']});
+    p.push({paras:['I touch cold ice.','I touch warm sand.','I touch a smooth leaf.']});
+    p.push({paras:['My skin feels many things.','Touch helps me stay safe too.','I know hot from cold.']});
+    p.push({heading:'Chapter Six: My Senses Together', paras:['I use all five senses at once.','At the beach, I see the waves.','I hear the waves too.']});
+    p.push({paras:['I smell the salty air.','I taste a cold snack.','I touch the warm sand.']});
+    p.push({paras:['My senses work as a team.','They help me enjoy my day.','Senses are amazing!']});
+    p.push({heading:'Chapter Seven: Animals Have Senses Too', paras:['A dog has a strong nose.','A dog can smell far away.','An owl can hear very well.']});
+    p.push({paras:['A cat can see in the dark.','A shark can taste in water.','A spider can feel with its legs.']});
+    p.push({paras:['Animals use senses to find food.','Animals use senses to stay safe.','Just like me!']});
+    p.push({heading:'Chapter Eight: Taking Care of My Senses', paras:['I wear a hat in the sun.','I keep loud sounds turned down.','I wash my hands to stay clean.']});
+    p.push({paras:['I eat good food for my body.','I wear gloves when it is cold.','I take care of myself.']});
+    p.push({heading:'The End', paras:['My five senses help me every day.','See, hear, smell, taste, and touch.','I am glad I have five senses!']});
+    return p;
+  })()
+});
+
+/* Book: The Cat Sat (phonics, CVC words) */
+BOOKS.push({
+  id:'cat-sat', level:'phonics', title:'The Cat Sat', author:'Reading Buds Originals',
+  color:'#7EC4CF', emoji:'🐱',
+  blurb:'Short, simple sentences about a cat, a hat, and a big red van — perfect for sounding out words.',
+  pages: (function(){
+    const p=[];
+    p.push({heading:'The Cat Sat', paras:['The cat sat.','The cat sat on a mat.']});
+    p.push({paras:['The cat had a hat.','The hat was red.']});
+    p.push({paras:['The cat ran.','The cat ran to the van.']});
+    p.push({paras:['The van was big.','The van was red.']});
+    p.push({paras:['The cat got in.','The cat sat in the van.']});
+    p.push({paras:['A dog ran up.','The dog had a bag.']});
+    p.push({paras:['The dog got in too.','The dog and cat sat.']});
+    p.push({paras:['The van did go.','It went up the hill.']});
+    p.push({paras:['The sun was hot.','The cat had a nap.']});
+    p.push({paras:['The dog had a nap too.','Nap, nap, nap.']});
+    p.push({paras:['The van did stop.','It stopped at a pond.']});
+    p.push({paras:['The cat sat up.','The dog sat up too.']});
+    p.push({paras:['They saw a duck.','The duck sat on a log.']});
+    p.push({paras:['The duck did quack.','Quack, quack, quack!']});
+    p.push({paras:['The cat did not run.','The dog did not run.']});
+    p.push({paras:['They just sat and looked.','It was fun to look.']});
+    p.push({paras:['The sun set fast.','The sky was pink.']});
+    p.push({paras:['The van did go back.','Back to the small hut.']});
+    p.push({paras:['The cat got out.','The cat sat on the mat.']});
+    p.push({paras:['The dog got out.','The dog sat on the rug.']});
+    p.push({paras:['The hat was still red.','The cat was still glad.']});
+    p.push({paras:['It was a fun day.','A fun day in the sun.']});
+    p.push({paras:['The cat had a big yawn.','The dog had a big yawn too.']});
+    p.push({paras:['It was time for bed.','Time to rest their heads.']});
+    p.push({heading:'The End', paras:['The cat sat, the dog sat.','What a fun, fun day.']});
+    return p;
+  })()
+});
+
+/* Book: Big Bug, Small Bug (phonics) */
+BOOKS.push({
+  id:'big-bug-small-bug', level:'phonics', title:'Big Bug, Small Bug', author:'Reading Buds Originals',
+  color:'#7EC4CF', emoji:'🐞',
+  blurb:'Meet a big bug and a small bug as they hop, dig, and play in the garden.',
+  pages:(function(){
+    const p=[];
+    p.push({heading:'Big Bug, Small Bug', paras:['This is Big Bug.','This is Small Bug.']});
+    p.push({paras:['Big Bug is big.','Small Bug is small.']});
+    p.push({paras:['They live in the grass.','The grass is green.']});
+    p.push({paras:['Big Bug can hop.','Small Bug can hop too.']});
+    p.push({paras:['Hop, hop, hop!','They hop up high.']});
+    p.push({paras:['Big Bug can dig.','Small Bug can dig too.']});
+    p.push({paras:['Dig, dig, dig!','They dig in the mud.']});
+    p.push({paras:['Big Bug likes the sun.','Small Bug likes the sun too.']});
+    p.push({paras:['The sun is hot.','It is a fun spot.']});
+    p.push({paras:['A bird flies by.','The bird is big.']});
+    p.push({paras:['Big Bug and Small Bug run.','They run and hide.']});
+    p.push({paras:['They hide by a log.','The log is big.']});
+    p.push({paras:['The bird flies off.','It is safe now.']});
+    p.push({paras:['Big Bug and Small Bug come out.','They are not scared now.']});
+    p.push({paras:['They see a leaf.','The leaf is green.']});
+    p.push({paras:['Big Bug sits on the leaf.','Small Bug sits on it too.']});
+    p.push({paras:['The leaf goes up and down.','It is like a boat.']});
+    p.push({paras:['They float on the leaf.','It is so much fun.']});
+    p.push({paras:['A frog hops by.','The frog says ribbit.']});
+    p.push({paras:['Big Bug waves.','Small Bug waves too.']});
+    p.push({paras:['The frog hops on.','It goes to the pond.']});
+    p.push({paras:['The sun starts to set.','The sky turns pink.']});
+    p.push({paras:['Big Bug and Small Bug go home.','Home is under a rock.']});
+    p.push({paras:['They rest under the rock.','It is soft and dark.']});
+    p.push({heading:'The End', paras:['Big Bug and Small Bug sleep.','Good night, Big Bug.','Good night, Small Bug.']});
+    return p;
+  })()
+});
+
+/* ---------------- EASY LEVEL ---------------- */
+
+/* Book: Billie B. Brown wanted originally - replaced with original: "Millie J. Green" */
+BOOKS.push({
+  id:'millie-green', level:'easy', title:'Millie J. Green and the Lost Library Book', author:'Reading Buds Originals',
+  color:'#8FBF6B', emoji:'📚',
+  blurb:'Millie loves solving little problems. Today, her class library book has gone missing — and only Millie can crack the case!',
+  pages:(function(){
+    const p=[];
+    p.push({heading:'Chapter 1: A Big Problem', paras:['Millie J. Green loved two things more than anything: solving problems, and reading books.','Today, she had a problem that needed both.']});
+    p.push({paras:['"Millie," said her teacher, Mr. Diaz, "the library book you borrowed is due back today. Do you have it?"','Millie\'s stomach did a little flip. She did not have it.']});
+    p.push({paras:['She had brought it to school in her backpack. She was sure of it.','But when she looked, her backpack held only a squished banana and three pencils.']});
+    p.push({heading:'Chapter 2: Thinking Like a Detective', paras:['Millie decided the best thing to do was think like a detective.','A good detective does not panic. A good detective makes a list.']});
+    p.push({paras:['She got out a piece of paper and wrote: WHERE DID I LAST SEE THE BOOK?','1. At home, on my bed.','2. In my backpack this morning.','3. ...']});
+    p.push({paras:['That was as far as she got. After that, the trail went cold.']});
+    p.push({heading:'Chapter 3: Asking Around', paras:['At recess, Millie asked her best friend Priya if she had seen the book.','"Was it the one with the dragon on the cover?" Priya asked.']});
+    p.push({paras:['"Yes!" said Millie. "Did you see it?"','"I saw it on the bus," Priya said. "You were reading it this morning."']});
+    p.push({paras:['Millie gasped. The bus! She had not thought about the bus.']});
+    p.push({heading:'Chapter 4: The Bus Line', paras:['At the end of the day, Millie stood in the bus line with her detective brain switched all the way on.','She looked under seats. She looked in the seat pockets.']});
+    p.push({paras:['Nothing. Just an old juice box and someone\'s missing mitten.']});
+    p.push({heading:'Chapter 5: A Clue From Mr. Diaz', paras:['Back in the classroom, Mr. Diaz was tidying the reading corner.','"Millie," he said, "is this yours?"']});
+    p.push({paras:['He held up a bookmark shaped like a tiny dragon.','"That\'s from my library book!" Millie said. "But where\'s the book?"']});
+    p.push({heading:'Chapter 6: Retracing Her Steps', paras:['Millie remembered something. This morning, before the bell rang, she had been reading in the reading corner.','She must have set the book down when the bell rang!']});
+    p.push({paras:['She looked at the bookshelf. She looked under the beanbag chair.','Still no book.']});
+    p.push({heading:'Chapter 7: The Beanbag Chair', paras:['Millie decided to really look under the beanbag chair, not just peek.','She got down on her hands and knees.']});
+    p.push({paras:['And there, wedged between the chair and the wall, was a book with a dragon on the cover.','"Found it!" Millie shouted, maybe a little too loudly.']});
+    p.push({heading:'Chapter 8: Case Closed', paras:['Millie carried the book to Mr. Diaz\'s desk like it was a trophy.','"Great detective work," Mr. Diaz said, smiling.']});
+    p.push({paras:['"It must have slipped down when I got up for the bell," Millie explained.','"That happens to the best of us," said Mr. Diaz.']});
+    p.push({heading:'Chapter 9: A New Book', paras:['With her mystery solved, Millie picked a brand new library book to bring home.','This one had a picture of a lighthouse on the cover.']});
+    p.push({paras:['"I promise I\'ll keep track of this one," Millie said.','Mr. Diaz laughed. "I believe you, detective."']});
+    p.push({heading:'Chapter 10: Telling Priya', paras:['At the bus stop, Millie told Priya the whole story.','"You found it under the beanbag chair? Nice work, Sherlock," Priya said.']});
+    p.push({paras:['"It\'s Millie J. Green, actually," Millie said, grinning. "But I\'ll take it."']});
+    p.push({heading:'Chapter 11: A New Case', paras:['That night, Millie put her new book carefully on her nightstand, not her bed, not her backpack — right on the nightstand where she could see it.','"No more mysteries for you," she told the lighthouse on the cover.']});
+    p.push({paras:['But as she turned off her light, she noticed her little brother\'s toy truck was missing from the shelf.','Millie smiled into the dark.']});
+    p.push({heading:'Chapter 12: To Be Continued...', paras:['"Another case," she whispered, "for tomorrow."','Millie J. Green closed her eyes, already planning her next investigation.']});
+    p.push({heading:'The End', paras:['Millie J. Green may be small, but her detective brain is always switched on.','What will she solve next?']});
+    return p;
+  })()
+});
+
+/* Book: School of Monsters (replaces "School of Monsters" concept but original) */
+BOOKS.push({
+  id:'monster-school', level:'easy', title:'Bram Starts Monster School', author:'Reading Buds Originals',
+  color:'#8FBF6B', emoji:'👹',
+  blurb:'Bram is a small, fuzzy, three-eyed monster starting his very first day at Wobblewood Monster School.',
+  pages:(function(){
+    const p=[];
+    p.push({heading:'Chapter 1: The First Day', paras:['Bram was a small, fuzzy monster with three eyes and one very worried tummy.','Today was his first day at Wobblewood Monster School.']});
+    p.push({paras:['"What if nobody likes my eyes?" Bram asked his mom.','"Everybody has different eyes here," she said. "That\'s what makes monster school fun."']});
+    p.push({heading:'Chapter 2: Walking to School', paras:['Bram walked to school with his mom, his backpack bouncing on his back.','The backpack had two straps for his two extra arms.']});
+    p.push({paras:['They passed a monster with green polka dots.','They passed a monster who floated three feet off the ground.']});
+    p.push({heading:'Chapter 3: The Big Purple Door', paras:['Wobblewood Monster School had a big purple door shaped like a yawning mouth.','Bram gulped. It looked like it might eat him.']});
+    p.push({paras:['"It\'s just a door, silly," said his mom, giving him a hug with all four of her arms.','Bram took a deep breath and walked inside.']});
+    p.push({heading:'Chapter 4: Meeting Miss Grimlock', paras:['His teacher was Miss Grimlock, a tall monster with fur the color of blueberries.','"Welcome, little ones!" she boomed, though it came out more like a friendly rumble.']});
+    p.push({paras:['Bram found a seat at the back, hoping nobody would notice his wobbly knees.']});
+    p.push({heading:'Chapter 5: Show and Roar', paras:['"Today," said Miss Grimlock, "we are doing Show and Roar!"','Bram had never heard of Show and Roar.']});
+    p.push({paras:['A monster named Pip stood up and showed everyone how loud he could roar.','ROOOAAAR! The windows rattled.']});
+    p.push({heading:'Chapter 6: Bram\'s Turn', paras:['"Bram, would you like to go next?" asked Miss Grimlock.','Bram\'s tummy did a nervous flip-flop.']});
+    p.push({paras:['He didn\'t think he had a good roar. His roars usually came out more like squeaks.']});
+    p.push({heading:'Chapter 7: A Different Kind of Roar', paras:['Bram stood up slowly. He opened his mouth.','What came out was not a roar at all — it was a high, wobbly squeak.']});
+    p.push({paras:['A few monsters giggled. Bram felt his face turn hot and purple.']});
+    p.push({heading:'Chapter 8: Miss Grimlock\'s Kindness', paras:['But Miss Grimlock clapped her big furry hands.','"That," she said, "is the best squeak I have ever heard. Not every monster roars the same way."']});
+    p.push({paras:['Bram looked up, surprised. Nobody had ever said his squeak was special before.']});
+    p.push({heading:'Chapter 9: New Friends', paras:['At recess, Pip came over. "Can you teach me to squeak like that?" he asked.','Bram grinned, all three eyes lighting up.']});
+    p.push({paras:['Together, they practiced squeaking so loudly that a flock of bats flew away in surprise.']});
+    p.push({heading:'Chapter 10: Slime Painting', paras:['After recess, it was time for Slime Painting.','Everyone got a bucket of glowing green slime and a big piece of paper.']});
+    p.push({paras:['Bram painted a picture of his house, with his mom\'s four arms all waving hello.']});
+    p.push({heading:'Chapter 11: A Little Accident', paras:['While painting, Bram\'s elbow bumped his slime bucket. It tipped over, right onto Pip\'s shoe.','"Oh no! I\'m so sorry!" Bram said.']});
+    p.push({paras:['Pip just laughed. "Now my shoe glows in the dark! Best accident ever."']});
+    p.push({heading:'Chapter 12: Lunchtime', paras:['At lunch, Bram sat with Pip and two other new friends: a monster named Dusk who had bat wings, and a tiny monster named Glimmer who sparkled all over.','They shared snacks and told jokes about roaring.']});
+    p.push({heading:'Chapter 13: The Walk Home', paras:['When the big purple door opened at the end of the day, Bram\'s mom was waiting outside.','"How was your first day?" she asked.']});
+    p.push({paras:['Bram squeaked so loudly and happily that a nearby bird fell off its branch in surprise.']});
+    p.push({heading:'Chapter 14: Telling the Story', paras:['That night at dinner, Bram told his whole family about Miss Grimlock, and Pip, and the slime accident.','"Sounds like a great first day," said his dad.']});
+    p.push({heading:'Chapter 15: Ready for Tomorrow', paras:['Bram packed his backpack for the next day, adding an extra bucket in case of more slime accidents.','He couldn\'t wait to go back to Wobblewood Monster School.']});
+    p.push({heading:'The End', paras:['Bram learned that being different isn\'t something to hide.','Sometimes, your squeak is exactly what makes you special.']});
+    return p;
+  })()
+});
+
+/* Book: Easy level - "Nolan the New Kid" */
+BOOKS.push({
+  id:'nolan-new-kid', level:'easy', title:'Nolan the New Kid', author:'Reading Buds Originals',
+  color:'#8FBF6B', emoji:'🎒',
+  blurb:'Nolan just moved to a new town. Making a new friend on the first day might be scarier than he thought.',
+  pages:(function(){
+    const p=[];
+    p.push({heading:'Chapter 1: The Moving Truck', paras:['Nolan watched the moving truck drive away, empty at last.','His new house still smelled like paint.']});
+    p.push({paras:['Tomorrow was his first day at a brand new school, and he didn\'t know a single person.']});
+    p.push({heading:'Chapter 2: Butterflies', paras:['That night, Nolan couldn\'t sleep. His stomach felt full of butterflies.','"What if nobody talks to me?" he asked his dad.']});
+    p.push({paras:['"Then you talk to them first," his dad said. "That\'s the secret trick."']});
+    p.push({heading:'Chapter 3: The First Bell', paras:['The next morning, Nolan stood outside room 12, his new backpack heavy on his shoulders.','The bell rang and he walked in.']});
+    p.push({heading:'Chapter 4: An Empty Seat', paras:['There was one empty seat left, next to a girl with curly hair drawing dinosaurs in her notebook.','Nolan sat down carefully.']});
+    p.push({heading:'Chapter 5: The Drawing', paras:['"That\'s a good triceratops," Nolan whispered.','The girl looked up, surprised. "You know dinosaurs?"']});
+    p.push({paras:['"I know all of them," Nolan said. It wasn\'t exactly true, but it was close enough.']});
+    p.push({heading:'Chapter 6: Meeting Ada', paras:['"I\'m Ada," the girl said. "You\'re new, right?"','"Yeah. I\'m Nolan. We just moved here."']});
+    p.push({heading:'Chapter 7: Recess', paras:['At recess, Ada waved Nolan over to the dinosaur mural on the playground wall.','"This is where I hang out," she said. "Come see."']});
+    p.push({heading:'Chapter 8: The Mural', paras:['The mural showed a T. rex chasing a much smaller dinosaur across a painted jungle.','"I want to add a pterodactyl someday," Ada said.']});
+    p.push({paras:['"I could help," said Nolan. "I\'m pretty good at drawing wings."']});
+    p.push({heading:'Chapter 9: Lunch Together', paras:['At lunch, Ada waved Nolan over to her table.','"This is Nolan," she told her friends. "He knows all the dinosaurs."']});
+    p.push({heading:'Chapter 10: A Tricky Question', paras:['"What\'s your favorite dinosaur?" one of Ada\'s friends asked.','Nolan thought hard. "Stegosaurus," he said. "Because of the plates on its back."']});
+    p.push({paras:['"Good answer," Ada said, nodding seriously.']});
+    p.push({heading:'Chapter 11: The Afternoon', paras:['By afternoon, Nolan wasn\'t nervous anymore. He raised his hand twice in class.','He even got a math problem right on the board.']});
+    p.push({heading:'Chapter 12: Walking Home', paras:['After school, Ada walked partway home with Nolan.','"Same time tomorrow?" she asked at the corner.']});
+    p.push({paras:['"Same time tomorrow," Nolan said, grinning.']});
+    p.push({heading:'Chapter 13: Telling Dad', paras:['At dinner, Nolan told his dad everything — about Ada, about the mural, about the stegosaurus question.','"Sounds like the trick worked," his dad said.']});
+    p.push({heading:'Chapter 14: The Pterodactyl Plan', paras:['That night, Nolan sketched a pterodactyl in his notebook, wings spread wide.','He couldn\'t wait to show Ada tomorrow.']});
+    p.push({heading:'Chapter 15: A New Town, A New Start', paras:['Nolan looked out his window at his new street, still a little unfamiliar.','But it felt a little less new than it had that morning.']});
+    p.push({heading:'The End', paras:['Sometimes the scariest part of something new is just the very beginning.','Nolan couldn\'t wait to see what came next.']});
+    return p;
+  })()
+});
+
+/* ---------------- MEDIUM LEVEL ---------------- */
+
+/* Book: Diary style - "The Not-So-Secret Diary of Wesley Pratt" (instead of Diary of a Wimpy Kid) */
+BOOKS.push({
+  id:'wesley-pratt', level:'medium', title:'The Not-So-Secret Diary of Wesley Pratt', author:'Reading Buds Originals',
+  color:'#F4B740', emoji:'📓',
+  blurb:'Wesley Pratt is just trying to survive sixth grade without any embarrassing disasters. It is not going well.',
+  pages:(function(){
+    const p=[];
+    p.push({heading:'Monday', paras:['Okay, first of all, this is NOT a diary. Diaries are for people who write about their "feelings."','This is a journal. There is a big difference, even if my little sister doesn\'t think so.']});
+    p.push({paras:['My mom got me this notebook because my teacher, Mr. Fenwick, said writing "helps process the school day."','I don\'t know what needs processing. School is just school.']});
+    p.push({heading:'Monday (continued)', paras:['Anyway, today was the worst kind of Monday: a picture day Monday.','I forgot it was picture day and wore my dinosaur shirt, which I have officially outgrown.']});
+    p.push({paras:['My friend Dev said the picture would be "iconic." I don\'t think that\'s a compliment.']});
+    p.push({heading:'Tuesday', paras:['Today we got our seating chart changed in science class. I now sit next to Priyanka Suresh, who is the smartest person in sixth grade.','This is either very good or very bad for my grades. Probably very good, if I\'m honest.']});
+    p.push({paras:['She already caught me copying the wrong answer from the board. In my defense, the board was very far away.']});
+    p.push({heading:'Wednesday', paras:['Big news: there is a talent show coming up in three weeks.','Dev wants us to do a "comedy duo" act. I told him I\'m not funny. He said that\'s exactly why it would be funny.']});
+    p.push({paras:['I don\'t totally follow the logic, but Dev has never let logic stop him before.']});
+    p.push({heading:'Thursday', paras:['I tried to practice being funny at lunch today. It did not go well.','I told a joke about a cafeteria taco and nobody laughed except the lunch monitor, who I don\'t think was even listening.']});
+    p.push({paras:['Dev says we need "better material." I say we need a different plan entirely.']});
+    p.push({heading:'Friday', paras:['Good news: no homework this weekend except reading.','Bad news: my little sister found this journal and read the picture day entry out loud at dinner.']});
+    p.push({paras:['I have since hidden the journal under my mattress, which I realize is the most obvious hiding spot in the history of hiding spots.']});
+    p.push({heading:'Saturday', paras:['Dev came over and we actually wrote some talent show jokes. They\'re about our school\'s weird cafeteria food.','One joke is about the "mystery meat" being older than the school itself. I think it\'s pretty good, actually.']});
+    p.push({paras:['We practiced in my garage. My dad walked by and laughed at one joke, so I\'m calling that a win.']});
+    p.push({heading:'Sunday', paras:['Spent all day worrying about the talent show even though it\'s still two weeks away.','My mom says I "catastrophize," which is a fancy word for "worry about everything at once."']});
+    p.push({heading:'Monday, Week Two', paras:['Priyanka overheard me and Dev practicing jokes at lunch. I thought she\'d think it was dumb.','Instead she said one joke needed a better ending, and she was right.']});
+    p.push({heading:'Tuesday, Week Two', paras:['Priyanka is now unofficially our talent show "writer." She has a whole notebook of ideas.','It turns out being smart also means being funny, which honestly feels a little unfair.']});
+    p.push({heading:'Wednesday, Week Two', paras:['We did a full run-through in Dev\'s basement. His little brother watched and laughed so hard he fell off the couch.','That has to be a good sign, right?']});
+    p.push({heading:'Thursday, Week Two', paras:['I am starting to get nervous about the actual talent show. Standing on a stage is very different from a basement.','Dev keeps saying "trust the material," like he\'s a movie director.']});
+    p.push({heading:'Friday, Week Two', paras:['Sign-ups for the talent show closed today. We are Act 7, right after a kid who does yo-yo tricks.','I hope the yo-yo kid is really good so people are in a good mood by the time we\'re up.']});
+    p.push({heading:'Saturday, Week Two', paras:['Full dress rehearsal in my garage. Priyanka came this time and gave us notes like a real director.','She thinks we should end on the mystery meat joke since it gets the biggest laugh.']});
+    p.push({heading:'Sunday, Week Two', paras:['One week left. I keep imagining every single way this could go wrong.','My mom says that\'s normal before something big, and that I should focus on being prepared instead.']});
+    p.push({heading:'Monday, Week Three', paras:['We practiced at lunch again. A few kids from another table started listening and actually laughing.','Word is apparently getting around that our act is "not bad," which for sixth grade might be the highest compliment there is.']});
+    p.push({heading:'Tuesday, Week Three', paras:['I told Priyanka she should come up on stage with us since she wrote half the jokes.','She said she\'d rather stay backstage, but she\'d be "cheering silently, in her head."']});
+    p.push({heading:'Wednesday, Week Three', paras:['Three days left. Dev and I timed our act — exactly two minutes and forty seconds.','That feels both very short and impossibly long at the same time.']});
+    p.push({heading:'Thursday, Week Three', paras:['I couldn\'t focus in any of my classes today. All I could think about was the stage lights.','Priyanka slipped me a note that just said: "You\'ll be fine. Trust the material."']});
+    p.push({heading:'Friday, Week Three: Talent Show Day', paras:['It\'s here. The gym is set up with folding chairs and a stage that looks a lot bigger than it did in rehearsal.','My hands will not stop being sweaty.']});
+    p.push({heading:'Backstage', paras:['The yo-yo kid was actually amazing. The crowd loved him. This is either great news or terrible news for us.','Dev grabbed my arm. "Trust the material," he said, sounding a lot less confident than usual.']});
+    p.push({heading:'On Stage', paras:['We walked out. The lights were bright and I could barely see the audience, which honestly helped.','We started with the cafeteria jokes, and on the very first one — people actually laughed.']});
+    p.push({paras:['By the mystery meat joke, the whole gym was laughing, even Mr. Fenwick.','We finished, took a bow, and practically ran off stage, grinning like idiots.']});
+    p.push({heading:'After the Show', paras:['Priyanka was waiting backstage. "Told you," she said, but she was smiling too.','Dev high-fived me so hard my hand still stings.']});
+    p.push({heading:'That Night', paras:['We didn\'t win — the yo-yo kid did, and honestly, he deserved it.','But for two minutes and forty seconds, an entire gym full of people laughed at something I said. That\'s pretty good, even for a "journal, not a diary."']});
+    p.push({heading:'The End', paras:['So yeah. Maybe writing this stuff down does "process the day" a little.','Don\'t tell Mr. Fenwick I said that.']});
+    return p;
+  })()
+});
+
+/* Book: Diary-style comedic girl book instead of Dork Diaries */
+BOOKS.push({
+  id:'zoe-diaries', level:'medium', title:'Zoe Marchetti\'s Totally Epic Notebook', author:'Reading Buds Originals',
+  color:'#F4B740', emoji:'✏️',
+  blurb:'Zoe wants to be a famous illustrator. Right now, she\'s just trying to survive middle school without any drama — good luck with that.',
+  pages:(function(){
+    const p=[];
+    p.push({heading:'Entry 1', paras:['I have decided to keep an illustrated notebook of my life because someday I\'m going to be a famous artist, and famous artists always have notebooks like this in movies.','So far, I have drawn seventeen doodles of my cat and zero doodles of anything else. Progress is progress.']});
+    p.push({heading:'Entry 2', paras:['Middle school started this week and already there is Drama (yes, capital D).','The most popular girl in seventh grade, Brynlee Katz, is having an art showcase for the school fundraiser, and I desperately want to be part of it.']});
+    p.push({heading:'Entry 3', paras:['I found out you have to submit three drawings to be considered for the showcase.','I have exactly zero drawings that aren\'t of my cat. This is a problem.']});
+    p.push({heading:'Entry 4', paras:['My best friend Ingrid says I should draw something "meaningful," not just cute.','I told her my cat IS meaningful. She was not convinced.']});
+    p.push({heading:'Entry 5', paras:['Spent all of study hall trying to think of a "meaningful" drawing idea.','Accidentally drew my cat again. My hand has a mind of its own.']});
+    p.push({heading:'Entry 6', paras:['Ingrid suggested I draw scenes from my actual life instead — like the time the school bus got a flat tire and we all had to walk two blocks in the rain.','That actually sounds like a good idea. Rare for Ingrid to have a good idea before lunch.']});
+    p.push({heading:'Entry 7', paras:['Drew the flat-tire-bus-rain scene. It came out pretty good, if I say so myself.','Everyone is soaked and grumpy in the drawing except one kid who is somehow eating a sandwich.']});
+    p.push({heading:'Entry 8', paras:['Brynlee Katz saw me drawing in the hallway today. She actually stopped and looked.','"That\'s really good," she said. I nearly fell over from shock.']});
+    p.push({heading:'Entry 9', paras:['Started my second submission drawing: the cafeteria on "mystery casserole" day, when three different kids swore the casserole moved on its own.','This one is even funnier than the bus drawing.']});
+    p.push({heading:'Entry 10', paras:['Ingrid wants to be in my drawings now. I told her I\'d put her in the casserole one, running away in terror.','She said that was "extremely accurate" to how she actually felt that day.']});
+    p.push({heading:'Entry 11', paras:['Third drawing idea: the time our gym teacher, Coach Duffy, tripped over a cone during dodgeball and pretended it was intentional.','This drawing might be my masterpiece.']});
+    p.push({heading:'Entry 12', paras:['Finished all three drawings! Bus rain scene, casserole chaos, and Coach Duffy\'s cone incident.','I stared at them for twenty minutes straight, feeling proud and terrified at the same time.']});
+    p.push({heading:'Entry 13', paras:['Submitted my drawings to Brynlee today. My hands were shaking so much the paper wrinkled a little.','"These are hilarious," she said, laughing at the casserole one. I think that\'s a good sign??']});
+    p.push({heading:'Entry 14', paras:['A whole week of waiting to hear if I made the showcase. This is the longest week of my entire life, and I have lived through several long weeks.']});
+    p.push({heading:'Entry 15', paras:['Distracted myself by drawing my cat again. Some things never change.']});
+    p.push({heading:'Entry 16', paras:['Ingrid keeps texting me theories about whether I made it in. Her latest theory involves a raccoon that supposedly lives near the art room. I don\'t follow the logic.']});
+    p.push({heading:'Entry 17', paras:['THE LIST WENT UP TODAY.','I made myself walk past it three times before I actually looked.']});
+    p.push({heading:'Entry 18', paras:['My name is on it. Zoe Marchetti. Right there in Comic Sans, which is not my favorite font, but I am not complaining today.']});
+    p.push({heading:'Entry 19', paras:['Called Ingrid the second I got home. She screamed so loud I had to hold the phone away from my ear.','"Told you the casserole one was a masterpiece," she said.']});
+    p.push({heading:'Entry 20', paras:['Now I have to figure out how to frame three drawings for a real art showcase. This feels very official and very scary.']});
+    p.push({heading:'Entry 21', paras:['My mom helped me pick out frames at the craft store. She kept saying "I\'m so proud of you" in a voice that made my ears turn red.']});
+    p.push({heading:'Entry 22', paras:['The showcase is in three days. I have checked my drawings for smudges approximately eleven times today.']});
+    p.push({heading:'Entry 23', paras:['Brynlee texted the whole showcase group chat that our pieces "represent real seventh grade experiences," which felt like the nicest compliment I\'ve ever gotten.']});
+    p.push({heading:'Entry 24: Showcase Day', paras:['The art room was packed. My three drawings hung right in the middle of the wall.','I watched a group of kids stop at the casserole drawing and laugh so hard one of them snorted.']});
+    p.push({heading:'Entry 25: After the Showcase', paras:['Coach Duffy himself came to see his cone incident immortalized in marker.','He laughed for a full minute and then asked if he could take a photo of it. I said yes, obviously.']});
+    p.push({heading:'Entry 26', paras:['Someone I don\'t even know asked if I take drawing requests. I said maybe, feeling extremely famous for a Tuesday afternoon.']});
+    p.push({heading:'Entry 27', paras:['Ingrid declared that I am now "officially a real artist," which is a title I am choosing to accept immediately and permanently.']});
+    p.push({heading:'The Last Entry (For Now)', paras:['I still don\'t know if I\'ll be famous someday. But for now, three drawings on a wall in the art room feel pretty close to it.','New notebook idea: an entire comic about Coach Duffy and the cone. I already have the first page sketched.']});
+    return p;
+  })()
+});
+
+/* Book: Medium - fantasy school story instead of Matilda */
+BOOKS.push({
+  id:'clementine-quiet-power', level:'medium', title:'Clementine and the Quiet Power', author:'Reading Buds Originals',
+  color:'#F4B740', emoji:'📖',
+  blurb:'Clementine is the smallest, quietest kid in her class — and she has a secret gift that nobody, not even her family, has noticed yet.',
+  pages:(function(){
+    const p=[];
+    p.push({heading:'Chapter 1: The Quietest Kid', paras:['Clementine Byrd was the smallest child in her class, and possibly the quietest child in the entire town.','She spent most of her time reading, because books never asked her to speak up in front of everyone.']});
+    p.push({paras:['At home, her parents were too busy watching game shows to notice much of anything Clementine did, quiet or otherwise.']});
+    p.push({heading:'Chapter 2: A Strange Afternoon', paras:['One rainy afternoon, Clementine was staring hard at a glass of water on the kitchen table, wishing it would slide two inches to the left so she could reach it without getting up.','The glass slid two inches to the left.']});
+    p.push({paras:['Clementine froze. She looked around. Nobody else was in the room.','She stared at the glass again, this time on purpose, and imagined it sliding back. It slid back.']});
+    p.push({heading:'Chapter 3: Testing the Strange Thing', paras:['That night, Clementine tried it again with a pencil on her desk. She stared, and thought hard, and the pencil rolled an inch.','Her heart pounded. Something was happening, and she had absolutely no idea what to call it.']});
+    p.push({heading:'Chapter 4: Miss Halloway\'s Classroom', paras:['At school the next day, Clementine\'s teacher, Miss Halloway, was the only adult who ever seemed to really see her.','"You look like you have a secret today," Miss Halloway said kindly at lunch.']});
+    p.push({paras:['Clementine almost told her everything, right there over the cafeteria trays. But she wasn\'t ready. Not yet.']});
+    p.push({heading:'Chapter 5: Practice Makes Progress', paras:['Every evening after that, Clementine practiced in her room with the door shut.','A hairbrush. A sock. A very confused houseplant, which she quickly apologized to.']});
+    p.push({paras:['By the end of the week, she could move small things clear across her desk without touching them at all.']});
+    p.push({heading:'Chapter 6: The Class Bully', paras:['At school, a boy named Dax Merrick liked to knock books out of quieter kids\' hands, just to hear them laugh.','On Thursday, he grabbed Clementine\'s favorite book and held it out of reach, grinning.']});
+    p.push({heading:'Chapter 7: A Small, Quiet Push', paras:['Clementine didn\'t shout. She didn\'t cry. She just looked at the book very hard and imagined it slipping gently from Dax\'s fingers.','It slipped from his fingers and landed softly in her lap.']});
+    p.push({paras:['Dax stared at his empty hand like it had betrayed him personally.']});
+    p.push({heading:'Chapter 8: Miss Halloway Notices', paras:['Miss Halloway had seen the whole thing from across the room, though she hadn\'t quite seen how the book moved.','After class, she asked Clementine to stay behind for a moment.']});
+    p.push({heading:'Chapter 9: The Truth Comes Out', paras:['"I have something strange to tell you," Clementine said, twisting her sleeve nervously.','She demonstrated with a paperclip on Miss Halloway\'s desk. It floated an inch into the air.']});
+    p.push({paras:['Miss Halloway didn\'t gasp or run away. She simply smiled, like she\'d been waiting for this exact moment for a long time.']});
+    p.push({heading:'Chapter 10: A Secret Ally', paras:['"I had a feeling about you," Miss Halloway said softly. "You see things others miss. That\'s its own kind of gift, even before the floating paperclips."','Clementine felt, for the first time, completely and totally understood.']});
+    p.push({heading:'Chapter 11: Learning Together', paras:['After school, Miss Halloway began teaching Clementine how to use her ability carefully — never to hurt anyone, only to help, or to protect herself when needed.','Clementine learned to move heavier things: a chair, a stack of books, an entire wastebasket (which was mostly by accident).']});
+    p.push({heading:'Chapter 12: Trouble at Home', paras:['At home, Clementine\'s parents were arguing about the electric bill, too distracted to notice her fork gently rearranging the peas on her plate into a smiley face.','It was a small comfort, drawing a smile no one else could see.']});
+    p.push({heading:'Chapter 13: Dax Tries Again', paras:['Dax, embarrassed about the book incident, tried once more the following week, this time going after a smaller kid named Theo.','Clementine watched from across the playground, her hands curling into fists.']});
+    p.push({heading:'Chapter 14: Standing Up, Quietly', paras:['She didn\'t need to shout. She looked hard at Dax\'s shoelaces, which were untied, and imagined them tying themselves together — just enough to make him stumble, not fall.','Dax wobbled, caught himself, and looked around wildly for whoever had tripped him.']});
+    p.push({paras:['Theo scurried off safely. Clementine allowed herself a small, satisfied smile.']});
+    p.push({heading:'Chapter 15: A Warning From Miss Halloway', paras:['"That was clever," Miss Halloway said later, "but remember — this gift isn\'t for revenge. It\'s for protecting what matters."','Clementine nodded, understanding completely.']});
+    p.push({heading:'Chapter 16: The School Assembly', paras:['A special assembly was announced: the annual talent showcase, where students could display anything unusual or impressive.','Clementine\'s stomach twisted at the thought of showing anyone what she could really do.']});
+    p.push({heading:'Chapter 17: Deciding Not to Hide', paras:['She talked it over with Miss Halloway for a long time. "You don\'t have to show everyone everything," Miss Halloway said. "But you also don\'t have to hide who you are."','Clementine thought about that for days.']});
+    p.push({heading:'Chapter 18: A Careful Plan', paras:['In the end, Clementine decided on something small and true: she would make a single paper crane float gently across the stage, nothing more.','It felt like the right amount of brave.']});
+    p.push({heading:'Chapter 19: The Big Day', paras:['On the day of the assembly, Clementine\'s hands shook as she stepped onto the stage, the tiny paper crane resting in her palm.','The whole auditorium went quiet.']});
+    p.push({heading:'Chapter 20: The Crane Takes Flight', paras:['She focused, the way Miss Halloway had taught her, and the crane lifted gently off her hand, floating in slow, graceful loops above the stage.','The audience gasped, then began to clap.']});
+    p.push({heading:'Chapter 21: A New Kind of Attention', paras:['For once, Clementine wasn\'t invisible — but somehow, it didn\'t feel scary. It felt like being seen for exactly who she was.','Even her parents, sitting in the crowd, looked up from their phones, mouths open in surprise.']});
+    p.push({heading:'Chapter 22: After the Assembly', paras:['Kids crowded around her afterward, asking how she did it. Clementine just smiled and said, "Practice."','It was, technically, the truth.']});
+    p.push({heading:'Chapter 23: Home, Differently', paras:['That night, her parents turned off the television for once and asked her, really asked her, how she\'d learned to do something so amazing.','For the first time in a long time, Clementine talked, and talked, and talked.']});
+    p.push({heading:'Chapter 24: Miss Halloway\'s Gift', paras:['The next day, Miss Halloway gave Clementine a small notebook. "For recording what you learn," she said. "Every quiet power deserves its own book."','Clementine hugged it to her chest like a treasure.']});
+    p.push({heading:'The End', paras:['Clementine Byrd was still the smallest, and often still the quietest, kid in her class.','But quiet, she had learned, was never the same thing as powerless.']});
+    return p;
+  })()
+});
+
+/* Book: Medium - another diary style: "Operation Bake Sale" */
+BOOKS.push({
+  id:'operation-bake-sale', level:'medium', title:'Operation Bake Sale', author:'Reading Buds Originals',
+  color:'#F4B740', emoji:'🧁',
+  blurb:'When the school library needs new books, June and her friends launch the biggest, messiest bake sale their town has ever seen.',
+  pages:(function(){
+    const p=[];
+    p.push({heading:'Chapter 1: Bad News in the Library', paras:['The library announcement came over the loudspeaker on a totally normal Tuesday: due to budget cuts, no new books would be ordered this year.','June Alvarez, who read approximately one book every two days, felt personally attacked.']});
+    p.push({heading:'Chapter 2: An Idea Is Born', paras:['At lunch, June slammed her tray down dramatically. "We have to do something," she announced to her friends.','Her friend Marcus, mouth full of pizza, mumbled, "Bake sale?"']});
+    p.push({heading:'Chapter 3: The Plan Takes Shape', paras:['By the end of lunch, they had a plan: bake, sell, and donate every cent to the library fund.','"How hard can baking be?" June said. This would turn out to be a very important question.']});
+    p.push({heading:'Chapter 4: Recruiting the Team', paras:['June recruited her friend Priya for organizing, Marcus for "tasting," and her little cousin Theo for "moral support," which mostly meant he wanted free cookies.']});
+    p.push({heading:'Chapter 5: The First Attempt', paras:['Saturday morning, June\'s kitchen looked like a flour explosion had occurred, because one basically had.','Her first batch of cookies came out flat, hard, and slightly burnt on one side.']});
+    p.push({heading:'Chapter 6: Marcus the Taster', paras:['"They\'re... crunchy," Marcus said diplomatically, trying to be polite while also trying not to break a tooth.','June sighed and started over.']});
+    p.push({heading:'Chapter 7: A Better Batch', paras:['On her fourth try, following the recipe exactly instead of guessing, June finally produced a batch of cookies that didn\'t require dental work to eat.','"THESE are good," Marcus said, already reaching for seconds.']});
+    p.push({heading:'Chapter 8: Priya\'s Spreadsheet', paras:['Priya arrived with a color-coded spreadsheet listing every recipe, every ingredient, and every price they\'d charge.','"We need cupcakes, brownies, and something for kids who can\'t have nuts," Priya said seriously.']});
+    p.push({heading:'Chapter 9: Building the Menu', paras:['They settled on chocolate chip cookies, vanilla cupcakes, fudgy brownies, and rice krispie treats for the nut-free option.','Theo insisted on adding "just cookies with no chips" for what he called "picky people like me."']});
+    p.push({heading:'Chapter 10: The Great Cupcake Disaster', paras:['The cupcake batter turned out too thin, and half of them collapsed into sad little puddles in the oven.','"We are NOT selling puddle cakes," June declared.']});
+    p.push({heading:'Chapter 11: Fixing the Recipe', paras:['They looked up the mistake online — too much liquid, not enough flour — and tried again.','The second batch rose beautifully, golden and perfectly domed.']});
+    p.push({heading:'Chapter 12: A Week of Practice', paras:['Every afternoon that week, June\'s kitchen turned into a bakery. By Friday, her family was thoroughly sick of the smell of vanilla, but the recipes were finally perfect.']});
+    p.push({heading:'Chapter 13: Getting Permission', paras:['June and Priya presented their plan to the principal, Mrs. Okafor, complete with the spreadsheet and a sample brownie.','Mrs. Okafor took one bite and said, "You have my permission. Also, can I get the recipe?"']});
+    p.push({heading:'Chapter 14: Spreading the Word', paras:['They made colorful flyers to hang around school: BAKE SALE THIS SATURDAY — SAVE OUR LIBRARY BOOKS!','Marcus insisted on drawing a cartoon cookie wearing sunglasses on every single one.']});
+    p.push({heading:'Chapter 15: The Night Before', paras:['The night before the sale, June barely slept, running through checklists in her head: cash box, table, price signs, napkins.','She had never wanted anything to go this right before.']});
+    p.push({heading:'Chapter 16: Setting Up', paras:['Saturday morning, they set up their table outside the school with a checkered tablecloth Priya had brought from home.','Rows of cookies, cupcakes, and brownies were arranged like a tiny, delicious army.']});
+    p.push({heading:'Chapter 17: The First Customer', paras:['Their first customer was Mrs. Okafor herself, who bought three brownies "for research purposes."','June, Priya, Marcus, and Theo cheered like they\'d won a championship.']});
+    p.push({heading:'Chapter 18: A Steady Stream', paras:['By mid-morning, a line had formed. Neighbors, classmates, and even a few strangers stopped by, drawn in by the smell of fresh baking.','Theo took his job as "greeter" very seriously, high-fiving every single customer.']});
+    p.push({heading:'Chapter 19: Running Low', paras:['By noon, they had sold nearly everything except a few lonely rice krispie treats.','"We might actually sell out," Priya said, staring at the cash box in disbelief.']});
+    p.push({heading:'Chapter 20: A Surprise Helper', paras:['Marcus\'s older sister showed up with an extra tray of cookies she\'d baked that morning after hearing about the cause.','"Couldn\'t let you run out," she said, setting the tray down with a grin.']});
+    p.push({heading:'Chapter 21: Sold Out', paras:['By one o\'clock, every last treat was gone, including the rice krispie treats, which a very determined third grader bought all four of at once.']});
+    p.push({heading:'Chapter 22: Counting the Money', paras:['That evening, the whole team gathered at June\'s kitchen table to count the cash box.','Coins and bills piled up higher and higher until Priya finally announced the total: two hundred and eighteen dollars.']});
+    p.push({heading:'Chapter 23: Delivering the News', paras:['On Monday, June and Priya marched into the library with an envelope of cash and handed it to the librarian, Mr. Osei.','His eyes went wide. "This is enough for a whole new shelf of books," he said.']});
+    p.push({heading:'Chapter 24: Picking New Books', paras:['Mr. Osei let June and Priya help choose which new titles to order.','June picked mostly mysteries and adventure stories, because obviously.']});
+    p.push({heading:'Chapter 25: The New Shelf', paras:['Three weeks later, a brand new shelf appeared in the library, with a small handwritten sign: DONATED BY THE OPERATION BAKE SALE TEAM.','June ran her fingers along the new spines, grinning.']});
+    p.push({heading:'Chapter 26: Already Planning the Next One', paras:['"We should do this every year," Marcus said, already dreaming up new flavors.','"Only if I get to make the spreadsheet again," Priya said.']});
+    p.push({heading:'The End', paras:['June checked out the very first book off the new shelf that same afternoon.','It felt, she thought, like the best kind of ending — one that led straight into a brand new story.']});
+    return p;
+  })()
+});
+
+/* ---------------- HARD LEVEL ---------------- */
+
+/* Book: Hard - "The Wandering Tide" (whale/sea adventure, in the spirit of Moby Dick but wholly original) */
+BOOKS.push({
+  id:'wandering-tide', level:'hard', title:'The Wandering Tide', author:'Reading Buds Originals',
+  color:'#E4633B', emoji:'🐋',
+  blurb:'A sprawling sea adventure about a young sailor, a mysterious captain, and the vast, unknowable ocean they sail across.',
+  pages:(function(){
+    const p=[];
+    p.push({heading:'Chapter 1: The Harbor at Dawn', paras:['Call me Idris. That is not the name I was born with, but it is the name I chose the morning I first walked onto the docks of Greyharbor, seeking passage on any ship that would take me.','The harbor smelled of salt, tar, and the particular restlessness of men who had spent too many months on land.']});
+    p.push({paras:['I had come with little more than a single trunk, a letter of introduction from my uncle, and a hunger for the sea that I could not fully explain, even to myself.']});
+    p.push({heading:'Chapter 2: The Ship Meridian', paras:['The vessel I finally boarded was called the Meridian, a whaling ship of considerable age and even more considerable reputation.','Sailors in the tavern spoke of her captain in hushed, uncertain tones, as though naming him too loudly might summon some misfortune.']});
+    p.push({heading:'Chapter 3: Captain Vantor', paras:['Captain OSric Vantor was not a large man, but he carried himself with the weight of someone who had stared into more storms than most men see in a lifetime.','A long scar ran from his temple to his jaw, said to be a memento from a creature he had hunted for eleven years across three oceans.']});
+    p.push({heading:'Chapter 4: Setting Sail', paras:['We left Greyharbor on a grey morning, the kind that gives no promises about the weather to come.','The crew worked with the practiced silence of men who had done this a hundred times before, hauling ropes and trimming sails without a single wasted motion.']});
+    p.push({heading:'Chapter 5: Life Among the Crew', paras:['I was assigned to work alongside a weathered sailor named Bramwell, who had sailed with Captain Vantor for nearly a decade.','"You\'ll learn the ropes," Bramwell told me, not unkindly, "or the ropes will teach you a harder lesson."']});
+    p.push({heading:'Chapter 6: The First Storm', paras:['Two weeks into our voyage, the sky turned the color of a bruise, and the sea rose up beneath us like something alive and furious.','I clung to the rigging as waves crashed over the deck, certain in that moment that I had made a terrible mistake in leaving dry land.']});
+    p.push({heading:'Chapter 7: Surviving the Night', paras:['We rode out the storm through the entire night, the ship groaning under the strain, the crew shouting orders that were nearly swallowed by the wind.','By dawn, the sea had calmed to a deceptive stillness, as though nothing at all had happened.']});
+    p.push({heading:'Chapter 8: A Story by Firelight', paras:['That evening, gathered below deck with mugs of something bitter and warm, Bramwell told me the story that explained the captain\'s scar.','Eleven years ago, Vantor had hunted a great white whale of impossible size, one the old sailors called the Pale Leviathan.']});
+    p.push({heading:'Chapter 9: The Legend of the Leviathan', paras:['The creature, Bramwell said, had capsized two ships before Vantor ever laid eyes on it, and had escaped his own harpoon not once but three times.','"He\'s been chasing it ever since," Bramwell said quietly, glancing toward the captain\'s quarters. "Some men say it isn\'t a whale at all, but something the sea sent to test him."']});
+    p.push({heading:'Chapter 10: Doubts Begin', paras:['I began to wonder, as the weeks wore on, whether our voyage was truly about whaling at all, or whether Captain Vantor had led us into something far more personal.','The other sailors seemed to sense it too, though none dared speak the thought aloud.']});
+    p.push({heading:'Chapter 11: A Sighting', paras:['In our sixth week at sea, the lookout\'s cry split the morning air: "Whale off the port bow!"','The crew scrambled to their positions, but Captain Vantor stood utterly still at the helm, staring at something only he could see.']});
+    p.push({heading:'Chapter 12: Not the One', paras:['It was an ordinary whale, dark and unremarkable, nothing like the pale giant of legend.','Vantor lowered his spyglass slowly. "Not him," he said, and turned back to his charts without another word.']});
+    p.push({heading:'Chapter 13: Restlessness Aboard', paras:['Disappointment settled over the crew like a fog. Supplies were running low, and murmurs of turning back began to circulate among the older sailors.','Bramwell warned me to keep such talk to myself. "The captain doesn\'t take kindly to doubt," he said.']});
+    p.push({heading:'Chapter 14: A Confrontation', paras:['One evening, the ship\'s quartermaster finally approached Captain Vantor directly, arguing that we should make for the nearest port to resupply.','Vantor\'s response was cold and final: "We sail until I say otherwise."']});
+    p.push({heading:'Chapter 15: My Own Doubts', paras:['I lay awake that night, staring at the low ceiling of my bunk, wondering if I had bound my fate to a man chasing a ghost across the ocean.','And yet, something about his certainty, however troubling, kept me from regretting my choice entirely.']});
+    p.push({heading:'Chapter 16: Strange Waters', paras:['We sailed into waters the charts did not fully account for, where the sea turned an unfamiliar shade of green and the air grew unnervingly still.','Even Bramwell, who had crossed a dozen oceans, admitted he had never sailed through waters quite like these.']});
+    p.push({heading:'Chapter 17: The Second Sighting', paras:['It happened at dusk, when the light was thin and uncertain. A shape broke the surface far off the starboard side — pale, enormous, and unmistakable.','The entire crew fell silent. Even the wind seemed to hold its breath.']});
+    p.push({heading:'Chapter 18: The Chase Begins', paras:['Captain Vantor\'s voice rang out across the deck, sharper and more alive than I had heard it the entire voyage.','"Lower the boats!" he commanded, and for the first time, I understood exactly what eleven years of waiting looked like on a man\'s face.']});
+    p.push({heading:'Chapter 19: Into the Small Boats', paras:['I found myself in one of the small hunting boats alongside Bramwell, oars cutting through unnervingly calm water as the Pale Leviathan surfaced ahead of us.','Its size, up close, defied everything I had imagined from Bramwell\'s stories.']});
+    p.push({heading:'Chapter 20: The Creature Turns', paras:['For a long moment, the great whale simply floated, as though studying us in return, its dark eye impossibly old and unreadable.','Then, without warning, it dove, and the sea swallowed it whole.']});
+    p.push({heading:'Chapter 21: Waiting in Silence', paras:['We sat in our small boats for what felt like hours, oars raised, watching the still water for any sign of movement.','Captain Vantor, in the lead boat, never once looked away from the water\'s surface.']});
+    p.push({heading:'Chapter 22: The Leviathan Returns', paras:['When the whale finally surfaced again, it was not where anyone expected — directly beneath Vantor\'s own boat, lifting it half out of the water in a single, terrifying motion.','Men shouted. Oars scattered. Somehow, impossibly, no one fell.']});
+    p.push({heading:'Chapter 23: A Choice', paras:['Vantor stood in his rocking boat, harpoon raised, eleven years of pursuit balanced on this single moment.','And then, to the shock of every sailor watching, he lowered his weapon.']});
+    p.push({heading:'Chapter 24: Vantor\'s Decision', paras:['"Let it go," he said quietly, so quietly that only those nearest could hear him.','The great whale hovered a moment longer, as though it too understood, before slipping silently beneath the waves and vanishing for good.']});
+    p.push({heading:'Chapter 25: The Journey Home', paras:['We rowed back to the Meridian in near total silence, none of us quite certain what we had just witnessed.','Bramwell finally spoke as we climbed aboard: "Eleven years, and he just... let it go."']});
+    p.push({heading:'Chapter 26: A Changed Captain', paras:['Something in Vantor seemed lighter after that day, as though a weight he had carried for over a decade had finally been set down.','He gave the order to turn the Meridian toward home the very next morning.']});
+    p.push({heading:'Chapter 27: The Long Voyage Back', paras:['The journey home felt different from the journey out — calmer, somehow, despite the same wide and unpredictable ocean beneath us.','I spent the long days on deck thinking about everything I had seen, unsure I would ever be able to explain it properly to anyone on land.']});
+    p.push({heading:'Chapter 28: Return to Greyharbor', paras:['We sailed back into Greyharbor months after we had left it, the crew weathered and quieter than before, but somehow more whole.','Captain Vantor stood at the bow as the harbor came into view, watching the shore with an expression I had never seen on him before: peace.']});
+    p.push({heading:'Epilogue: What the Sea Teaches', paras:['I never sailed with Captain Vantor again, though I heard, years later, that he had retired to a small cottage overlooking the very water he had once hunted across.','As for myself, I carry the memory of the Pale Leviathan with me always — not as a trophy I failed to win, but as proof that some things are better witnessed than conquered.']});
+    return p;
+  })()
+});
+
+/* Book: Hard - "The Ledgerbound Apprentice" (wizarding-school adventure, wholly original, not Harry Potter) */
+BOOKS.push({
+  id:'ledgerbound-apprentice', level:'hard', title:'The Ledgerbound Apprentice', author:'Reading Buds Originals',
+  color:'#E4633B', emoji:'🪄',
+  blurb:'On his eleventh birthday, Corwin discovers he has been chosen to study at Thistlecroft Academy of Ledgerbinding — where books are not just read, but obeyed.',
+  pages:(function(){
+    const p=[];
+    p.push({heading:'Chapter 1: A Letter With No Sender', paras:['On the morning of his eleventh birthday, Corwin Ashvale found an envelope waiting on his windowsill, sealed with a smear of wax shaped like an open book.','There was no return address, no stamp, and no explanation for how it had arrived on the third floor of a locked house.']});
+    p.push({paras:['Inside was a single line of shifting, silver ink: You have been chosen. Thistlecroft awaits.']});
+    p.push({heading:'Chapter 2: An Unusual Visitor', paras:['That evening, a woman in a coat made entirely of overlapping paper pages knocked on the Ashvale family\'s door.','She introduced herself as Registrar Pemberly, and explained, with the patience of someone who had done this many times before, that Corwin possessed a rare gift called Ledgerbinding.']});
+    p.push({heading:'Chapter 3: What Is Ledgerbinding', paras:['"Some people can move objects with their minds," Pemberly explained. "Others can call fire from nothing. You, Corwin, can command the written word itself."','Corwin stared at her, certain this was an elaborate joke, until she handed him a blank notebook and asked him to simply think the word "open."']});
+    p.push({paras:['The notebook\'s pages fanned open on their own, rustling like leaves in a wind that wasn\'t there.']});
+    p.push({heading:'Chapter 4: Packing for Thistlecroft', paras:['Within a week, Corwin found himself packing a trunk with items from a list that included "one unbound quill," "three vials of memory ink," and, strangely, "a single sturdy umbrella."','His parents, ordinary in every sense, could not entirely believe what was happening to their son, but they helped him pack anyway.']});
+    p.push({heading:'Chapter 5: The Hidden Platform', paras:['Registrar Pemberly led Corwin to an unremarkable library in the city center, where she pressed her palm against a shelf labeled "Reference — Do Not Remove."','The shelf swung inward, revealing a spiral staircase descending into golden light.']});
+    p.push({heading:'Chapter 6: Arrival at Thistlecroft', paras:['At the bottom of the stairs stood Thistlecroft Academy of Ledgerbinding, a towering building constructed entirely from stacked, floating books held together by threads of glowing script.','Corwin had never seen anything so impossible, or so beautiful.']});
+    p.push({heading:'Chapter 7: The Sorting Shelf', paras:['New students were led into a grand hall and made to stand before an ancient, empty bookshelf known as the Sorting Shelf.','One by one, students stepped forward, and a single book would fly from somewhere unseen to land in their open hands, revealing which of the four Halls they would join.']});
+    p.push({heading:'Chapter 8: Corwin\'s Book', paras:['When Corwin\'s turn came, he waited, heart pounding, until a thick, weathered book bound in deep green leather soared across the hall and landed squarely in his palms.','The cover read, in looping gold letters: HALL OF QUIET STORMS.']});
+    p.push({heading:'Chapter 9: Meeting His Hallmates', paras:['The Hall of Quiet Storms, he soon learned, was known for producing careful, thoughtful Ledgerbinders rather than flashy ones.','He met his roommate, a sharp-tongued girl named Isolde Fenn, who had already read every book in the Thistlecroft library twice, according to her own count.']});
+    p.push({heading:'Chapter 10: First Lessons', paras:['Corwin\'s first class, Foundations of Ledgerbinding, was taught by a stern instructor named Professor Duvane, who insisted that every command spoken to a book must be precise, or the book would misbehave.','"A careless word," Professor Duvane warned, "can turn a simple storybook into something considerably less friendly."']});
+    p.push({heading:'Chapter 11: A Small Disaster', paras:['During practice, Corwin misspoke a single word while commanding a practice book to "open," accidentally saying "unravel" instead.','The book promptly tore itself apart into a whirlwind of loose pages, which took the entire class twenty minutes to catch and reassemble.']});
+    p.push({heading:'Chapter 12: Isolde\'s Warning', paras:['"You need to slow down," Isolde told him afterward, not unkindly. "Ledgerbinding isn\'t about speed. It\'s about precision."','Corwin, embarrassed but determined, resolved to practice every command slowly and deliberately from then on.']});
+    p.push({heading:'Chapter 13: The Restricted Archive', paras:['Rumors spread through the Hall of Quiet Storms about a Restricted Archive deep beneath the academy, said to house books too dangerous for ordinary students to command.','"They say one book down there can rewrite a person\'s memories if commanded wrong," Isolde whispered during dinner one night.']});
+    p.push({heading:'Chapter 14: A Mysterious Assignment', paras:['Weeks into the term, Professor Duvane assigned the class a special project: locate and safely command an "unstable text" from the general library, under close supervision.','Corwin and Isolde were paired together, much to both their surprise.']});
+    p.push({heading:'Chapter 15: The Unstable Text', paras:['They found their assigned book tucked in a shadowed corner of the library, a slim volume that pulsed faintly, like something breathing.','Its title, barely visible on the spine, read: THE BOOK THAT REMEMBERS EVERYTHING.']});
+    p.push({heading:'Chapter 16: A Careful Command', paras:['Following every precaution Professor Duvane had taught them, Corwin and Isolde spoke their command together, slowly and clearly: "Reveal one memory, and only one."','The book\'s pages fluttered open to reveal a single scene — not from their own lives, but from someone else\'s entirely.']});
+    p.push({heading:'Chapter 17: A Startling Discovery', paras:['The memory showed a much younger Registrar Pemberly, standing before the very same Restricted Archive doors the students had only whispered about.','In the memory, she was arguing fiercely with someone whose face the book refused to show.']});
+    p.push({heading:'Chapter 18: Reporting the Find', paras:['Unsure what to make of it, Corwin and Isolde brought the memory straight to Professor Duvane, who went uncharacteristically pale upon seeing it.','"This book should not have shown you that," she said quietly. "Tell no one else what you saw."']});
+    p.push({heading:'Chapter 19: Growing Suspicion', paras:['Over the following weeks, Corwin noticed Registrar Pemberly watching him more closely than seemed necessary, as though she suspected he knew something he shouldn\'t.','Isolde, ever curious, began quietly researching the history of the Restricted Archive in every spare moment she had.']});
+    p.push({heading:'Chapter 20: Isolde\'s Discovery', paras:['"I found something," Isolde announced one evening, sliding an old newspaper clipping across their shared desk.','It described a Ledgerbinding accident decades earlier, one that had been quietly erased from most official academy records.']});
+    p.push({heading:'Chapter 21: Piecing It Together', paras:['The accident, they learned, had involved a book so powerful it had nearly unraveled the entire academy — and Registrar Pemberly had been the student at the center of it.','Corwin began to understand why she guarded the Restricted Archive so fiercely.']});
+    p.push({heading:'Chapter 22: A Confrontation', paras:['Gathering their courage, Corwin and Isolde requested a private meeting with Registrar Pemberly, choosing their words as carefully as any Ledgerbinding command.','"We know about the accident," Corwin said simply. "We just want to understand."']});
+    p.push({heading:'Chapter 23: The Truth Revealed', paras:['Pemberly sighed, the paper folds of her coat rustling softly, and finally told them the whole story: as a student, she had once commanded a book carelessly, nearly losing her own memories in the process.','"That is why I test every new student so closely," she admitted. "I never want another child to make my mistake."']});
+    p.push({heading:'Chapter 24: A New Understanding', paras:['Rather than punishing them for their curiosity, Pemberly seemed almost relieved to finally share the truth with someone.','"You two show real promise," she said. "Careful, thoughtful Ledgerbinders — exactly what this academy needs more of."']});
+    p.push({heading:'Chapter 25: End of Term Exams', paras:['As the term drew to a close, Corwin faced his final practical exam: commanding a moderately complex book to perform a sequence of three precise actions without a single mistake.','His hands trembled, but he thought of Isolde\'s advice and slowed every word.']});
+    p.push({heading:'Chapter 26: A Perfect Command', paras:['"Open to chapter three. Read aloud the second paragraph. Close gently," Corwin commanded, and the book obeyed each instruction flawlessly.','Professor Duvane, watching from the front of the room, allowed herself the smallest, rarest smile.']});
+    p.push({heading:'Chapter 27: Celebrating Success', paras:['That night, the Hall of Quiet Storms held a small celebration for their successful first-years, complete with cakes that, Corwin was fairly sure, had been Ledgerbound to never run out of frosting.','Isolde raised her glass. "To careful, thoughtful Ledgerbinders," she said, grinning.']});
+    p.push({heading:'Chapter 28: A Summer Away', paras:['As Corwin packed his trunk to return home for the summer, Registrar Pemberly stopped him at the staircase.','"You\'ll be back," she said. It wasn\'t a question.']});
+    p.push({heading:'Epilogue: The Beginning of Something Larger', paras:['Corwin climbed the spiral staircase back toward the ordinary world, clutching his green-bound book tightly, already counting the days until autumn.','Somewhere far beneath the city, the doors of the Restricted Archive waited, patient and unopened, for a story that had not yet been told.']});
+    return p;
+  })()
+});
+
+/* ---------- book -> level completeness check helper (used only in dev) ---------- */
+
+/* =========================================================
+   STATE MANAGEMENT (in-memory only — no localStorage per rules)
+   ========================================================= */
+const state = {
+  screen: 'age',       // age | buddies | library | reader
+  age: null,
+  activeBuddy: null,
+  currentLevel: 'phonics',
+  currentBookId: null,
+  currentPageIdx: 0,
+  streakDays: 6,        // simulated existing streak progress for demo purposes
+  todayRead: false,
+  progress: {},          // bookId -> pagesReadCount
+};
+
+function getBuddyUnlocked(buddy){
+  return state.streakDays >= buddy.unlockDays;
+}
+
+function markTodayRead(){
+  if(!state.todayRead){
+    state.todayRead = true;
+    state.streakDays += 1;
+    checkNewUnlocks();
+  }
+}
+
+let lastUnlockAnnounced = new Set();
+function checkNewUnlocks(){
+  BUDDIES.forEach(b=>{
+    if(getBuddyUnlocked(b) && b.unlockDays>0 && !lastUnlockAnnounced.has(b.id) && state.streakDays === b.unlockDays){
+      lastUnlockAnnounced.add(b.id);
+      showToast(`🎉 New reading buddy unlocked: ${b.name} the ${b.animal}!`);
+    }
+  });
+}
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(()=>t.classList.remove('show'), 3400);
+}
+
+/* =========================================================
+   RENDER FUNCTIONS
+   ========================================================= */
+function render(){
+  const app = document.getElementById('app');
+  app.innerHTML = '';
+
+  if(state.screen === 'age'){
+    app.appendChild(renderAgeScreen());
+    return;
+  }
+
+  // shared topbar for buddies/library/reader
+  app.appendChild(renderTopbar());
+
+  if(state.screen === 'buddies') app.appendChild(renderBuddyScreen());
+  if(state.screen === 'library') app.appendChild(renderLibraryScreen());
+  if(state.screen === 'reader') app.appendChild(renderReaderScreen());
+
+  const foot = document.createElement('footer');
+  foot.className = 'credit';
+  foot.textContent = 'Reading Buds — every story here is written just for this app.';
+  app.appendChild(foot);
+}
+
+function renderAgeScreen(){
+  const wrap = document.createElement('div');
+  wrap.className = 'center-wrap screen';
+  wrap.innerHTML = `
+    <div class="card age-card">
+      <div class="mascot">📖🐭</div>
+      <h2>Welcome to Reading Buds!</h2>
+      <p>Before we start, tell us how old you are.</p>
+      <div class="age-input-row">
+        <input type="number" id="ageInput" min="3" max="14" placeholder="8" />
+        <span style="font-family:var(--font-display);color:#8a8070;">years old</span>
+      </div>
+      <button class="big-btn" id="ageGoBtn" disabled>Let's go!</button>
+      <div class="age-hint">You'll pick a reading buddy next 🐾</div>
+    </div>
+  `;
+  setTimeout(()=>{
+    const input = wrap.querySelector('#ageInput');
+    const btn = wrap.querySelector('#ageGoBtn');
+    input.addEventListener('input', ()=>{
+      const v = parseInt(input.value,10);
+      btn.disabled = !(v>=3 && v<=14);
+    });
+    input.addEventListener('keydown', (e)=>{ if(e.key==='Enter' && !btn.disabled) btn.click(); });
+    btn.addEventListener('click', ()=>{
+      state.age = parseInt(input.value,10);
+      state.screen = 'buddies';
+      render();
+    });
+  },0);
+  return wrap;
+}
+
+function renderTopbar(){
+  const bar = document.createElement('div');
+  bar.className = 'topbar';
+
+  const filledCount = Math.min(state.streakDays % 7 === 0 && state.streakDays>0 ? 7 : state.streakDays % 7, 7);
+  let cells = '';
+  for(let i=0;i<7;i++){
+    const filled = i < filledCount;
+    const isToday = i === filledCount - 1 && filled;
+    cells += `<div class="streak-cell ${filled?'filled':''} ${isToday?'today':''}"></div>`;
+  }
+
+  bar.innerHTML = `
+    <div class="brand">
+      <div class="logo">📚</div>
+      <div>
+        <h1>Reading Buds</h1>
+        <span>${state.age ? state.age + ' years old' : ''}</span>
+      </div>
+    </div>
+    <div class="streakbox">
+      <div class="streakbox-head">
+        <b>This week</b>
+        <span class="flame">🔥 ${state.streakDays}-day streak</span>
+      </div>
+      <div class="streak-grid">${cells}</div>
+    </div>
+  `;
+  return bar;
+}
+
+function renderBuddyScreen(){
+  const wrap = document.createElement('div');
+  wrap.className = 'screen';
+
+  const crumb = document.createElement('div');
+  crumb.className = 'crumb';
+  crumb.innerHTML = `<span class="on">1. Pick a Reading Buddy</span> <span>→</span> <span>2. Choose a Book</span>`;
+  wrap.appendChild(crumb);
+
+  const head = document.createElement('div');
+  head.className = 'section-head';
+  head.innerHTML = `<h2>Choose your Reading Buddy</h2><p>Read every day to unlock more buddies. Five are ready for you right now!</p>`;
+  wrap.appendChild(head);
+
+  const grid = document.createElement('div');
+  grid.className = 'buddy-grid';
+
+  BUDDIES.forEach(b=>{
+    const unlocked = getBuddyUnlocked(b);
+    const isActive = state.activeBuddy === b.id;
+    const card = document.createElement('div');
+    card.className = `buddy-card ${unlocked?'selectable':'locked'} ${isActive?'active-buddy':''}`;
+    card.innerHTML = `
+      ${!unlocked ? `<div class="lockbadge">🔒 ${b.unlockDays}d</div>` : ''}
+      <span class="emoji">${b.emoji}</span>
+      <h3>${b.name}</h3>
+      <div class="role">the ${b.animal}</div>
+      ${unlocked
+        ? `<button class="pick-btn" data-id="${b.id}">${isActive? 'Selected ✓' : 'Pick '+b.name}</button>`
+        : `<div class="req">Reach a ${b.unlockDays}-day streak</div>`
+      }
+    `;
+    grid.appendChild(card);
+  });
+  wrap.appendChild(grid);
+
+  setTimeout(()=>{
+    wrap.querySelectorAll('.pick-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        state.activeBuddy = btn.dataset.id;
+        state.screen = 'library';
+        render();
+      });
+    });
+  },0);
+
+  return wrap;
+}
+
+function getActiveBuddyObj(){
+  return BUDDIES.find(b=>b.id===state.activeBuddy);
+}
+
+function renderLibraryScreen(){
+  const wrap = document.createElement('div');
+  wrap.className = 'screen';
+
+  const crumb = document.createElement('div');
+  crumb.className = 'crumb';
+  crumb.innerHTML = `<span>1. Pick a Reading Buddy</span> <span>→</span> <span class="on">2. Choose a Book</span>`;
+  wrap.appendChild(crumb);
+
+  const buddy = getActiveBuddyObj();
+  if(buddy){
+    const strip = document.createElement('div');
+    strip.className = 'buddy-strip';
+    strip.innerHTML = `
+      <span class="emoji">${buddy.emoji}</span>
+      <div class="info">
+        <b>${buddy.name} the ${buddy.animal}</b>
+        <div>is reading along with you today</div>
+      </div>
+      <button id="changeBuddyBtn">Change buddy</button>
+    `;
+    wrap.appendChild(strip);
+    setTimeout(()=>{
+      strip.querySelector('#changeBuddyBtn').addEventListener('click', ()=>{
+        state.screen='buddies'; render();
+      });
+    },0);
+  }
+
+  const head = document.createElement('div');
+  head.className = 'section-head';
+  head.innerHTML = `<h2>Pick a book</h2><p>Choose a reading level, then pick a story to dive into.</p>`;
+  wrap.appendChild(head);
+
+  const tabs = document.createElement('div');
+  tabs.className = 'level-tabs';
+  LEVELS.forEach(l=>{
+    const tab = document.createElement('button');
+    tab.className = `level-tab ${state.currentLevel===l.id?'active':''}`;
+    tab.innerHTML = `<span class="dot" style="background:${l.color}"></span>${l.label}`;
+    tab.addEventListener('click', ()=>{ state.currentLevel=l.id; render(); });
+    tabs.appendChild(tab);
+  });
+  wrap.appendChild(tabs);
+
+  const grid = document.createElement('div');
+  grid.className = 'book-grid';
+  const booksAtLevel = BOOKS.filter(b=>b.level===state.currentLevel);
+  booksAtLevel.forEach(book=>{
+    const readCount = state.progress[book.id] || 0;
+    const pct = Math.min(100, Math.round((readCount/book.pages.length)*100));
+    const card = document.createElement('div');
+    card.className = 'book-card';
+    card.innerHTML = `
+      <div class="book-cover" style="background:${book.color}">
+        ${book.emoji}
+        <span class="pagepill">${book.pages.length} pages</span>
+      </div>
+      <div class="book-body">
+        <h4>${book.title}</h4>
+        <div class="author">${book.author}</div>
+        <div class="blurb">${book.blurb}</div>
+        <div class="progress-row">
+          <div class="progress-bar"><div style="width:${pct}%"></div></div>
+          <div class="progress-txt">${readCount}/${book.pages.length}</div>
+        </div>
+        <button class="open-btn" data-id="${book.id}">${readCount>0 ? 'Keep reading' : 'Start reading'}</button>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+  wrap.appendChild(grid);
+
+  setTimeout(()=>{
+    wrap.querySelectorAll('.open-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const bookId = btn.dataset.id;
+        state.currentBookId = bookId;
+        const already = state.progress[bookId] || 0;
+        const book = BOOKS.find(b=>b.id===bookId);
+        state.currentPageIdx = Math.min(already, book.pages.length-1);
+        state.screen = 'reader';
+        render();
+      });
+    });
+  },0);
+
+  return wrap;
+}
+
+function renderReaderScreen(){
+  const wrap = document.createElement('div');
+  wrap.className = 'screen reader-wrap';
+
+  const book = BOOKS.find(b=>b.id===state.currentBookId);
+  if(!book){ state.screen='library'; render(); return wrap; }
+
+  const page = book.pages[state.currentPageIdx];
+  const total = book.pages.length;
+
+  const top = document.createElement('div');
+  top.className = 'reader-top';
+  top.innerHTML = `
+    <button class="back-link" id="backToLibrary">&larr; Library</button>
+    <div class="reader-title">
+      <h2>${book.title}</h2>
+      <div class="sub">${book.author}</div>
+    </div>
+    <div class="page-pos">Page ${state.currentPageIdx+1} / ${total}</div>
+  `;
+  wrap.appendChild(top);
+
+  const paper = document.createElement('div');
+  paper.className = 'page-paper';
+  paper.innerHTML = `
+    ${page.heading ? `<h3>${page.heading}</h3>` : ''}
+    ${page.paras.map(t=>`<p>${t}</p>`).join('')}
+    <div class="pnum">${state.currentPageIdx+1}</div>
+  `;
+  wrap.appendChild(paper);
+
+  const nav = document.createElement('div');
+  nav.className = 'reader-nav';
+  const isLast = state.currentPageIdx === total-1;
+  nav.innerHTML = `
+    <button class="nav-btn" id="prevBtn" ${state.currentPageIdx===0?'disabled':''}>&larr; Back</button>
+    <button class="nav-btn ${isLast?'finish':''}" id="nextBtn">${isLast?'Finish book 🎉':'Next page →'}</button>
+  `;
+  wrap.appendChild(nav);
+
+  setTimeout(()=>{
+    wrap.querySelector('#backToLibrary').addEventListener('click', ()=>{ state.screen='library'; render(); });
+    wrap.querySelector('#prevBtn').addEventListener('click', ()=>{
+      if(state.currentPageIdx>0){ state.currentPageIdx--; render(); }
+    });
+    wrap.querySelector('#nextBtn').addEventListener('click', ()=>{
+      const readSoFar = state.progress[book.id] || 0;
+      state.progress[book.id] = Math.max(readSoFar, state.currentPageIdx+1);
+      markTodayRead();
+      if(isLast){
+        showToast(`🎉 You finished "${book.title}"! Great reading today.`);
+        state.screen = 'library';
+        render();
+      } else {
+        state.currentPageIdx++;
+        render();
+      }
+    });
+  },0);
+
+  return wrap;
+}
+
+render();
+</script>
+</body>
+</html>

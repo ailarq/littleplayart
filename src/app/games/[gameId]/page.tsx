@@ -2,7 +2,7 @@
 
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import gamesData from '../../../../games.json'
 
 export default function GamePage() {
@@ -14,10 +14,45 @@ export default function GamePage() {
   const relatedGames = games.filter(g => g.category === game?.category && g.id !== gameId).slice(0, 3)
 
   const [mounted, setMounted] = useState(false)
+  const [isFullscreen, setIsFullscreen] = useState(false)
+  const playerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     setMounted(true)
   }, [])
+
+  // Keep state in sync when the user exits native fullscreen with Esc
+  useEffect(() => {
+    const onChange = () => {
+      if (!document.fullscreenElement) setIsFullscreen(false)
+    }
+    document.addEventListener('fullscreenchange', onChange)
+    return () => document.removeEventListener('fullscreenchange', onChange)
+  }, [])
+
+  // Esc exits the CSS fallback mode (native fullscreen handles Esc itself)
+  useEffect(() => {
+    if (!isFullscreen) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') exitFullscreen()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [isFullscreen])
+
+  const enterFullscreen = async () => {
+    setIsFullscreen(true) // CSS overlay works everywhere, incl. iOS Safari
+    try {
+      await playerRef.current?.requestFullscreen?.()
+    } catch {
+      // unsupported or denied: the CSS overlay is still active
+    }
+  }
+
+  const exitFullscreen = () => {
+    setIsFullscreen(false)
+    if (document.fullscreenElement) document.exitFullscreen().catch(() => {})
+  }
 
   if (!mounted) return null
 
@@ -46,14 +81,40 @@ export default function GamePage() {
         </div>
 
         {/* Game Layout */}
-        <div className="grid lg:grid-cols-3 gap-8 mb-8">
+        <div className="grid lg:grid-cols-4 gap-8 mb-8">
           {/* Game Player Area */}
-          <div className="lg:col-span-2">
-            <div className="bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden shadow-lg">
+          <div className="lg:col-span-3">
+            <div
+              ref={playerRef}
+              className={
+                isFullscreen
+                  ? 'fixed inset-0 z-50 flex flex-col bg-gray-900'
+                  : 'bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden shadow-lg'
+              }
+            >
+              <div className="flex items-center justify-between gap-2 bg-pink-600 px-3 py-2">
+                <Link
+                  href="/"
+                  className="bg-white/20 hover:bg-white/30 text-white text-sm font-bold py-1.5 px-3 rounded-lg transition-all"
+                >
+                  🏠 Back to Home
+                </Link>
+                <button
+                  onClick={isFullscreen ? exitFullscreen : enterFullscreen}
+                  className="bg-white/20 hover:bg-white/30 text-white text-sm font-bold py-1.5 px-3 rounded-lg transition-all"
+                >
+                  {isFullscreen ? '⤡ Exit Full Screen' : '⤢ Full Screen'}
+                </button>
+              </div>
               <iframe
                 src={`/games/${gameId}/index.html`}
                 title={game.title}
-                className="w-full h-96 sm:h-[600px] border-none"
+                className={
+                  isFullscreen
+                    ? 'w-full flex-1 border-none'
+                    : 'w-full h-96 sm:h-[600px] border-none'
+                }
+                allow="fullscreen"
                 allowFullScreen
               />
             </div>

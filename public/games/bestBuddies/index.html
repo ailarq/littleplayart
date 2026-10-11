@@ -1,0 +1,1357 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"></head><body>
+<title>Bestie Buddies</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Sniglet:wght@400;800&display=swap">
+<style>
+/* Layout: one playdate "activity box" column; a sticky candy-stripe top bar holds the friendship meter + sound; screens swap inside. Single pastel world, deliberately light. */
+:root{
+  --pink:#ffc8dd; --pink-deep:#ff4f9a; --pink-mid:#ff8fc1;
+  --lav:#e3d6ff; --lav-deep:#8a5cf0;
+  --blue:#cde8ff; --blue-deep:#2f8fe0;
+  --yellow:#fff1a8; --yellow-deep:#ffc93c;
+  --mint:#c9f5e3; --mint-deep:#1fae78;
+  --ink:#4a3560; --ink-soft:#7c6893; --paper:#fffafd; --bg:#fff0f7;
+  --display:'Sniglet','Fredoka','Comic Sans MS','Chalkboard SE',system-ui,sans-serif;
+  --body:'Fredoka','Nunito','Trebuchet MS',system-ui,sans-serif;
+  --emoji:'Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji',sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{min-height:100%}
+body{
+  margin:0;font-family:var(--body);color:var(--ink);font-size:18px;line-height:1.45;
+  background-color:var(--bg);
+  background-image:
+    radial-gradient(circle at 12px 12px, rgba(255,143,193,.22) 3px, transparent 4px),
+    linear-gradient(160deg,#ffe3f0 0%,#efe4ff 45%,#dff0ff 100%);
+  background-size:36px 36px,100% 100%;background-attachment:fixed;
+}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:4px solid var(--lav-deep);outline-offset:3px}
+h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance;line-height:1.1}
+.emo{font-family:var(--emoji)}
+
+/* ---------- top bar ---------- */
+.topbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:space-between;
+  padding:10px 16px;background:
+  repeating-linear-gradient(-45deg,rgba(255,255,255,.55) 0 14px,rgba(255,255,255,0) 14px 28px),var(--pink);
+  border-bottom:3px solid #fff;box-shadow:0 4px 14px rgba(138,92,240,.15)}
+.brand{font-family:var(--display);font-weight:800;font-size:20px;color:var(--pink-deep);white-space:nowrap;
+  text-shadow:2px 2px 0 #fff}
+.bar-right{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.meter{display:flex;gap:2px;align-items:center;background:#fff;border-radius:999px;padding:4px 10px;font-size:20px;
+  box-shadow:inset 0 -3px 0 var(--pink)}
+.meter .lbl{font-size:13px;font-weight:600;color:var(--ink-soft);margin-right:4px}
+.meter span.h{display:inline-block;transition:transform .3s}
+.meter span.h.pop{animation:pop .6s}
+.pill{border:0;background:#fff;border-radius:999px;padding:8px 14px;font-weight:600;font-size:15px;
+  box-shadow:0 3px 0 var(--lav)}
+.pill:active{transform:translateY(2px);box-shadow:0 1px 0 var(--lav)}
+
+/* ---------- screens ---------- */
+main{max-width:1040px;margin:0 auto;padding-inline:16px;padding-block:22px 60px}
+.screen{animation:screenIn .45s ease both}
+.card{background:var(--paper);border-radius:32px;padding:clamp(18px,4vw,34px);
+  border:4px solid #fff;box-shadow:0 10px 0 rgba(138,92,240,.12),0 18px 40px rgba(255,79,154,.12)}
+.center{text-align:center}
+.stack{display:flex;flex-direction:column;gap:16px}
+.row{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;align-items:center}
+.sub{color:var(--ink-soft);font-size:18px;margin:0}
+.big-title{font-size:clamp(40px,9vw,78px);font-weight:800;color:var(--pink-deep);
+  text-shadow:4px 4px 0 #fff,7px 7px 0 var(--lav)}
+.big-title .hrt{color:var(--pink-mid)}
+h2{font-size:clamp(28px,5vw,42px);color:var(--lav-deep);font-weight:800}
+h3{font-size:24px;font-weight:800}
+
+/* bubbly buttons */
+.btn{border:0;border-radius:999px;padding:16px 28px;font-weight:700;font-size:21px;
+  background:var(--pink-deep);color:#fff;box-shadow:0 6px 0 #c9337a;transition:transform .08s,box-shadow .08s;
+  min-height:56px;text-align:center}
+.btn:hover{filter:brightness(1.05)}
+.btn:active{transform:translateY(4px);box-shadow:0 2px 0 #c9337a}
+.btn.lav{background:var(--lav-deep);box-shadow:0 6px 0 #5f36bf}
+.btn.lav:active{box-shadow:0 2px 0 #5f36bf}
+.btn.blue{background:var(--blue-deep);box-shadow:0 6px 0 #1c69ac}
+.btn.blue:active{box-shadow:0 2px 0 #1c69ac}
+.btn.soft{background:#fff;color:var(--ink);box-shadow:0 6px 0 var(--lav)}
+.btn.soft:active{box-shadow:0 2px 0 var(--lav)}
+.btn.huge{font-size:clamp(24px,5vw,34px);padding:22px 44px;
+  background:linear-gradient(90deg,#ff6fae,#ffb14f,#ffd84d,#6fd6a0,#6cb8ff,#a47bff);color:#fff;
+  text-shadow:0 2px 0 rgba(74,53,96,.35);box-shadow:0 8px 0 #b44a8f;animation:bob 2.4s ease-in-out infinite}
+.btn.huge:active{box-shadow:0 3px 0 #b44a8f}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+
+/* ---------- home ---------- */
+.scene{width:100%;max-width:560px;margin:0 auto;display:block}
+.sparkle-float{position:absolute;pointer-events:none;font-size:26px;animation:twinkle 3s ease-in-out infinite}
+.home-wrap{position:relative;overflow:hidden}
+
+/* ---------- setup ---------- */
+.setup-grid{display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr);gap:24px;align-items:start}
+.preview{background:linear-gradient(180deg,var(--blue),var(--lav));border-radius:28px;padding:14px;text-align:center;
+  position:sticky;top:90px;border:4px solid #fff}
+.preview svg{width:100%;max-width:240px;height:auto}
+.preview .nm{font-family:var(--display);font-size:26px;font-weight:800;color:var(--ink);word-break:break-word}
+.namebox{width:100%;font:inherit;font-size:24px;padding:14px 20px;border-radius:999px;border:4px solid var(--pink);
+  background:#fff;color:var(--ink);font-weight:600}
+.opt-group h3{font-size:20px;margin-bottom:8px}
+.opts{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:10px}
+.opt{border:4px solid transparent;background:#fff;border-radius:22px;padding:8px 6px;font-weight:600;font-size:15px;
+  display:flex;flex-direction:column;align-items:center;gap:2px;box-shadow:0 4px 0 var(--lav);min-height:64px;justify-content:center}
+.opt .ic{font-size:30px;line-height:1}
+.opt svg{width:58px;height:66px}
+.opt[aria-pressed="true"]{border-color:var(--pink-deep);background:#fff0f7;transform:scale(1.04)}
+.swatch{width:100%;aspect-ratio:1;max-width:72px;border-radius:50%;border:5px solid #fff;box-shadow:0 4px 0 rgba(74,53,96,.18);justify-self:center}
+.swatch[aria-pressed="true"]{outline:5px solid var(--ink);outline-offset:2px}
+.opts.swatches{grid-template-columns:repeat(auto-fill,minmax(64px,1fr))}
+
+/* duo */
+.duo{display:flex;justify-content:center;align-items:flex-end;gap:clamp(4px,3vw,30px);flex-wrap:wrap}
+.duo figure{margin:0;text-align:center}
+.duo svg{width:clamp(120px,30vw,210px);height:auto}
+.duo figcaption{font-family:var(--display);font-weight:800;font-size:24px}
+.duo .mid{font-size:48px;align-self:center;animation:pulse 1.2s ease-in-out infinite}
+
+/* ---------- hub ---------- */
+.hub-meter{font-size:clamp(28px,6vw,44px);letter-spacing:4px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px}
+.tile{border:0;border-radius:28px;padding:20px 16px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px;
+  box-shadow:0 7px 0 rgba(74,53,96,.14);position:relative;transition:transform .15s}
+.tile:hover{transform:translateY(-3px) rotate(-1deg)}
+.tile:active{transform:translateY(3px)}
+.tile .ic{font-size:54px;line-height:1.1}
+.tile .t{font-family:var(--display);font-weight:800;font-size:23px}
+.tile .d{font-size:15px;color:var(--ink-soft)}
+.tile .done{position:absolute;top:10px;right:12px;background:#fff;border-radius:999px;padding:2px 10px;font-size:14px;font-weight:700;color:var(--pink-deep)}
+.c1{background:var(--pink)}.c2{background:var(--lav)}.c3{background:var(--yellow)}.c4{background:var(--blue)}.c5{background:var(--mint)}.c6{background:#ffd9c7}
+
+/* ---------- generic game bits ---------- */
+.prompt-banner{background:var(--yellow);border-radius:24px;padding:16px 20px;font-family:var(--display);font-weight:800;
+  font-size:clamp(24px,4.6vw,36px);text-align:center;border:4px dashed #fff;box-shadow:0 5px 0 var(--yellow-deep)}
+.turn{display:flex;align-items:center;gap:10px;justify-content:center;font-weight:700;font-size:22px;flex-wrap:wrap;text-align:center}
+.mini{display:inline-block;width:52px;height:60px;flex:0 0 auto}
+.mini svg{width:100%;height:100%}
+.progress{font-weight:600;color:var(--ink-soft);text-align:center}
+.choices{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.choice{border:0;border-radius:24px;background:#fff;padding:16px 10px;font-weight:700;font-size:20px;
+  box-shadow:0 6px 0 var(--lav);display:flex;flex-direction:column;align-items:center;gap:4px;min-height:96px;justify-content:center}
+.choice .ic{font-size:42px;line-height:1}
+.choice:active{transform:translateY(4px);box-shadow:0 2px 0 var(--lav)}
+.choice.off{opacity:.35;pointer-events:none}
+.choice.right{background:var(--mint);box-shadow:0 6px 0 var(--mint-deep)}
+.handoff{background:linear-gradient(135deg,var(--lav),var(--blue));border-radius:28px;padding:28px 18px;text-align:center}
+.handoff .ic{font-size:70px}
+
+/* drawing */
+.pads{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.pad{background:#fff;border-radius:26px;padding:12px;border:4px solid var(--pink);display:flex;flex-direction:column;gap:10px}
+.pad.p2{border-color:var(--blue)}
+.pad-head{display:flex;align-items:center;gap:8px;font-weight:700;font-size:20px}
+.pad canvas{width:100%;aspect-ratio:5/4;background:#fff;border-radius:18px;border:3px dashed var(--lav);touch-action:none;display:block;cursor:crosshair}
+.tools{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.dot{width:36px;height:36px;border-radius:50%;border:4px solid #fff;box-shadow:0 0 0 2px rgba(74,53,96,.2)}
+.dot[aria-pressed="true"]{box-shadow:0 0 0 4px var(--ink)}
+.tool{border:0;background:var(--lav);border-radius:999px;padding:6px 12px;font-weight:600;font-size:15px;min-height:38px}
+.tool[aria-pressed="true"]{background:var(--lav-deep);color:#fff}
+.reveal-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.reveal-item{background:#fff;border-radius:26px;padding:12px;text-align:center;border:4px solid var(--yellow)}
+.reveal-item img{width:100%;border-radius:16px;border:3px solid var(--lav);animation:popIn .6s ease both}
+.award{display:inline-block;background:var(--yellow);border-radius:999px;padding:6px 14px;font-weight:700;margin:4px;animation:popIn .5s ease both}
+
+/* quiz results */
+.qres{display:flex;flex-direction:column;gap:10px}
+.qrow{background:#fff;border-radius:22px;padding:12px 16px;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr);gap:10px;align-items:center;animation:popIn .5s ease both}
+.qrow .q{font-weight:700}
+.qrow .a{background:var(--pink);border-radius:16px;padding:6px 10px;text-align:center;font-weight:600}
+.qrow .a.b{background:var(--blue)}
+.qrow .verdict{grid-column:1/-1;text-align:center;font-weight:700;color:var(--lav-deep)}
+.qhead{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr);gap:10px;font-weight:700;text-align:center;padding-inline:16px}
+
+/* would you rather */
+.wyr{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:12px;align-items:stretch}
+.wyr .or{align-self:center;font-family:var(--display);font-weight:800;font-size:30px;color:var(--pink-deep)}
+.bigchoice{border:0;border-radius:32px;padding:22px 12px;font-weight:700;font-size:clamp(20px,3.6vw,28px);
+  display:flex;flex-direction:column;align-items:center;gap:8px;min-height:200px;justify-content:center;box-shadow:0 8px 0 rgba(74,53,96,.18)}
+.bigchoice .ic{font-size:clamp(64px,12vw,96px);line-height:1}
+.bigchoice.a{background:var(--pink)}.bigchoice.b{background:var(--blue)}
+.bigchoice:active{transform:translateY(5px)}
+.pickers{display:flex;gap:4px;justify-content:center;min-height:60px}
+
+/* mystery */
+.silo{font-size:clamp(110px,24vw,170px);line-height:1.1;text-align:center;transition:filter .6s}
+.clues{display:flex;flex-direction:column;gap:8px}
+.clue{background:#fff;border-radius:18px;padding:10px 16px;font-weight:600;font-size:20px;animation:popIn .5s ease both;border-left:8px solid var(--lav-deep)}
+
+/* puzzles */
+.memgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;max-width:520px;margin:0 auto}
+.mcard{aspect-ratio:1;border:0;border-radius:20px;font-size:clamp(30px,8vw,48px);background:var(--lav-deep);color:#fff;box-shadow:0 5px 0 #5f36bf}
+.mcard.up{background:#fff;box-shadow:0 5px 0 var(--lav)}
+.mcard.got{background:var(--mint);box-shadow:0 5px 0 var(--mint-deep)}
+.pattern{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;font-size:clamp(36px,8vw,56px)}
+.pattern span{background:#fff;border-radius:18px;padding:4px 10px;min-width:1.4em;text-align:center}
+.pattern span.q{background:var(--yellow);font-family:var(--display);color:var(--pink-deep)}
+.spot{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.sgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;background:#fff;padding:10px;border-radius:22px}
+.scell{aspect-ratio:1;border:0;background:#fff7fb;border-radius:14px;font-size:clamp(22px,5vw,38px);position:relative;padding:0}
+.scell.found{background:var(--mint);outline:4px solid var(--mint-deep)}
+.matchcols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;max-width:520px;margin:0 auto}
+.matchcols .col{display:flex;flex-direction:column;gap:10px}
+.mitem{border:0;border-radius:22px;background:#fff;font-size:44px;padding:8px;box-shadow:0 5px 0 var(--lav)}
+.mitem.sel{background:var(--yellow);box-shadow:0 5px 0 var(--yellow-deep)}
+.mitem.ok{background:var(--mint);box-shadow:0 5px 0 var(--mint-deep);pointer-events:none}
+.wiggle{animation:wiggle .45s}
+.ok-msg{background:var(--mint);border-radius:22px;padding:14px;text-align:center;font-weight:700;font-size:22px;animation:popIn .5s both}
+
+/* card maker */
+.maker{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:18px;align-items:start}
+.fcard{position:relative;aspect-ratio:4/3;width:100%;border-radius:26px;overflow:hidden;border:6px solid #fff;
+  box-shadow:0 10px 24px rgba(138,92,240,.25);touch-action:none;user-select:none}
+.fcard .msg{position:absolute;left:12%;right:12%;top:30%;bottom:26%;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:rgba(255,255,255,.78);border-radius:24px;padding:10px;text-align:center}
+.fcard .msg .m{font-family:var(--display);font-weight:800;font-size:clamp(18px,3.4vw,30px);line-height:1.15;word-break:break-word;color:var(--ink)}
+.fcard .msg .f{font-size:clamp(12px,1.8vw,16px);font-weight:600;color:var(--ink-soft);margin-top:6px}
+.stk{position:absolute;font-family:var(--emoji);line-height:1;cursor:grab;transform:translate(-50%,-50%);touch-action:none}
+.tabs{display:flex;flex-wrap:wrap;gap:6px}
+.stkbtns{display:grid;grid-template-columns:repeat(auto-fill,minmax(54px,1fr));gap:6px}
+.stkbtns button{border:0;background:#fff;border-radius:16px;font-size:30px;padding:6px;box-shadow:0 4px 0 var(--lav)}
+.bgbtns{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:8px}
+.bgbtns button{aspect-ratio:4/3;border-radius:14px;border:4px solid #fff;box-shadow:0 3px 0 rgba(74,53,96,.2)}
+.bgbtns button[aria-pressed="true"]{outline:4px solid var(--ink);outline-offset:1px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips button{border:0;background:var(--yellow);border-radius:999px;padding:6px 12px;font-size:15px;font-weight:600}
+.album{display:flex;gap:10px;overflow-x:auto;padding-bottom:6px}
+.album img{height:96px;border-radius:12px;border:3px solid #fff;box-shadow:0 3px 8px rgba(0,0,0,.12)}
+
+/* modal / toast */
+.modal{position:fixed;inset:0;background:rgba(74,53,96,.45);display:flex;align-items:center;justify-content:center;padding:16px;z-index:50}
+.modal .card{max-width:620px;width:100%;max-height:92vh;overflow:auto}
+.modal img{width:100%;border-radius:20px}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:#fff;border-radius:999px;
+  padding:14px 26px;font-weight:700;font-size:20px;box-shadow:0 8px 24px rgba(255,79,154,.35);z-index:60;animation:toastIn .4s both;
+  border:4px solid var(--pink);max-width:calc(100% - 32px);text-align:center}
+
+/* finale */
+.badge svg{width:min(320px,80vw);height:auto;animation:popIn .8s both}
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:40;width:100%;height:100%}
+
+/* friend's favourites */
+.faves-tile{background:
+  radial-gradient(circle at 20% 25%,rgba(255,79,154,.18) 6px,transparent 7px),
+  radial-gradient(circle at 70% 75%,rgba(31,174,120,.18) 6px,transparent 7px),#ffe0ec;background-size:40px 40px;
+  border:4px dashed #fff!important;grid-column:1/-1}
+.faves-wrap{background:
+  radial-gradient(circle at 14px 14px,rgba(255,79,154,.16) 4px,transparent 5px),
+  radial-gradient(circle at 34px 34px,rgba(121,220,176,.25) 4px,transparent 5px),#fff5f9;
+  background-size:40px 40px}
+.berry-border{display:flex;justify-content:center;gap:6px;font-size:26px;flex-wrap:wrap}
+.faves-hero{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap}
+.faves-hero svg{width:clamp(64px,14vw,96px);height:auto;animation:bob 2.6s ease-in-out infinite}
+.faves-hero svg:last-child{animation-delay:.6s}
+.popstar-title{font-family:var(--display);font-weight:800;font-size:clamp(26px,5.4vw,42px);text-align:center;
+  background:linear-gradient(90deg,#ff4f9a,#b05cf0,#2f8fe0,#ff4f9a);-webkit-background-clip:text;background-clip:text;color:transparent;
+  background-size:200% 100%;animation:shine 4s linear infinite}
+.stagecard{border-radius:28px;padding:18px 14px;text-align:center;color:#fff;position:relative;overflow:hidden;border:5px solid #fff;
+  box-shadow:0 8px 0 rgba(74,53,96,.2)}
+.stagecard::before{content:"";position:absolute;inset:-40% 20% auto;height:90%;background:radial-gradient(ellipse at top,rgba(255,255,255,.55),transparent 70%);pointer-events:none}
+.stagecard h3{font-size:26px;text-shadow:0 2px 0 rgba(74,53,96,.4);position:relative}
+.stagecard .mini{width:110px;height:126px}
+.stagecard ul{list-style:none;padding:0;margin:8px 0;display:flex;flex-direction:column;gap:6px;position:relative}
+.stagecard li{background:rgba(255,255,255,.88);color:var(--ink);border-radius:999px;padding:6px 12px;font-weight:600}
+.bracelet{display:flex;justify-content:center;align-items:center;gap:4px;padding:8px 14px;background:rgba(255,255,255,.88);border-radius:999px;
+  border:3px dotted var(--pink-deep);font-size:26px;position:relative;flex-wrap:wrap}
+.bead{width:12px;height:12px;border-radius:50%;background:var(--pink-mid);display:inline-block}
+.bead:nth-child(4n+2){background:var(--lav-deep)}.bead:nth-child(4n+3){background:var(--yellow-deep)}
+.opt.multi[aria-pressed="true"]::after{content:"✓";position:absolute;top:4px;right:10px;font-weight:800;color:var(--pink-deep)}
+.opt.multi{position:relative}
+.bandname{font-family:var(--display);font-weight:800;font-size:clamp(24px,5vw,36px);color:var(--pink-deep)}
+.songtitle{background:#fff;border-radius:26px;padding:18px;text-align:center;border:4px solid var(--pink);font-family:var(--display);font-weight:800;
+  font-size:clamp(24px,5vw,38px);color:var(--lav-deep)}
+.chip-row{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.chip-row button{border:0;border-radius:999px;padding:10px 16px;font-weight:700;font-size:18px;background:#fff;box-shadow:0 4px 0 var(--pink)}
+.chip-row button[aria-pressed="true"]{background:var(--pink-deep);color:#fff;box-shadow:0 4px 0 #c9337a}
+@keyframes shine{to{background-position:200% 0}}
+
+/* animations */
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.8)}100%{transform:scale(1)}}
+@keyframes popIn{0%{transform:scale(.6);opacity:.2}70%{transform:scale(1.06)}100%{transform:scale(1);opacity:1}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.2)}}
+@keyframes twinkle{0%,100%{transform:scale(1) rotate(0);opacity:1}50%{transform:scale(1.3) rotate(20deg);opacity:.6}}
+@keyframes wiggle{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+@keyframes screenIn{from{transform:translateY(10px);opacity:.3}to{transform:none;opacity:1}}
+@keyframes toastIn{from{transform:translate(-50%,30px);opacity:0}to{transform:translate(-50%,0);opacity:1}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+
+@media (max-width:760px){
+  .setup-grid{grid-template-columns:1fr}
+  .preview{position:static;display:flex;align-items:center;gap:10px;text-align:left}
+  .preview svg{width:120px}
+  .pads,.reveal-grid,.maker{grid-template-columns:1fr}
+  .wyr{grid-template-columns:1fr}
+  .wyr .or{text-align:center}
+  .bigchoice{min-height:150px}
+  .qrow,.qhead{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .qrow .q{grid-column:1/-1}
+  .qhead span:first-child{display:none}
+  .brand{font-size:17px}
+}
+@media (max-width:480px){ .hide-sm{display:none} .meter .lbl{display:none} .meter{font-size:17px;padding:3px 8px} .topbar{padding:8px 12px;gap:6px} .pill{padding:7px 11px} .spot{grid-template-columns:1fr} body{font-size:17px} .btn{font-size:19px;padding:14px 22px} }
+</style>
+
+<div class="topbar">
+  <div class="brand">💕 Bestie Buddies 🎀</div>
+  <div class="bar-right">
+    <div class="meter" id="meter" aria-label="Friendship meter"></div>
+    <button class="pill" id="homeBtn" type="button" aria-label="Playdate Box">🏠<span class="hide-sm"> Playdate Box</span></button>
+    <button class="pill" id="soundBtn" type="button" aria-pressed="true" aria-label="Sound on">🔊<span class="hide-sm"> Sound ON</span></button>
+  </div>
+</div>
+
+<main id="app"></main>
+<canvas id="confetti" hidden></canvas>
+
+<script>
+/* =========================================================
+   BESTIE BUDDIES — the ultimate playdate
+   ========================================================= */
+const $ = s => document.querySelector(s);
+const app = $('#app');
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const pick = a => a[Math.floor(Math.random() * a.length)];
+
+/* ---------------- SOUND (gentle Web Audio blips) ---------------- */
+let soundOn = true, actx = null;
+function ac(){ if (!actx) { try { actx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e){ actx = null; } } if (actx && actx.state === 'suspended') actx.resume(); return actx; }
+function tone(f, dur, type, when, vol, slide){
+  const c = ac(); if (!c || !soundOn) return;
+  const t = c.currentTime + (when || 0);
+  const o = c.createOscillator(), g = c.createGain();
+  o.type = type || 'sine'; o.frequency.setValueAtTime(f, t);
+  if (slide) o.frequency.exponentialRampToValueAtTime(slide, t + dur);
+  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol || .1, t + .015);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  o.connect(g); g.connect(c.destination); o.start(t); o.stop(t + dur + .05);
+}
+const SFX = {
+  click(){ tone(700, .07, 'triangle', 0, .07); },
+  sparkle(){ [1318,1568,2093,2637].forEach((f,i)=>tone(f,.18,'triangle',i*.06,.05)); },
+  heart(){ tone(420,.16,'sine',0,.14,980); tone(1300,.12,'triangle',.12,.05); },
+  party(){ [523,659,784,1047].forEach((f,i)=>tone(f,.22,'triangle',i*.1,.08)); [523,659,784].forEach(f=>tone(f,.7,'sine',.45,.06)); },
+  oops(){ tone(392,.18,'sine',0,.07,300); }
+};
+document.addEventListener('click', e => { if (e.target.closest('button')) SFX.click(); }, true);
+$('#soundBtn').onclick = () => {
+  soundOn = !soundOn;
+  $('#soundBtn').innerHTML = soundOn ? '🔊<span class="hide-sm"> Sound ON</span>' : '🔇<span class="hide-sm"> Sound OFF</span>'; $('#soundBtn').setAttribute('aria-label', soundOn ? 'Sound on' : 'Sound off');
+  $('#soundBtn').setAttribute('aria-pressed', soundOn);
+  if (soundOn) SFX.sparkle();
+};
+
+/* ---------------- CHARACTERS (SVG) ---------------- */
+const INK = '#4a3560';
+const ANIMALS = {
+  bunny:  {label:'Bunny',   fur:'#fff6fa', ear:'#fff6fa', inner:'#ffb3d1'},
+  kitty:  {label:'Kitty',   fur:'#ffd9a8', ear:'#ffd9a8', inner:'#ffb3c7'},
+  bear:   {label:'Teddy',   fur:'#dcae84', ear:'#dcae84', inner:'#f3d3b4'},
+  puppy:  {label:'Puppy',   fur:'#f6e6cf', ear:'#b98a62', inner:'#b98a62'},
+  unicorn:{label:'Unicorn', fur:'#f7f1ff', ear:'#f7f1ff', inner:'#ffc4e0'},
+  panda:  {label:'Panda',   fur:'#ffffff', ear:'#4a3f55', inner:'#4a3f55'}
+};
+const OUTFITS = {dress:{label:'Dress',ic:'👗'}, hoodie:{label:'Hoodie',ic:'🧥'}, overalls:{label:'Overalls',ic:'👖'}, tutu:{label:'Tutu',ic:'🩰'}};
+const COLOURS = {pink:'#ff8fc1', lavender:'#b89cff', blue:'#7cc7ff', yellow:'#ffd84d', mint:'#79dcb0', peach:'#ffa987'};
+const ACCS = {bow:{label:'Bow',ic:'🎀'}, crown:{label:'Crown',ic:'👑'}, flower:{label:'Flower',ic:'🌸'}, glasses:{label:'Glasses',ic:'👓'}, star:{label:'Star clip',ic:'⭐'}, heart:{label:'Heart clip',ic:'💖'}};
+
+function shade(hex, amt){
+  const n = parseInt(hex.slice(1),16); let r=n>>16, g=(n>>8)&255, b=n&255;
+  const f = v => Math.max(0, Math.min(255, Math.round(amt < 0 ? v*(1+amt) : v + (255-v)*amt)));
+  return '#' + [f(r),f(g),f(b)].map(v=>v.toString(16).padStart(2,'0')).join('');
+}
+function starPath(cx, cy, R, r){
+  let d=''; for (let i=0;i<10;i++){ const a=-Math.PI/2+i*Math.PI/5, rad=i%2?r:R; d+=(i?'L':'M')+(cx+Math.cos(a)*rad).toFixed(1)+' '+(cy+Math.sin(a)*rad).toFixed(1); } return d+'Z';
+}
+const HEART = (x,y,s,fill) => `<path transform="translate(${x} ${y}) scale(${s})" d="M0 6 C0 -2 -12 -4 -12 4 C-12 12 0 18 0 22 C0 18 12 12 12 4 C12 -4 0 -2 0 6Z" fill="${fill}" stroke="${INK}" stroke-width="${2.5/s}" stroke-linejoin="round"/>`;
+
+function charG(p){
+  const A = ANIMALS[p.animal] || ANIMALS.bunny, c = COLOURS[p.color] || COLOURS.pink, dc = shade(c,-.18), lc = shade(c,.45);
+  const S = `stroke="${INK}" stroke-width="4" stroke-linejoin="round"`;
+  let g = '';
+  // legs + body
+  g += `<ellipse cx="84" cy="228" rx="16" ry="10" fill="${A.fur}" ${S}/><ellipse cx="116" cy="228" rx="16" ry="10" fill="${A.fur}" ${S}/>`;
+  if (p.outfit === 'dress') g += `<path d="M78 150 Q100 142 122 150 L150 222 Q100 234 50 222 Z" fill="${c}" ${S}/><path d="M86 150 Q100 164 114 150" fill="#fff" ${S}/>${HEART(100,180,.8,lc)}`;
+  else if (p.outfit === 'hoodie') g += `<rect x="62" y="146" width="76" height="82" rx="30" fill="${c}" ${S}/><path d="M78 196 h44 v10 q-22 10 -44 0z" fill="${dc}" stroke="${INK}" stroke-width="3"/><path d="M92 152 v18 M108 152 v18" stroke="${INK}" stroke-width="3" stroke-linecap="round"/>`;
+  else if (p.outfit === 'overalls') g += `<rect x="64" y="146" width="72" height="80" rx="28" fill="#fff" ${S}/><path d="M74 172 h52 v28 q0 24 -26 24 q-26 0 -26 -24 z" fill="${c}" ${S}/><path d="M80 172 L72 150 M120 172 L128 150" stroke="${dc}" stroke-width="6" stroke-linecap="round"/><circle cx="82" cy="180" r="3.5" fill="${INK}"/><circle cx="118" cy="180" r="3.5" fill="${INK}"/>`;
+  else g += `<rect x="70" y="146" width="60" height="56" rx="24" fill="${c}" ${S}/><path d="M48 202 L58 188 L68 200 L78 186 L88 200 L100 186 L112 200 L122 186 L132 200 L142 188 L152 202 L140 222 Q100 232 60 222 Z" fill="${lc}" ${S}/>${starPath ? `<path d="${starPath(100,168,9,4)}" fill="#fff"/>` : ''}`;
+  g += `<circle cx="56" cy="182" r="14" fill="${A.fur}" ${S}/><circle cx="144" cy="182" r="14" fill="${A.fur}" ${S}/>`;
+  // unicorn mane behind head
+  if (p.animal === 'unicorn') g += `<circle cx="58" cy="70" r="14" fill="#ffb3d1" ${S}/><circle cx="50" cy="94" r="14" fill="#c9b3ff" ${S}/><circle cx="54" cy="118" r="13" fill="#a8dcff" ${S}/>`;
+  // back ears
+  const ears = {
+    bunny: `<ellipse cx="74" cy="38" rx="15" ry="36" fill="${A.ear}" ${S} transform="rotate(-10 74 38)"/><ellipse cx="74" cy="42" rx="7" ry="24" fill="${A.inner}" transform="rotate(-10 74 42)"/><ellipse cx="126" cy="38" rx="15" ry="36" fill="${A.ear}" ${S} transform="rotate(10 126 38)"/><ellipse cx="126" cy="42" rx="7" ry="24" fill="${A.inner}" transform="rotate(10 126 42)"/>`,
+    kitty: `<path d="M52 74 L58 22 L94 50 Z" fill="${A.ear}" ${S}/><path d="M61 62 L64 36 L83 51 Z" fill="${A.inner}"/><path d="M148 74 L142 22 L106 50 Z" fill="${A.ear}" ${S}/><path d="M139 62 L136 36 L117 51 Z" fill="${A.inner}"/>`,
+    bear: `<circle cx="56" cy="52" r="20" fill="${A.ear}" ${S}/><circle cx="56" cy="52" r="10" fill="${A.inner}"/><circle cx="144" cy="52" r="20" fill="${A.ear}" ${S}/><circle cx="144" cy="52" r="10" fill="${A.inner}"/>`,
+    panda: `<circle cx="56" cy="52" r="20" fill="${A.ear}" ${S}/><circle cx="144" cy="52" r="20" fill="${A.ear}" ${S}/>`,
+    unicorn: `<path d="M60 66 L64 34 L88 52 Z" fill="${A.ear}" ${S}/><path d="M140 66 L136 34 L112 52 Z" fill="${A.ear}" ${S}/>`,
+    puppy: ''
+  };
+  g += ears[p.animal] || '';
+  // head
+  g += `<circle cx="100" cy="98" r="56" fill="${A.fur}" ${S}/>`;
+  if (p.animal === 'puppy') g += `<ellipse cx="48" cy="98" rx="16" ry="34" fill="${A.ear}" ${S} transform="rotate(18 48 98)"/><ellipse cx="152" cy="98" rx="16" ry="34" fill="${A.ear}" ${S} transform="rotate(-18 152 98)"/>`;
+  if (p.animal === 'panda') g += `<ellipse cx="79" cy="102" rx="15" ry="18" fill="${A.ear}" transform="rotate(20 79 102)"/><ellipse cx="121" cy="102" rx="15" ry="18" fill="${A.ear}" transform="rotate(-20 121 102)"/>`;
+  if (p.animal === 'bear' || p.animal === 'puppy') g += `<ellipse cx="100" cy="120" rx="21" ry="15" fill="${shade(A.fur,.45)}"/>`;
+  // eyes
+  if (p.animal === 'panda') g += `<circle cx="80" cy="102" r="8" fill="#fff"/><circle cx="81" cy="103" r="5" fill="${INK}"/><circle cx="120" cy="102" r="8" fill="#fff"/><circle cx="119" cy="103" r="5" fill="${INK}"/>`;
+  else g += `<ellipse cx="80" cy="102" rx="7.5" ry="9.5" fill="${INK}"/><circle cx="82.5" cy="98" r="3" fill="#fff"/><ellipse cx="120" cy="102" rx="7.5" ry="9.5" fill="${INK}"/><circle cx="122.5" cy="98" r="3" fill="#fff"/>`;
+  g += `<ellipse cx="66" cy="121" rx="10" ry="6" fill="#ff9ebf" opacity=".75"/><ellipse cx="134" cy="121" rx="10" ry="6" fill="#ff9ebf" opacity=".75"/>`;
+  // nose & mouth
+  if (['bear','puppy','panda'].includes(p.animal)) g += `<ellipse cx="100" cy="114" rx="7" ry="5" fill="${INK}"/>`;
+  else g += `<path d="M94 112 Q100 119 106 112 Z" fill="#ff6fa3" stroke="${INK}" stroke-width="2"/>`;
+  g += `<path d="M90 124 Q100 134 110 124" fill="none" stroke="${INK}" stroke-width="3.5" stroke-linecap="round"/>`;
+  if (p.animal === 'kitty') g += `<path d="M44 108 L66 112 M44 120 L66 118 M156 108 L134 112 M156 120 L134 118" stroke="${INK}" stroke-width="2.5" stroke-linecap="round"/>`;
+  // accessory
+  const acc = {
+    bow: `<g transform="translate(140 52) rotate(18)"><path d="M0 0 L-22 -14 Q-29 0 -22 14 Z" fill="#ff4f9a" ${S}/><path d="M0 0 L22 -14 Q29 0 22 14 Z" fill="#ff4f9a" ${S}/><circle r="7" fill="#ff8fc1" ${S}/></g>`,
+    crown: `<g transform="translate(100 44)"><path d="M-26 8 L-28 -16 L-13 -4 L0 -24 L13 -4 L28 -16 L26 8 Z" fill="#ffd84d" ${S}/><circle cx="0" cy="-1" r="4.5" fill="#ff4f9a"/><circle cx="-16" cy="2" r="3" fill="#7cc7ff"/><circle cx="16" cy="2" r="3" fill="#7cc7ff"/></g>`,
+    flower: `<g transform="translate(60 58)">${[0,72,144,216,288].map(a=>`<circle cx="${(Math.cos(a*Math.PI/180)*10).toFixed(1)}" cy="${(Math.sin(a*Math.PI/180)*10).toFixed(1)}" r="8" fill="#ffc8dd" stroke="${INK}" stroke-width="2.5"/>`).join('')}<circle r="6" fill="#ffd84d" stroke="${INK}" stroke-width="2.5"/></g>`,
+    glasses: `<g fill="rgba(255,255,255,.3)" stroke="#ff4f9a" stroke-width="4.5"><circle cx="80" cy="102" r="15"/><circle cx="120" cy="102" r="15"/><path d="M95 100 Q100 95 105 100" fill="none"/></g>`,
+    star: `<path d="${starPath(138,56,15,7)}" fill="#ffd84d" ${S}/>`,
+    heart: HEART(62,44,1,'#ff4f9a')
+  };
+  g += acc[p.acc] || '';
+  if (p.animal === 'unicorn') g += `<path d="M100 4 L88 46 L112 46 Z" fill="#ffd84d" ${S}/><path d="M92 32 L108 26 M90 40 L110 36 M95 20 L105 16" stroke="${INK}" stroke-width="2.5"/>`;
+  return g;
+}
+const charSVG = (p, label) => `<svg viewBox="0 0 200 240" role="img" aria-label="${esc(label || 'Bestie character')}">${charG(p)}</svg>`;
+const mini = i => `<span class="mini">${charSVG(state.players[i], state.players[i].name)}</span>`;
+
+/* ---------------- STATE ---------------- */
+const ACTIVITIES = [
+  {id:'draw',   ic:'🎨', t:'Mystery Drawing', d:'Draw something super silly!', c:'c1'},
+  {id:'quiz',   ic:'🧠', t:'Bestie Quiz',     d:'Secret answers — do you match?', c:'c2'},
+  {id:'wyr',    ic:'🤪', t:'Would You Rather?', d:'Pick one… if you dare!', c:'c3'},
+  {id:'mystery',ic:'🎁', t:'Mystery Object',  d:'Guess it from 3 clues', c:'c4'},
+  {id:'puzzle', ic:'🧩', t:'Mini Puzzles',    d:'Solve them together', c:'c5'},
+  {id:'card',   ic:'💌', t:'Friendship Card', d:'Make a card for each other', c:'c6'},
+  {id:'faves',  ic:'🍓', t:"Friend's Favourites", d:'Pop stars, strawberries & cucumbers!', c:'faves-tile'}
+];
+const DEFAULTS = [
+  {name:'', animal:'bunny', outfit:'dress', color:'pink', acc:'bow'},
+  {name:'', animal:'kitty', outfit:'hoodie', color:'blue', acc:'crown'}
+];
+let state = { players: JSON.parse(JSON.stringify(DEFAULTS)), done: [], ready: false };
+const pname = i => state.players[i].name || ('Bestie ' + (i+1));
+
+function renderMeter(popIdx){
+  const n = ACTIVITIES.length;
+  let h = '<span class="lbl">Friendship</span>';
+  for (let i=0;i<n;i++) h += `<span class="h emo${i===popIdx?' pop':''}">${i < state.done.length ? '💗' : '🤍'}</span>`;
+  $('#meter').innerHTML = h;
+  $('#meter').setAttribute('aria-label', `Friendship meter: ${state.done.length} of ${n} hearts`);
+}
+function toast(msg){
+  const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg; document.body.appendChild(t);
+  setTimeout(()=>t.remove(), 2400);
+}
+function earnHeart(id){
+  if (state.done.includes(id)) return false;
+  state.done.push(id); SFX.heart(); renderMeter(state.done.length-1);
+  toast('💗 +1 Friendship Heart! 💗'); return true;
+}
+$('#homeBtn').onclick = () => state.ready ? goHub() : goHome();
+
+function show(html){ app.innerHTML = `<div class="screen">${html}</div>`; window.scrollTo({top:0,behavior:'smooth'}); }
+
+/* ---------------- HOME ---------------- */
+function homeScene(){
+  const pillow = (x,y,w,h,r,fill) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="26" fill="${fill}" stroke="${INK}" stroke-width="4" transform="rotate(${r} ${x+w/2} ${y+h/2})"/>`;
+  const popcorn = [[-22,-8],[-8,-16],[8,-14],[22,-6],[-14,0],[2,-4],[16,2],[-4,-24],[12,-26]].map(([x,y])=>`<circle cx="${260+x}" cy="${238+y}" r="9" fill="#fffbe8" stroke="${INK}" stroke-width="2.5"/>`).join('');
+  const crayons = ['#ff4f9a','#ffd84d','#7cc7ff','#79dcb0'].map((c,i)=>`<g transform="translate(${452+i*13} 248) rotate(${-12+i*8})"><rect x="-5" y="-30" width="10" height="36" rx="3" fill="${c}" stroke="${INK}" stroke-width="2.5"/><path d="M-5 -30 L0 -40 L5 -30Z" fill="${c}" stroke="${INK}" stroke-width="2.5"/></g>`).join('');
+  return `<svg class="scene" viewBox="0 0 520 320" role="img" aria-label="Two cartoon besties sitting together on pillows with popcorn, cupcakes and crayons">
+    <ellipse cx="260" cy="284" rx="250" ry="34" fill="#e3d6ff" stroke="#fff" stroke-width="5"/>
+    <ellipse cx="260" cy="284" rx="200" ry="22" fill="none" stroke="#fff" stroke-width="3" stroke-dasharray="10 10"/>
+    ${pillow(18,150,120,86,-8,'#ffc8dd')}${pillow(382,150,120,86,8,'#cde8ff')}
+    ${HEART(78,178,1.2,'#fff')}<path d="${starPath(442,192,14,6)}" fill="#fff" stroke="${INK}" stroke-width="2.5"/>
+    <g transform="translate(22 42) scale(1)">${charG(DEFAULTS[0])}</g>
+    <g transform="translate(298 42) scale(1)">${charG(DEFAULTS[1])}</g>
+    <path d="M226 238 Q260 292 294 238 Z" fill="#ff8fc1" stroke="${INK}" stroke-width="4"/>
+    ${popcorn}
+    <path d="M232 248 L288 248" stroke="#fff" stroke-width="4" stroke-dasharray="8 7"/>
+    <g transform="translate(40 262)"><path d="M-14 0 L14 0 L10 18 L-10 18Z" fill="#7cc7ff" stroke="${INK}" stroke-width="3"/><path d="M-16 0 Q-16 -18 0 -18 Q16 -18 16 0Z" fill="#fff" stroke="${INK}" stroke-width="3"/><circle cx="0" cy="-22" r="5" fill="#ff4f9a" stroke="${INK}" stroke-width="2.5"/></g>
+    ${crayons}
+    <text x="200" y="50" font-size="26" class="emo">✨</text><text x="300" y="30" font-size="22" class="emo">⭐</text><text x="250" y="80" font-size="24" class="emo">💕</text>
+  </svg>`;
+}
+function goHome(){
+  show(`<div class="card center stack home-wrap">
+    <span class="sparkle-float emo" style="left:6%;top:8%">✨</span><span class="sparkle-float emo" style="right:7%;top:12%;animation-delay:.8s">🌸</span>
+    <span class="sparkle-float emo" style="left:10%;bottom:12%;animation-delay:1.4s">⭐</span><span class="sparkle-float emo" style="right:9%;bottom:18%;animation-delay:.4s">🎀</span>
+    <h1 class="big-title"><span class="hrt">💕</span> BESTIE BUDDIES <span class="hrt">💕</span></h1>
+    <p class="sub" style="font-size:22px;font-weight:600">Ready for the ultimate playdate? 🎀✨</p>
+    ${homeScene()}
+    <div class="row"><button class="btn huge" id="startBtn" type="button">🌈 START PLAYDATE! 🌈</button></div>
+    <div class="row"><button class="btn soft" id="howBtn" type="button">🎮 How to Play</button></div>
+  </div>`);
+  $('#startBtn').onclick = () => { SFX.sparkle(); goSetup(0); };
+  $('#howBtn').onclick = goHow;
+}
+function goHow(){
+  const steps = [
+    ['👭','Sit together','Grab a comfy spot and share one screen — phone, tablet or computer.'],
+    ['🎀','Make your besties','Each player picks a name, a character, an outfit, a colour and something cute to wear.'],
+    ['🎮','Pick an activity','Choose any game from the Playdate Box. Take turns tapping and choosing.'],
+    ['💗','Fill the Friendship Meter','Every activity you finish adds a heart. Nobody loses — you win together!'],
+    ['🙈','No peeking!','In the Bestie Quiz, cover your eyes while your friend picks a secret answer.'],
+    ['🎉','Become Bestie Buddies','Finish your playdate to get your Ultimate Playdate Buddies badge.']
+  ];
+  show(`<div class="card stack">
+    <h2 class="center">🎮 How to Play</h2>
+    <div class="choices" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr))">
+      ${steps.map(s=>`<div class="choice" style="cursor:default;align-items:flex-start;text-align:left;padding:18px"><span class="ic emo">${s[0]}</span><span>${s[1]}</span><span style="font-weight:500;font-size:16px;color:var(--ink-soft)">${s[2]}</span></div>`).join('')}
+    </div>
+    <p class="sub center">Everything is played sitting down — just tap, draw and choose! 🧸</p>
+    <div class="row"><button class="btn" id="back" type="button">🌈 Let's go!</button></div>
+  </div>`);
+  $('#back').onclick = goHome;
+}
+
+/* ---------------- SETUP ---------------- */
+function goSetup(i){
+  const p = state.players[i];
+  const optBtns = (group, entries, render) => entries.map(([k,v]) => `<button class="opt" type="button" data-g="${group}" data-v="${k}" aria-pressed="${p[group]===k}">${render(k,v)}</button>`).join('');
+  show(`<div class="card stack">
+    <h2 class="center">Player ${i+1}: What's your name? 💕</h2>
+    <div class="setup-grid">
+      <div class="preview"><div id="pv"></div><div class="nm" id="pvName"></div></div>
+      <div class="stack">
+        <input class="namebox" id="nameInput" maxlength="12" placeholder="Type your name here ✏️" autocomplete="off" value="${esc(p.name)}" aria-label="Player ${i+1} name">
+        <div class="opt-group"><h3>🌸 Pick your character</h3><div class="opts">${optBtns('animal', Object.entries(ANIMALS), (k,v)=>`${charSVG({...p, animal:k}, v.label)}<span>${v.label}</span>`)}</div></div>
+        <div class="opt-group"><h3>🎀 Pick your outfit</h3><div class="opts">${optBtns('outfit', Object.entries(OUTFITS), (k,v)=>`<span class="ic emo">${v.ic}</span><span>${v.label}</span>`)}</div></div>
+        <div class="opt-group"><h3>💖 Favourite colour</h3><div class="opts swatches">${Object.entries(COLOURS).map(([k,v])=>`<button class="swatch" type="button" data-g="color" data-v="${k}" aria-pressed="${p.color===k}" aria-label="${k}" style="background:${v}"></button>`).join('')}</div></div>
+        <div class="opt-group"><h3>⭐ Cute accessory</h3><div class="opts">${optBtns('acc', Object.entries(ACCS), (k,v)=>`<span class="ic emo">${v.ic}</span><span>${v.label}</span>`)}</div></div>
+        <div class="row" style="justify-content:space-between">
+          <button class="btn soft" id="backBtn" type="button">⬅ Back</button>
+          <button class="btn lav" id="nextBtn" type="button">${i===0 ? 'Next: Player 2 ➜' : 'Meet the besties! 💕'}</button>
+        </div>
+      </div>
+    </div>
+  </div>`);
+  const refresh = () => {
+    $('#pv').innerHTML = charSVG(p, pname(i));
+    $('#pvName').textContent = p.name || `Player ${i+1}`;
+    document.querySelectorAll('[data-g]').forEach(b => b.setAttribute('aria-pressed', p[b.dataset.g] === b.dataset.v));
+    document.querySelectorAll('[data-g="animal"]').forEach(b => b.querySelector('svg').outerHTML = charSVG({...p, animal:b.dataset.v}, ANIMALS[b.dataset.v].label));
+  };
+  refresh();
+  $('#nameInput').oninput = e => { p.name = e.target.value.trim().slice(0,12); $('#pvName').textContent = p.name || `Player ${i+1}`; };
+  app.querySelectorAll('[data-g]').forEach(b => b.onclick = () => { p[b.dataset.g] = b.dataset.v; SFX.sparkle(); refresh(); });
+  $('#backBtn').onclick = () => i === 0 ? goHome() : goSetup(0);
+  $('#nextBtn').onclick = () => { SFX.sparkle(); i === 0 ? goSetup(1) : goDuo(); };
+}
+function goDuo(){
+  state.ready = true; renderMeter();
+  show(`<div class="card center stack">
+    <h2>✨ Meet the Besties! ✨</h2>
+    <div class="duo">
+      <figure>${charSVG(state.players[0], pname(0))}<figcaption>${esc(pname(0))}</figcaption></figure>
+      <div class="mid emo" aria-hidden="true">💕</div>
+      <figure>${charSVG(state.players[1], pname(1))}<figcaption>${esc(pname(1))}</figcaption></figure>
+    </div>
+    <p class="sub" style="font-size:22px;font-weight:600">Best friends, ready to play! 🎀🌈</p>
+    <div class="row"><button class="btn huge" id="goBtn" type="button">🎀 Open the Playdate Box! 🎀</button></div>
+  </div>`);
+  SFX.party();
+  $('#goBtn').onclick = goHub;
+}
+
+/* ---------------- HUB ---------------- */
+function goHub(){
+  if (!state.ready) return goHome();
+  if (state.done.length === ACTIVITIES.length && !state.finaleShown) return goFinale();
+  const hearts = ACTIVITIES.map((_,i)=> i < state.done.length ? '💗' : '🤍').join('');
+  show(`<div class="stack">
+    <div class="card center stack">
+      <div class="duo" style="gap:6px">${mini(0).replace('mini','mini" style="width:80px;height:92px')}<h2 style="align-self:center">${esc(pname(0))} &amp; ${esc(pname(1))}'s Playdate Box</h2>${mini(1).replace('mini','mini" style="width:80px;height:92px')}</div>
+      <div class="hub-meter emo" aria-label="${state.done.length} of ${ACTIVITIES.length} friendship hearts">${hearts}</div>
+      <p class="sub">Every activity you finish adds a friendship heart! 💕</p>
+    </div>
+    <div class="tiles">
+      ${ACTIVITIES.map(a=>`<button class="tile ${a.c}" type="button" data-a="${a.id}"><span class="ic emo">${a.ic}</span><span class="t">${a.t}</span><span class="d">${a.d}</span>${state.done.includes(a.id)?'<span class="done">💗 Done!</span>':''}</button>`).join('')}
+    </div>
+    <div class="row"><button class="btn lav" id="finishBtn" type="button" ${state.done.length?'':'disabled'}>🎉 Finish our playdate</button></div>
+  </div>`);
+  const go = {draw:goDraw, quiz:goQuiz, wyr:goWyr, mystery:goMystery, puzzle:goPuzzleMenu, card:goCard, faves:goFaves};
+  app.querySelectorAll('[data-a]').forEach(b => b.onclick = () => go[b.dataset.a]());
+  $('#finishBtn').onclick = goFinale;
+}
+const backRow = (extra='') => `<div class="row" style="justify-content:space-between">
+  <button class="btn soft" type="button" data-hub>⬅ Playdate Box</button>${extra}</div>`;
+function wireHub(){ app.querySelectorAll('[data-hub]').forEach(b => b.onclick = goHub); }
+
+/* ---------------- 1. MYSTERY DRAWING ---------------- */
+const DRAW_PROMPTS = [
+  ['🐱','Draw a cat wearing a crown!'],['🦄','Draw a unicorn eating pizza!'],['🐸','Draw a frog going to school!'],
+  ['👽','Draw an alien having a birthday party!'],['🐶','Draw a puppy driving a bus!'],['🐧','Draw a penguin at the beach!'],
+  ['🐢','Draw a turtle flying a kite!'],['🦖','Draw a dinosaur having a tea party!'],['🐻','Draw a bear in a ballet tutu!'],
+  ['🐙','Draw an octopus brushing its teeth!'],['🐷','Draw a pig riding a rainbow!'],['🦒','Draw a giraffe wearing a scarf!'],
+  ['🐝','Draw a bee baking cupcakes!'],['🐰','Draw a bunny astronaut on the moon!'],['🦕','Draw a dinosaur on a skateboard!'],
+  ['🐭','Draw a mouse living in a cheese house!']
+];
+const PAINTS = ['#4a3560','#ff4f9a','#ff9f43','#ffd84d','#3cc47c','#2f8fe0','#8a5cf0','#8d5a3b','#ffffff'];
+const AWARDS = [['😂','Funniest'],['🎨','Most Creative'],['🌈','Most Colourful'],['🐸','Silliest'],['💖','Cutest'],['⭐','Super Sparkly'],['🤪','Wackiest'],['🦄','Most Magical'],['🎀','Fanciest']];
+let drawPrompt = null;
+function goDraw(newOne){
+  if (!drawPrompt || newOne) { let p; do { p = pick(DRAW_PROMPTS); } while (drawPrompt && p === drawPrompt && DRAW_PROMPTS.length > 1); drawPrompt = p; }
+  const pad = i => `<div class="pad ${i?'p2':''}"><div class="pad-head">${mini(i)}${esc(pname(i))}'s drawing</div>
+    <canvas width="500" height="400" id="cv${i}" aria-label="${esc(pname(i))}'s drawing area"></canvas>
+    <div class="tools">${PAINTS.map((c,k)=>`<button class="dot" type="button" style="background:${c}" data-p="${i}" data-c="${c}" aria-label="colour ${c}" aria-pressed="${k===1}"></button>`).join('')}</div>
+    <div class="tools">${[['S',5],['M',11],['L',22]].map(([l,s],k)=>`<button class="tool" type="button" data-p="${i}" data-s="${s}" aria-pressed="${k===1}">${l==='S'?'• Thin':l==='M'?'● Medium':'⬤ Thick'}</button>`).join('')}
+      <button class="tool" type="button" data-p="${i}" data-er aria-pressed="false">🧽 Eraser</button>
+      <button class="tool" type="button" data-p="${i}" data-clear>🗑️ Start over</button></div></div>`;
+  show(`<div class="stack">
+    <div class="prompt-banner"><span class="emo">${drawPrompt[0]}</span> ${drawPrompt[1]}</div>
+    <p class="sub center">Draw at the same time, or take turns. No rush! 🖍️</p>
+    <div class="pads">${pad(0)}${pad(1)}</div>
+    <div class="row"><button class="btn soft" type="button" id="newPrompt">🔄 Different challenge</button><button class="btn huge" type="button" id="revealBtn">✨ REVEAL! ✨</button></div>
+    ${backRow()}
+  </div>`);
+  wireHub();
+  const pads = [0,1].map(i => setupPad(i));
+  $('#newPrompt').onclick = () => goDraw(true);
+  $('#revealBtn').onclick = () => drawReveal(pads.map(p => p.canvas.toDataURL('image/png')));
+}
+function setupPad(i){
+  const canvas = $('#cv'+i), ctx = canvas.getContext('2d');
+  const st = {color:PAINTS[1], size:11, eraser:false, drawing:false, last:null};
+  ctx.fillStyle = '#fff'; ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  const pos = e => { const r = canvas.getBoundingClientRect(); return {x:(e.clientX-r.left)*canvas.width/r.width, y:(e.clientY-r.top)*canvas.height/r.height}; };
+  const dot = pt => { ctx.beginPath(); ctx.fillStyle = st.eraser ? '#fff' : st.color; ctx.arc(pt.x, pt.y, (st.eraser?st.size*2:st.size)/2, 0, Math.PI*2); ctx.fill(); };
+  canvas.addEventListener('pointerdown', e => { e.preventDefault(); canvas.setPointerCapture(e.pointerId); st.drawing = true; st.last = pos(e); dot(st.last); });
+  canvas.addEventListener('pointermove', e => {
+    if (!st.drawing) return; const pt = pos(e);
+    ctx.strokeStyle = st.eraser ? '#fff' : st.color; ctx.lineWidth = st.eraser ? st.size*2 : st.size;
+    ctx.beginPath(); ctx.moveTo(st.last.x, st.last.y); ctx.lineTo(pt.x, pt.y); ctx.stroke(); st.last = pt;
+  });
+  const end = () => { st.drawing = false; };
+  canvas.addEventListener('pointerup', end); canvas.addEventListener('pointercancel', end); canvas.addEventListener('pointerleave', end);
+  app.querySelectorAll(`[data-p="${i}"]`).forEach(b => b.onclick = () => {
+    if (b.dataset.c) { st.color = b.dataset.c; st.eraser = false; app.querySelectorAll(`[data-p="${i}"][data-c]`).forEach(x=>x.setAttribute('aria-pressed', x===b)); app.querySelector(`[data-p="${i}"][data-er]`).setAttribute('aria-pressed', false); }
+    else if (b.dataset.s) { st.size = +b.dataset.s; app.querySelectorAll(`[data-p="${i}"][data-s]`).forEach(x=>x.setAttribute('aria-pressed', x===b)); }
+    else if (b.hasAttribute('data-er')) { st.eraser = !st.eraser; b.setAttribute('aria-pressed', st.eraser); }
+    else if (b.hasAttribute('data-clear')) { ctx.fillStyle = '#fff'; ctx.fillRect(0,0,canvas.width,canvas.height); }
+  });
+  return {canvas};
+}
+function drawReveal(imgs){
+  const aw = shuffle(AWARDS);
+  const give = [aw.slice(0,2), aw.slice(2,4)];
+  const earned = earnHeart('draw');
+  show(`<div class="stack">
+    <div class="prompt-banner">✨ Ta-daaa! ✨ <span class="emo">${drawPrompt[0]}</span> ${drawPrompt[1].replace('Draw ','')}</div>
+    <div class="reveal-grid">${[0,1].map(i=>`<div class="reveal-item"><div class="turn">${mini(i)}${esc(pname(i))}</div>
+      <img src="${imgs[i]}" alt="${esc(pname(i))}'s drawing">
+      <div>${give[i].map((a,k)=>`<span class="award" style="animation-delay:${.4+k*.3+i*.6}s"><span class="emo">${a[0]}</span> ${a[1]}</span>`).join('')}</div></div>`).join('')}</div>
+    <p class="sub center" style="font-weight:600">Both drawings are AMAZING! Give each other a big thumbs up! 👍💕</p>
+    <div class="row"><button class="btn lav" type="button" id="again">🎨 Draw another one</button><button class="btn" type="button" data-hub>💗 Back to Playdate Box</button></div>
+  </div>`);
+  wireHub(); SFX.party(); if (!earned) SFX.sparkle();
+  confetti(1600);
+  $('#again').onclick = () => goDraw(true);
+}
+
+/* ---------------- 2. BESTIE QUIZ ---------------- */
+const QUIZ = [
+  {q:'💖 What\'s your favourite colour?', o:[['🩷','Pink'],['💜','Purple'],['💙','Blue'],['💛','Yellow'],['💚','Green'],['🌈','Rainbow']]},
+  {q:'🍕 What\'s your favourite food?', o:[['🍕','Pizza'],['🍝','Pasta'],['🌮','Tacos'],['🥞','Pancakes'],['🍓','Fruit'],['🍗','Nuggets']]},
+  {q:'🐶 Dog or cat?', o:[['🐶','Dog'],['🐱','Cat']]},
+  {q:'🌈 Rainbow or glitter?', o:[['🌈','Rainbow'],['✨','Glitter']]},
+  {q:'🎬 What kind of movie do you love most?', o:[['🧚','Fairy tale'],['🐾','Animals'],['😂','Funny'],['🚀','Space'],['🦸','Superhero'],['🎤','Music & singing']]},
+  {q:'🦄 If you could have any magical pet, what would it be?', o:[['🦄','Unicorn'],['🐉','Baby dragon'],['🧜‍♀️','Mermaid fish'],['🐱','Flying kitten'],['🦋','Giant butterfly'],['🐰','Talking bunny']]},
+  {q:'🍦 Best ice cream flavour?', o:[['🍓','Strawberry'],['🍫','Chocolate'],['🍦','Vanilla'],['🍪','Cookies'],['🌱','Mint']]},
+  {q:'🎨 Favourite thing to do?', o:[['🖍️','Drawing'],['📚','Reading'],['🎤','Singing'],['🧱','Building'],['🎲','Games'],['🌳','Playing outside']]},
+  {q:'🌙 Morning or night?', o:[['☀️','Morning'],['🌙','Night']]},
+  {q:'🏖️ Beach or snow?', o:[['🏖️','Beach'],['⛄','Snow']]}
+];
+let quiz;
+function goQuiz(){
+  quiz = {qs: [QUIZ[0],QUIZ[1],QUIZ[2],QUIZ[3],...shuffle(QUIZ.slice(4)).slice(0,2)], qi:0, turn:0, ans:[[],[]], stage:'intro'};
+  renderQuiz();
+}
+function renderQuiz(){
+  const Q = quiz.qs[quiz.qi], t = quiz.turn, other = 1 - t;
+  if (quiz.stage === 'intro') {
+    show(`<div class="card stack center"><h2>🧠 Bestie Quiz</h2>
+      <div class="handoff"><div class="ic emo">🤫</div><h3>Secret answers!</h3><p>You'll each answer ${quiz.qs.length} questions in secret. When it's not your turn, cover your eyes! 🙈</p>
+      <p>At the end we'll see if you match!</p></div>
+      <div class="row"><button class="btn" type="button" id="go">${esc(pname(0))} goes first! ➜</button></div>${backRow()}</div>`);
+    wireHub(); $('#go').onclick = () => { quiz.stage = 'ask'; renderQuiz(); }; return;
+  }
+  if (quiz.stage === 'ask') {
+    show(`<div class="card stack"><div class="progress">Question ${quiz.qi+1} of ${quiz.qs.length}</div>
+      <div class="turn">${mini(t)}<span>${esc(pname(t))}, tap your secret answer! 🤫</span></div>
+      <p class="sub center">${esc(pname(other))}, no peeking! 🙈</p>
+      <div class="prompt-banner">${Q.q}</div>
+      <div class="choices">${Q.o.map((o,k)=>`<button class="choice" type="button" data-k="${k}"><span class="ic emo">${o[0]}</span>${o[1]}</button>`).join('')}</div>
+      ${backRow()}</div>`);
+    wireHub();
+    app.querySelectorAll('[data-k]').forEach(b => b.onclick = () => {
+      quiz.ans[t][quiz.qi] = +b.dataset.k; SFX.sparkle();
+      if (t === 0) { quiz.turn = 1; quiz.stage = 'pass'; }
+      else if (quiz.qi < quiz.qs.length - 1) { quiz.qi++; quiz.turn = 0; quiz.stage = 'pass'; }
+      else quiz.stage = 'drum';
+      renderQuiz();
+    });
+    return;
+  }
+  if (quiz.stage === 'pass') {
+    show(`<div class="card stack center"><div class="handoff"><div class="ic emo">🤫</div><h3>Secret answer saved!</h3>
+      <div class="turn" style="margin-top:10px">Now it's ${mini(t)} ${esc(pname(t))}'s turn!</div></div>
+      <div class="row"><button class="btn lav" type="button" id="go">I'm ${esc(pname(t))}, ready! 👀</button></div></div>`);
+    $('#go').onclick = () => { quiz.stage = 'ask'; renderQuiz(); }; return;
+  }
+  if (quiz.stage === 'drum') {
+    show(`<div class="card stack center"><div class="handoff"><div class="ic emo">🥁</div><h3>All the answers are in!</h3><p>Sit together — it's time for the big reveal!</p></div>
+      <div class="row"><button class="btn huge" type="button" id="go">✨ Reveal answers ✨</button></div></div>`);
+    $('#go').onclick = () => { quiz.stage = 'results'; renderQuiz(); }; return;
+  }
+  // results
+  let matches = 0;
+  const rows = quiz.qs.map((Q,i) => {
+    const a = Q.o[quiz.ans[0][i]], b = Q.o[quiz.ans[1][i]], m = quiz.ans[0][i] === quiz.ans[1][i]; if (m) matches++;
+    return `<div class="qrow" style="animation-delay:${i*.25}s"><div class="q">${Q.q}</div><div class="a"><span class="emo">${a[0]}</span> ${a[1]}</div><div class="a b"><span class="emo">${b[0]}</span> ${b[1]}</div>
+      <div class="verdict">${m ? 'You matched! 💕' : 'You are totally different! 😂'}</div></div>`;
+  }).join('');
+  const summary = matches >= 4 ? 'Twin brains! You think alike! 🧠💕' : matches >= 2 ? 'A little bit the same, a little bit different — perfect besties! 🌈' : 'Opposites make the best adventures! 😂✨';
+  earnHeart('quiz');
+  show(`<div class="card stack"><h2 class="center">🧠 The Big Reveal!</h2>
+    <div class="qhead"><span></span><span>${esc(pname(0))}</span><span>${esc(pname(1))}</span></div>
+    <div class="qres">${rows}</div>
+    <div class="ok-msg">You matched ${matches} time${matches===1?'':'s'}! ${summary}</div>
+    <div class="row"><button class="btn lav" type="button" id="again">🔁 Play again</button><button class="btn" type="button" data-hub>💗 Back to Playdate Box</button></div></div>`);
+  wireHub(); SFX.party(); confetti(1200);
+  $('#again').onclick = goQuiz;
+}
+
+/* ---------------- 3. WOULD YOU RATHER ---------------- */
+const WYR = [
+  [['🦄','Have a unicorn'],['🐉','Have a dragon']],[['🍕','Eat pizza'],['🍔','Eat burgers']],
+  [['🌈','Live in a rainbow house'],['🏰','Live in a castle']],[['🐱','Talk to cats'],['🐶','Talk to dogs']],
+  [['🧜‍♀️','Be a mermaid'],['🧚','Be a fairy']],[['🍦','Ice cream for breakfast'],['🥞','Pancakes for dinner']],
+  [['🚀','Visit the moon'],['🌊','Visit the bottom of the sea']],[['🐸','Hop like a frog'],['🐧','Waddle like a penguin']],
+  [['🎈','Float on a balloon'],['☁️','Bounce on a cloud']],[['🧁','Have a cupcake shop'],['🧸','Have a toy shop']],
+  [['🦖','Have a pet dinosaur'],['🐙','Have a pet octopus']],[['👑','Be a princess or prince'],['🦸','Be a superhero']],
+  [['🍭','Have lollipop trees'],['🍫','Have a chocolate river']],[['🦋','Have butterfly wings'],['🐢','Have a turtle shell']]
+];
+let wyr;
+function goWyr(){ wyr = {rounds: shuffle(WYR).slice(0,5), ri:0, picks:[null,null], turn:0}; renderWyr(); }
+function renderWyr(){
+  const R = wyr.rounds[wyr.ri], both = wyr.picks[0] !== null && wyr.picks[1] !== null;
+  const pickers = side => [0,1].filter(i => both && wyr.picks[i] === side).map(i=>mini(i)).join('');
+  show(`<div class="card stack"><div class="progress">Question ${wyr.ri+1} of ${wyr.rounds.length}</div>
+    <h2 class="center">🤪 Would you rather…</h2>
+    ${both ? `<div class="ok-msg">${wyr.picks[0]===wyr.picks[1] ? 'Same choice! Great minds think alike! 💕' : 'Different choices! How fun! 😂'}</div>`
+           : `<div class="turn">${mini(wyr.turn)}<span>${esc(pname(wyr.turn))}, tap your pick!</span></div>`}
+    <div class="wyr">
+      <div class="stack"><button class="bigchoice a" type="button" data-s="0" ${both?'disabled':''}><span class="ic emo">${R[0][0]}</span>${R[0][1]}</button><div class="pickers">${pickers(0)}</div></div>
+      <div class="or">OR</div>
+      <div class="stack"><button class="bigchoice b" type="button" data-s="1" ${both?'disabled':''}><span class="ic emo">${R[1][0]}</span>${R[1][1]}</button><div class="pickers">${pickers(1)}</div></div>
+    </div>
+    ${both ? `<div class="row"><button class="btn lav" type="button" id="next">${wyr.ri < wyr.rounds.length-1 ? 'Next question ➜' : '🎉 All done!'}</button></div>` : ''}
+    ${backRow()}</div>`);
+  wireHub();
+  if (!both) app.querySelectorAll('[data-s]').forEach(b => b.onclick = () => {
+    wyr.picks[wyr.turn] = +b.dataset.s; wyr.turn = 1 - wyr.turn; SFX.sparkle();
+    if (wyr.picks[0] !== null && wyr.picks[1] !== null) SFX.heart();
+    renderWyr();
+  });
+  else $('#next').onclick = () => {
+    if (wyr.ri < wyr.rounds.length - 1) { wyr.ri++; wyr.picks = [null,null]; wyr.turn = wyr.ri % 2; renderWyr(); }
+    else { earnHeart('wyr'); confetti(1200); SFX.party(); wyrDone(); }
+  };
+}
+function wyrDone(){
+  show(`<div class="card stack center"><div class="handoff"><div class="ic emo">🤪🎉</div><h3>Would You Rather — complete!</h3><p>You two have the silliest imaginations! 💕</p></div>
+    <div class="row"><button class="btn lav" type="button" id="again">🔁 More questions</button><button class="btn" type="button" data-hub>💗 Back to Playdate Box</button></div></div>`);
+  wireHub(); $('#again').onclick = goWyr;
+}
+
+/* ---------------- 4. MYSTERY OBJECT ---------------- */
+const OBJECTS = [
+  ['🧸','Teddy bear',['You might find me in a bedroom.','I\'m soft.','You might hug me!']],
+  ['☂️','Umbrella',['You need me on rainy days.','I open up really big.','I keep your head dry!']],
+  ['🍌','Banana',['You might find me in a fruit bowl.','I\'m yellow.','You peel me before you eat me!']],
+  ['🎈','Balloon',['You see me at birthday parties.','I can float up high.','Careful — I might go POP!']],
+  ['🚲','Bicycle',['You ride me outside.','I have two wheels.','You push my pedals with your feet!']],
+  ['🍦','Ice cream',['I live in the freezer.','I\'m cold and sweet.','I sit on top of a crunchy cone!']],
+  ['📚','Book',['You find lots of me in a library.','I have pages.','I\'m full of stories!']],
+  ['🦒','Giraffe',['You might see me at the zoo.','I have lots of spots.','I have the longest neck ever!']],
+  ['🎂','Birthday cake',['I come out at a party.','I have candles on top.','You make a wish before you blow!']],
+  ['🐧','Penguin',['I live where it\'s icy.','I can\'t fly, but I swim fast.','I look like I\'m wearing a tuxedo!']],
+  ['⏰','Alarm clock',['I sit next to your bed.','I go tick-tock.','I ring to wake you up!']],
+  ['🪁','Kite',['I love windy days.','I\'m attached to a long string.','I dance high up in the sky!']],
+  ['🦋','Butterfly',['You might see me in a garden.','I used to be a caterpillar.','I have beautiful colourful wings!']],
+  ['🧁','Cupcake',['You might find me at a bakery.','I\'m small and sweet.','I have frosting and sprinkles on top!']],
+  ['🐢','Turtle',['I\'m very, very slow.','I can live in water or on land.','I carry my house on my back!']],
+  ['🌈','Rainbow',['You see me after the rain.','I\'m up in the sky.','I have seven colours!']]
+];
+let mys;
+function goMystery(){ mys = {list: shuffle(OBJECTS).slice(0,4), oi:0}; startObject(); }
+function startObject(){
+  const O = mys.list[mys.oi];
+  const others = shuffle(OBJECTS.filter(o => o !== O)).slice(0,3);
+  mys.opts = shuffle([O, ...others]); mys.clues = 1; mys.wrong = []; mys.solved = false;
+  renderMystery();
+}
+function renderMystery(){
+  const O = mys.list[mys.oi], blur = mys.solved ? 0 : [0,14,8,3][mys.clues];
+  show(`<div class="card stack"><div class="progress">Mystery ${mys.oi+1} of ${mys.list.length}</div>
+    <h2 class="center">🎁 What's the Mystery Object?</h2>
+    <div class="silo emo" style="filter:${mys.solved ? 'none' : `brightness(0) blur(${blur}px)`};opacity:${mys.solved?1:.8}" aria-label="${mys.solved ? O[1] : 'Mystery silhouette'}">${O[0]}</div>
+    ${mys.solved ? `<div class="ok-msg"><span class="emo">${O[0]}</span> ${O[1].toUpperCase()}! You got it, besties! 🎉</div>` : ''}
+    <div class="clues">${O[2].slice(0, mys.solved ? 3 : mys.clues).map((c,i)=>`<div class="clue">🔍 Clue ${i+1}: "${c}"</div>`).join('')}</div>
+    ${mys.solved ? `<div class="row"><button class="btn lav" type="button" id="next">${mys.oi < mys.list.length-1 ? 'Next mystery ➜' : '🎉 All solved!'}</button></div>`
+      : `<p class="sub center">Talk it over together, then tap your guess! 💭</p>
+      <div class="choices">${mys.opts.map((o,k)=>`<button class="choice ${mys.wrong.includes(k)?'off':''}" type="button" data-k="${k}">${o[1]}</button>`).join('')}</div>
+      ${mys.clues < 3 ? `<div class="row"><button class="btn blue" type="button" id="clue">🔍 Show another clue</button></div>` : ''}`}
+    ${backRow()}</div>`);
+  wireHub();
+  if (mys.solved) { $('#next').onclick = () => { if (mys.oi < mys.list.length-1) { mys.oi++; startObject(); } else { earnHeart('mystery'); SFX.party(); confetti(1200); mysteryDone(); } }; return; }
+  if ($('#clue')) $('#clue').onclick = () => { mys.clues++; SFX.sparkle(); renderMystery(); };
+  app.querySelectorAll('[data-k]').forEach(b => b.onclick = () => {
+    const k = +b.dataset.k;
+    if (mys.opts[k] === O) { mys.solved = true; SFX.sparkle(); SFX.heart(); renderMystery(); }
+    else { mys.wrong.push(k); SFX.oops(); b.classList.add('off','wiggle'); toast(mys.clues < 3 ? 'Ooh, not quite! Try another clue 🔍' : 'Not quite — keep guessing! 💭'); }
+  });
+}
+function mysteryDone(){
+  show(`<div class="card stack center"><div class="handoff"><div class="ic emo">🕵️‍♀️✨</div><h3>Super detectives!</h3><p>You solved every mystery together! 🎁💕</p></div>
+    <div class="row"><button class="btn lav" type="button" id="again">🔁 More mysteries</button><button class="btn" type="button" data-hub>💗 Back to Playdate Box</button></div></div>`);
+  wireHub(); $('#again').onclick = goMystery;
+}
+
+/* ---------------- 5. MINI PUZZLES ---------------- */
+const PUZZLES = [
+  {id:'memory', ic:'🃏', t:'Memory Match', d:'Flip cards to find pairs'},
+  {id:'pattern', ic:'🔁', t:'Pattern Party', d:'What comes next?'},
+  {id:'spot', ic:'🔎', t:'Spot the Difference', d:'Find 3 changes'},
+  {id:'riddle', ic:'❓', t:'Silly Riddles', d:'Think think think!'},
+  {id:'match', ic:'🔗', t:'Match It Up', d:'Who likes what?'}
+];
+const puzDone = new Set();
+function goPuzzleMenu(){
+  show(`<div class="card stack"><h2 class="center">🧩 Mini Puzzles</h2><p class="sub center">Solve any puzzle together to earn a heart. Try them all! 💕</p>
+    <div class="tiles">${PUZZLES.map((p,i)=>`<button class="tile c${(i%6)+1}" type="button" data-z="${p.id}"><span class="ic emo">${p.ic}</span><span class="t">${p.t}</span><span class="d">${p.d}</span>${puzDone.has(p.id)?'<span class="done">✅ Solved!</span>':''}</button>`).join('')}</div>
+    ${backRow()}</div>`);
+  wireHub();
+  const go = {memory:pzMemory, pattern:pzPattern, spot:pzSpot, riddle:pzRiddle, match:pzMatch};
+  app.querySelectorAll('[data-z]').forEach(b => b.onclick = () => go[b.dataset.z]());
+}
+function puzzleSolved(id, msg){
+  puzDone.add(id); earnHeart('puzzle'); SFX.party(); confetti(1000);
+  const box = $('#pzEnd');
+  box.innerHTML = `<div class="ok-msg">${msg}</div><div class="row"><button class="btn lav" type="button" id="pzMore">🧩 More puzzles</button><button class="btn" type="button" data-hub>💗 Back to Playdate Box</button></div>`;
+  wireHub(); $('#pzMore').onclick = goPuzzleMenu;
+}
+const pzShell = (title, body) => `<div class="card stack"><h2 class="center">${title}</h2>${body}<div id="pzEnd" class="stack"></div>
+  <div class="row" style="justify-content:space-between"><button class="btn soft" type="button" id="pzBack">⬅ Puzzles</button></div></div>`;
+function wirePzBack(){ $('#pzBack').onclick = goPuzzleMenu; }
+
+function pzMemory(){
+  const faces = shuffle(['💖','🦄','🌈','🍓','🐱','⭐','🧁','🐰']).slice(0,6);
+  const deck = shuffle([...faces, ...faces]).map(f => ({f, up:false, got:false}));
+  let open = [], flips = 0, lock = false;
+  show(pzShell('🃏 Memory Match', `<p class="sub center">Take turns flipping two cards. Find all the matching pairs! 💕</p><div class="memgrid" id="mg"></div><p class="progress" id="flips">Flips: 0</p>`));
+  wirePzBack();
+  const draw = () => {
+    $('#mg').innerHTML = deck.map((c,i)=>`<button class="mcard emo ${c.got?'got':c.up?'up':''}" type="button" data-i="${i}" aria-label="${c.up||c.got?c.f:'hidden card'}">${c.up||c.got ? c.f : '?'}</button>`).join('');
+    $('#flips').textContent = 'Flips: ' + flips;
+    app.querySelectorAll('.mcard').forEach(b => b.onclick = () => {
+      const c = deck[+b.dataset.i]; if (lock || c.up || c.got) return;
+      c.up = true; open.push(c); flips++;
+      if (open.length === 2) {
+        lock = true;
+        if (open[0].f === open[1].f) { open.forEach(x => { x.got = true; x.up = false; }); open = []; lock = false; SFX.sparkle();
+          if (deck.every(x => x.got)) { draw(); return puzzleSolved('memory', `All pairs found in ${flips} flips! Super memory! 🧠✨`); } }
+        else setTimeout(() => { open.forEach(x => x.up = false); open = []; lock = false; draw(); }, 900);
+      }
+      draw();
+    });
+  };
+  draw();
+}
+function pzPattern(){
+  const P = shuffle([
+    [['🌸','⭐','🌸','⭐','🌸'],'⭐',['⭐','🌸','🍓']],
+    [['🍎','🍎','🍌','🍎','🍎'],'🍌',['🍎','🍌','🍇']],
+    [['🔴','🟡','🔵','🔴','🟡'],'🔵',['🔴','🟡','🔵']],
+    [['🐱','🐶','🐶','🐱','🐶'],'🐶',['🐱','🐶','🐰']],
+    [['⭐','🌙','☀️','⭐','🌙'],'☀️',['⭐','🌙','☀️']],
+    [['💗','💗','💜','💜','💗'],'💗',['💗','💜','💙']],
+    [['🐸','🐸','🐸','🐞','🐸'],'🐸',['🐸','🐞','🦋']]
+  ]).slice(0,4);
+  let pi = 0;
+  show(pzShell('🔁 Pattern Party', `<p class="sub center">Look at the pattern. What comes next? 🤔</p><div id="pp" class="stack"></div>`));
+  wirePzBack();
+  const draw = () => {
+    const [seq, ans, opts] = P[pi];
+    $('#pp').innerHTML = `<div class="progress">Pattern ${pi+1} of ${P.length}</div><div class="pattern emo">${seq.map(s=>`<span>${s}</span>`).join('')}<span class="q">?</span></div>
+      <div class="choices">${shuffle(opts).map(o=>`<button class="choice" type="button" data-o="${o}"><span class="ic emo">${o}</span></button>`).join('')}</div>`;
+    app.querySelectorAll('#pp [data-o]').forEach(b => b.onclick = () => {
+      if (b.dataset.o === ans) { SFX.sparkle(); b.classList.add('right'); setTimeout(() => { pi++; if (pi < P.length) draw(); else { $('#pp').innerHTML = ''; puzzleSolved('pattern', 'Pattern pros! You got them all! 🔁🌟'); } }, 650); }
+      else { SFX.oops(); b.classList.add('wiggle'); setTimeout(()=>b.classList.remove('wiggle'),500); toast('Hmm, look again! 👀'); }
+    });
+  };
+  draw();
+}
+function pzSpot(){
+  const pool = ['🌸','⭐','🍓','🐱','🎈','🦄','🍩','🐰','🌈','🍪','🐸','💖','🧁','🐝','🍋','🦋'];
+  const left = Array.from({length:16}, () => pick(pool));
+  const diffIdx = shuffle([...Array(16).keys()]).slice(0,3);
+  const right = left.slice(); diffIdx.forEach(i => { let n; do { n = pick(pool); } while (n === left[i]); right[i] = n; });
+  const found = new Set();
+  show(pzShell('🔎 Spot the Difference', `<p class="sub center">3 things are different in the <b>right</b> picture. Tap them! 🔍</p>
+    <div class="spot"><div><div class="progress">Picture A</div><div class="sgrid emo">${left.map(e=>`<div class="scell" style="display:flex;align-items:center;justify-content:center">${e}</div>`).join('')}</div></div>
+    <div><div class="progress">Picture B — tap here!</div><div class="sgrid emo" id="rg">${right.map((e,i)=>`<button class="scell" type="button" data-i="${i}">${e}</button>`).join('')}</div></div></div>
+    <p class="progress" id="sf">Found 0 of 3</p>`));
+  wirePzBack();
+  app.querySelectorAll('#rg [data-i]').forEach(b => b.onclick = () => {
+    const i = +b.dataset.i;
+    if (diffIdx.includes(i) && !found.has(i)) { found.add(i); b.classList.add('found'); SFX.sparkle(); $('#sf').textContent = `Found ${found.size} of 3`;
+      if (found.size === 3) puzzleSolved('spot', 'Eagle eyes! You found all 3 differences! 🦅🔎'); }
+    else if (!found.has(i)) { SFX.oops(); b.classList.add('wiggle'); setTimeout(()=>b.classList.remove('wiggle'),500); }
+  });
+}
+function pzRiddle(){
+  const R = shuffle([
+    ['What has hands but can\'t clap?', ['⏰ A clock','🧤 A glove','🐒 A monkey'], 0],
+    ['What has keys but can\'t open doors?', ['🚪 A door','🎹 A piano','🗝️ A treasure chest'], 1],
+    ['What goes up but never comes down?', ['🎈 A balloon','🎂 Your age','🪁 A kite'], 1],
+    ['What can you catch but never throw?', ['⚽ A ball','🐟 A fish','🤧 A cold'], 2],
+    ['What has lots of teeth but can\'t bite?', ['🦈 A shark','🪮 A comb','🐊 A crocodile'], 1],
+    ['What gets bigger the more you take away?', ['🕳️ A hole','🍕 A pizza','🧸 A teddy'], 0],
+    ['What has one eye but can\'t see?', ['🪡 A needle','🐙 An octopus','🌀 A storm'], 0]
+  ]).slice(0,4);
+  let ri = 0;
+  show(pzShell('❓ Silly Riddles', `<p class="sub center">Read the riddle out loud together, then pick an answer! 🤔</p><div id="rr" class="stack"></div>`));
+  wirePzBack();
+  const draw = () => {
+    const [q, opts, a] = R[ri];
+    $('#rr').innerHTML = `<div class="progress">Riddle ${ri+1} of ${R.length}</div><div class="prompt-banner">${q}</div>
+      <div class="choices">${opts.map((o,k)=>`<button class="choice" type="button" data-k="${k}">${o}</button>`).join('')}</div>`;
+    app.querySelectorAll('#rr [data-k]').forEach(b => b.onclick = () => {
+      if (+b.dataset.k === a) { b.classList.add('right'); SFX.sparkle(); setTimeout(() => { ri++; if (ri < R.length) draw(); else { $('#rr').innerHTML = ''; puzzleSolved('riddle', 'Riddle masters! Your brains are sparkling! 🧠✨'); } }, 800); }
+      else { SFX.oops(); b.classList.add('off'); toast('Good try! Pick another one 💭'); }
+    });
+  };
+  draw();
+}
+function pzMatch(){
+  const PAIRS = shuffle([['🐝','🍯'],['🐶','🦴'],['🐰','🥕'],['🐒','🍌'],['🐭','🧀'],['🐼','🎋'],['🐿️','🌰']]).slice(0,5);
+  const rightSide = shuffle(PAIRS.map(p=>p[1]));
+  let sel = null; const matched = new Set();
+  show(pzShell('🔗 Match It Up', `<p class="sub center">Tap an animal, then tap its favourite thing! 🐾</p>
+    <div class="matchcols"><div class="col" id="ml">${PAIRS.map((p,i)=>`<button class="mitem emo" type="button" data-l="${i}">${p[0]}</button>`).join('')}</div>
+    <div class="col" id="mr">${rightSide.map(f=>`<button class="mitem emo" type="button" data-r="${f}">${f}</button>`).join('')}</div></div>`));
+  wirePzBack();
+  app.querySelectorAll('[data-l]').forEach(b => b.onclick = () => {
+    app.querySelectorAll('[data-l]').forEach(x => x.classList.remove('sel')); b.classList.add('sel'); sel = +b.dataset.l;
+  });
+  app.querySelectorAll('[data-r]').forEach(b => b.onclick = () => {
+    if (sel === null) { toast('Tap an animal first! 🐾'); return; }
+    const lb = app.querySelector(`[data-l="${sel}"]`);
+    if (PAIRS[sel][1] === b.dataset.r) { lb.classList.remove('sel'); lb.classList.add('ok'); b.classList.add('ok'); matched.add(sel); sel = null; SFX.sparkle();
+      if (matched.size === PAIRS.length) puzzleSolved('match', 'Perfect matches! Every animal is happy! 🐾💕'); }
+    else { SFX.oops(); b.classList.add('wiggle'); setTimeout(()=>b.classList.remove('wiggle'),500); }
+  });
+}
+
+/* ---------------- 6. FRIENDSHIP CARD MAKER ---------------- */
+const CARD_BGS = [
+  {n:'Pink Dream', s:['#ffc8dd','#ff8fc1'], dark:false},
+  {n:'Lavender Sky', s:['#e3d6ff','#b69cff'], dark:false},
+  {n:'Baby Blue', s:['#dff0ff','#8fcaff'], dark:false},
+  {n:'Lemonade', s:['#fff7c9','#ffd84d'], dark:false},
+  {n:'Rainbow', s:['#ffb3c7','#ffd9a0','#fff1a8','#c9f5e3','#bde0fe','#d9c8ff'], dark:false},
+  {n:'Starry Night', s:['#5b3f8f','#2c2a6b'], dark:true}
+];
+const STICKERS = {
+  '🌸 Stickers':['🌸','🌷','🌼','🍓','🧁','🍭','🎀','🎈'],
+  '💕 Hearts':['💕','💖','💗','💜','💙','💛','💞','🩷'],
+  '⭐ Stars':['⭐','🌟','💫','🌙','☀️','☁️'],
+  '🌈 Rainbow':['🌈','🦄','☁️','🌈'],
+  '🦄 Animals':['🦄','🐱','🐶','🐰','🐻','🐼','🐸','🦋','🐥','🐬'],
+  '✨ Sparkles':['✨','🎉','🎊','💎','🫧','👑'],
+  '🍓 Faves':['🍓','🥒','🎤','🎵','🎶','🩷','💕','⭐']
+};
+const MSG_IDEAS = ["You're an awesome friend! 💕","Besties forever! 🎀","You make me laugh! 😂","Best playdate ever! 🌈","Thanks for being my buddy! 🧸"];
+const card = {bg:0, stickers:[], msg:"You're an awesome friend! 💕", tab:'🌸 Stickers'};
+function loadAlbum(){ try { return JSON.parse(localStorage.getItem('bb_album') || '[]'); } catch(e){ return []; } }
+function saveAlbum(a){ try { localStorage.setItem('bb_album', JSON.stringify(a)); } catch(e){} }
+const bgCSS = b => b.s.length > 2 ? `linear-gradient(135deg,${b.s.join(',')})` : `linear-gradient(135deg,${b.s[0]},${b.s[1]})`;
+function goCard(){
+  const album = loadAlbum();
+  show(`<div class="stack"><div class="card stack"><h2 class="center">💌 Friendship Card Maker</h2>
+    <p class="sub center">Pick a background, tap stickers to add them, then drag them around! ✨</p>
+    <div class="maker">
+      <div class="stack"><div class="fcard" id="fcard"></div>
+        <div class="row"><button class="tool" type="button" id="undo">↩️ Undo sticker</button><button class="tool" type="button" id="clr">🧹 Clear stickers</button></div></div>
+      <div class="stack">
+        <div class="opt-group"><h3>🎀 Background</h3><div class="bgbtns">${CARD_BGS.map((b,i)=>`<button type="button" data-bg="${i}" aria-label="${b.n}" aria-pressed="${card.bg===i}" style="background:${bgCSS(b)}"></button>`).join('')}</div></div>
+        <div class="opt-group"><h3>🌟 Stickers</h3><div class="tabs">${Object.keys(STICKERS).map(k=>`<button class="tool" type="button" data-tab="${k}" aria-pressed="${card.tab===k}">${k}</button>`).join('')}</div>
+          <div class="stkbtns emo" id="stkb" style="margin-top:8px"></div></div>
+        <div class="opt-group"><h3>✏️ Your message</h3><input class="namebox" id="msgIn" maxlength="48" value="${esc(card.msg)}" aria-label="Card message" style="font-size:19px">
+          <div class="chips" style="margin-top:8px">${MSG_IDEAS.map(m=>`<button type="button" data-m="${esc(m)}">${esc(m)}</button>`).join('')}</div></div>
+      </div>
+    </div>
+    <div class="row"><button class="btn huge" type="button" id="saveCard">💖 SAVE OUR FRIENDSHIP CARD</button></div>
+    ${backRow()}</div>
+    ${album.length ? `<div class="card stack"><h3>📒 Our saved cards</h3><div class="album">${album.map(a=>`<img src="${a}" alt="Saved friendship card">`).join('')}</div></div>` : ''}
+  </div>`);
+  wireHub();
+  drawCard(); drawStickerBtns();
+  app.querySelectorAll('[data-bg]').forEach(b => b.onclick = () => { card.bg = +b.dataset.bg; app.querySelectorAll('[data-bg]').forEach(x=>x.setAttribute('aria-pressed', x===b)); drawCard(); });
+  app.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => { card.tab = b.dataset.tab; app.querySelectorAll('[data-tab]').forEach(x=>x.setAttribute('aria-pressed', x===b)); drawStickerBtns(); });
+  $('#msgIn').oninput = e => { card.msg = e.target.value; drawCard(); };
+  app.querySelectorAll('[data-m]').forEach(b => b.onclick = () => { card.msg = b.dataset.m; $('#msgIn').value = card.msg; drawCard(); });
+  $('#undo').onclick = () => { card.stickers.pop(); drawCard(); };
+  $('#clr').onclick = () => { card.stickers = []; drawCard(); };
+  $('#saveCard').onclick = saveCard;
+}
+function drawStickerBtns(){
+  $('#stkb').innerHTML = [...new Set(STICKERS[card.tab])].map(e=>`<button type="button" data-st="${e}" aria-label="add ${e}">${e}</button>`).join('');
+  app.querySelectorAll('[data-st]').forEach(b => b.onclick = () => {
+    const edge = () => Math.random() < .5 ? 5 + Math.random()*12 : 83 + Math.random()*12;
+    const topOrBottom = Math.random() < .5;
+    card.stickers.push({e:b.dataset.st, x: topOrBottom ? 8+Math.random()*84 : edge(), y: topOrBottom ? (Math.random()<.5 ? 8+Math.random()*14 : 80+Math.random()*12) : 10+Math.random()*80, s:.8+Math.random()*.6, r:-20+Math.random()*40});
+    SFX.heart(); drawCard();
+  });
+}
+function drawCard(){
+  const el = $('#fcard'), b = CARD_BGS[card.bg];
+  el.style.background = bgCSS(b);
+  const starsBg = b.dark ? Array.from({length:18},(_,i)=>`<span class="emo" style="position:absolute;left:${(i*53)%100}%;top:${(i*37)%100}%;font-size:12px;opacity:.7">✦</span>`).join('').replace(/emo"/g,'emo" aria-hidden="true"') : '';
+  el.innerHTML = starsBg + `<div class="msg"><div class="m">${esc(card.msg || '💕')}</div><div class="f">From ${esc(pname(0))} &amp; ${esc(pname(1))} 💕</div></div>` +
+    card.stickers.map((s,i)=>`<span class="stk" data-si="${i}" style="left:${s.x}%;top:${s.y}%;font-size:calc(${s.s} * clamp(28px,6vw,52px));transform:translate(-50%,-50%) rotate(${s.r}deg)">${s.e}</span>`).join('');
+  el.querySelectorAll('.stk').forEach(sp => {
+    sp.addEventListener('pointerdown', e => {
+      e.preventDefault(); sp.setPointerCapture(e.pointerId); sp.style.cursor = 'grabbing';
+      const s = card.stickers[+sp.dataset.si];
+      const move = ev => { const r = el.getBoundingClientRect(); s.x = Math.max(0, Math.min(100, (ev.clientX - r.left) / r.width * 100)); s.y = Math.max(0, Math.min(100, (ev.clientY - r.top) / r.height * 100)); sp.style.left = s.x + '%'; sp.style.top = s.y + '%'; };
+      const up = () => { sp.removeEventListener('pointermove', move); sp.removeEventListener('pointerup', up); sp.removeEventListener('pointercancel', up); sp.style.cursor = 'grab'; };
+      sp.addEventListener('pointermove', move); sp.addEventListener('pointerup', up); sp.addEventListener('pointercancel', up);
+    });
+  });
+}
+function wrapText(ctx, text, maxW){
+  const words = text.split(' '); const lines = []; let line = '';
+  words.forEach(w => { const t = line ? line + ' ' + w : w; if (ctx.measureText(t).width > maxW && line) { lines.push(line); line = w; } else line = t; });
+  if (line) lines.push(line); return lines;
+}
+async function renderCardPNG(){
+  try { await document.fonts.ready; } catch(e){}
+  const W = 1200, H = 900, cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+  const ctx = cv.getContext('2d'), b = CARD_BGS[card.bg];
+  const gr = ctx.createLinearGradient(0,0,W,H); b.s.forEach((c,i)=>gr.addColorStop(i/(b.s.length-1), c));
+  ctx.fillStyle = gr; ctx.fillRect(0,0,W,H);
+  if (b.dark) { ctx.fillStyle = 'rgba(255,255,255,.7)'; ctx.font = '22px sans-serif'; for (let i=0;i<18;i++) ctx.fillText('✦', ((i*53)%100)/100*W, ((i*37)%100)/100*H + 20); }
+  // message panel
+  const px = W*.12, py = H*.30, pw = W*.76, ph = H*.44;
+  ctx.fillStyle = 'rgba(255,255,255,.8)'; ctx.beginPath();
+  if (ctx.roundRect) ctx.roundRect(px,py,pw,ph,48); else ctx.rect(px,py,pw,ph); ctx.fill();
+  ctx.fillStyle = INK; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.font = `800 64px Sniglet, Fredoka, ${getComputedStyle(document.body).fontFamily}`;
+  const lines = wrapText(ctx, card.msg || '💕', pw - 80).slice(0,3);
+  lines.forEach((l,i) => ctx.fillText(l, W/2, py + ph/2 - 30 - (lines.length-1)*36 + i*72));
+  ctx.font = '600 32px Fredoka, sans-serif'; ctx.fillStyle = '#7c6893';
+  ctx.fillText(`From ${pname(0)} & ${pname(1)} 💕`, W/2, py + ph - 50);
+  // stickers
+  const base = Math.min(52, Math.max(28, window.innerWidth*.06)) * (W / $('#fcard').clientWidth);
+  card.stickers.forEach(s => {
+    ctx.save(); ctx.translate(s.x/100*W, s.y/100*H); ctx.rotate(s.r*Math.PI/180);
+    ctx.font = `${Math.round(base*s.s)}px ${'Apple Color Emoji'}, 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif`;
+    ctx.fillText(s.e, 0, 0); ctx.restore();
+  });
+  // border
+  ctx.lineWidth = 24; ctx.strokeStyle = '#fff'; ctx.strokeRect(12,12,W-24,H-24);
+  return cv;
+}
+async function saveCard(){
+  const cv = await renderCardPNG();
+  const url = cv.toDataURL('image/png');
+  const album = loadAlbum(); album.unshift(cv.toDataURL('image/jpeg', .6)); saveAlbum(album.slice(0,6));
+  earnHeart('card'); SFX.party(); confetti(1400);
+  let dl = null; try { dl = window.claude && window.claude.use ? await Promise.race([window.claude.use('downloads'), new Promise(r=>setTimeout(()=>r(null),1500))]) : null; } catch(e){ dl = null; }
+  const m = document.createElement('div'); m.className = 'modal';
+  m.innerHTML = `<div class="card stack center"><h2>💖 Card saved! 💖</h2><img src="${url}" alt="Your friendship card">
+    <p class="sub">It's in your "Our saved cards" album on this device.${dl ? '' : ' To keep a copy, press and hold (or right-click) the picture and choose save.'}</p>
+    <div class="row">${dl ? '<button class="btn blue" type="button" id="dlBtn">⬇️ Download picture</button>' : ''}<button class="btn" type="button" id="closeM">🎀 Yay!</button></div></div>`;
+  document.body.appendChild(m);
+  m.querySelector('#closeM').onclick = () => { m.remove(); goCard(); };
+  if (dl) m.querySelector('#dlBtn').onclick = async () => {
+    cv.toBlob(async blob => {
+      try { await dl.save({filename:`friendship-card-${pname(0)}-${pname(1)}.png`.replace(/[^\w.-]+/g,'-'), data: blob}); toast('Saved! 💖'); }
+      catch(err){ if (err && err.code === 'declined') return; toast('Could not save — press and hold the picture instead 💕'); }
+    }, 'image/png');
+  };
+}
+
+/* ---------------- 7. FRIEND'S FAVOURITES ---------------- */
+const cuteBerry = () => `<svg viewBox="0 0 100 110" role="img" aria-label="Cute strawberry">
+  <path d="M50 102 C20 86 8 60 12 42 C16 26 34 24 50 30 C66 24 84 26 88 42 C92 60 80 86 50 102Z" fill="#ff5f7e" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/>
+  ${[[30,50],[70,50],[40,76],[60,76],[50,60],[26,66],[74,66],[50,88]].map(([x,y])=>`<ellipse cx="${x}" cy="${y}" rx="2.2" ry="3.4" fill="#fff1a8"/>`).join('')}
+  <path d="M50 30 L34 14 L46 22 L50 8 L54 22 L66 14 Z" fill="#5fcf8f" stroke="${INK}" stroke-width="3.5" stroke-linejoin="round"/>
+  <circle cx="40" cy="56" r="4" fill="${INK}"/><circle cx="60" cy="56" r="4" fill="${INK}"/><circle cx="41.5" cy="54.5" r="1.4" fill="#fff"/><circle cx="61.5" cy="54.5" r="1.4" fill="#fff"/>
+  <path d="M44 66 Q50 72 56 66" fill="none" stroke="${INK}" stroke-width="3" stroke-linecap="round"/>
+  <ellipse cx="32" cy="64" rx="5" ry="3" fill="#ffb3c7"/><ellipse cx="68" cy="64" rx="5" ry="3" fill="#ffb3c7"/></svg>`;
+const cuteCucumber = () => `<svg viewBox="0 0 100 110" role="img" aria-label="Cute cucumber">
+  <rect x="26" y="6" width="48" height="98" rx="24" fill="#6fcf7f" stroke="${INK}" stroke-width="4" transform="rotate(12 50 55)"/>
+  ${[[42,24],[60,36],[40,82],[62,84],[54,96]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="2.6" fill="#3f9d57"/>`).join('')}
+  <circle cx="42" cy="52" r="4" fill="${INK}"/><circle cx="60" cy="56" r="4" fill="${INK}"/><circle cx="43.5" cy="50.5" r="1.4" fill="#fff"/><circle cx="61.5" cy="54.5" r="1.4" fill="#fff"/>
+  <path d="M45 64 Q51 70 57 66" fill="none" stroke="${INK}" stroke-width="3" stroke-linecap="round"/>
+  <ellipse cx="36" cy="62" rx="5" ry="3" fill="#ffb3c7"/><ellipse cx="66" cy="68" rx="5" ry="3" fill="#ffb3c7"/>
+  <g transform="translate(66 18) rotate(20)"><path d="M0 0 L-10 -7 Q-13 0 -10 7Z M0 0 L10 -7 Q13 0 10 7Z" fill="#ff4f9a" stroke="${INK}" stroke-width="2.5"/><circle r="3.5" fill="#ff8fc1" stroke="${INK}" stroke-width="2"/></g></svg>`;
+const berryBorder = () => `<div class="berry-border emo" aria-hidden="true">🍓 💕 🥒 🎤 🍓 ✨ 🥒 💕 🍓</div>`;
+const favesDone = new Set();
+function favesShell(inner){
+  return `<div class="card stack faves-wrap">${berryBorder()}${inner}${berryBorder()}</div>`;
+}
+function goFaves(){
+  const rounds = [
+    {id:'popstar', ic:'🎤', t:'Pop Star Style Challenge', d:'Outfit, stage, mic & bracelet charms!', c:'c2'},
+    {id:'snacky',  ic:'🍓', t:'Snacky Bestie Quiz', d:'Strawberries? Cucumbers? Let\'s see!', c:'c1'},
+    {id:'song',    ic:'🎶', t:'Song Star Challenges', d:'Invent your own song title', c:'c4'}
+  ];
+  show(favesShell(`<div class="faves-hero">${cuteBerry()}<h2 style="color:var(--pink-deep)">Friend's Favourites</h2>${cuteCucumber()}</div>
+    <p class="sub center">A special corner full of strawberries, cucumbers, pink hearts and pop-star sparkle! 🍓🥒🎤💕</p>
+    <div class="tiles">${rounds.map(r=>`<button class="tile ${r.c}" type="button" data-f="${r.id}"><span class="ic emo">${r.ic}</span><span class="t">${r.t}</span><span class="d">${r.d}</span>${favesDone.has(r.id)?'<span class="done">💗 Done!</span>':''}</button>`).join('')}</div>
+    ${backRow()}`));
+  wireHub();
+  const go = {popstar:goPopStar, snacky:goSnacky, song:goSong};
+  app.querySelectorAll('[data-f]').forEach(b => b.onclick = () => go[b.dataset.f]());
+}
+function favesComplete(id){ favesDone.add(id); earnHeart('faves'); SFX.party(); confetti(1400); }
+const favesEndRow = againFn => `<div class="row"><button class="btn lav" type="button" id="fAgain">🔁 Play again</button><button class="btn blue" type="button" id="fMenu">🍓 More favourites</button><button class="btn" type="button" data-hub>💗 Playdate Box</button></div>`;
+function wireFavesEnd(againFn){ wireHub(); $('#fAgain').onclick = againFn; $('#fMenu').onclick = goFaves; }
+
+/* Pop Star Style Challenge */
+const PS_STEPS = [
+  {k:'outfit', q:'👗 Pick your dream concert outfit!', o:[['👗','Sparkly dress'],['🧥','Glitter jacket'],['🩰','Tutu & tights'],['👚','Sequin top'],['🦄','Unicorn onesie'],['🍓','Strawberry skirt']]},
+  {k:'stage', q:'🌈 Choose your stage colour!', o:[['🩷','Bubblegum pink','#ff6fae,#ffb3d1'],['💜','Purple glow','#8a5cf0,#c9b3ff'],['💙','Ocean blue','#2f8fe0,#8fcaff'],['💛','Golden shine','#f0b400,#ffe36e'],['💚','Cucumber green','#1fae78,#8fe6b8'],['🌈','Rainbow','#ff6fae,#ffb14f,#6fd6a0,#6cb8ff,#a47bff']]},
+  {k:'mic', q:'🎤 Pick your microphone!', o:[['🎤','Classic silver'],['💖','Heart mic'],['⭐','Star mic'],['🍓','Strawberry mic'],['🥒','Cucumber mic'],['🌈','Rainbow mic']]},
+  {k:'charms', q:'📿 Choose 3 friendship bracelet charms!', multi:3, o:[['🍓','Strawberry'],['🥒','Cucumber'],['💕','Heart'],['⭐','Star'],['🎵','Music note'],['🦄','Unicorn'],['🌈','Rainbow'],['🎀','Bow']]}
+];
+let ps;
+function goPopStar(){ ps = {turn:0, step:0, picks:[{charms:[]},{charms:[]}]}; renderPopStar(); }
+function renderPopStar(){
+  if (ps.turn > 1) return popStarReveal();
+  const S = PS_STEPS[ps.step], mine = ps.picks[ps.turn];
+  const sel = k => S.multi ? mine.charms.includes(k) : mine[S.k] === k;
+  show(favesShell(`<div class="popstar-title">🎤✨ POP STAR STYLE CHALLENGE ✨🎤</div>
+    <div class="progress">${esc(pname(ps.turn))} · step ${ps.step+1} of ${PS_STEPS.length}</div>
+    <div class="turn">${mini(ps.turn)}<span>${esc(pname(ps.turn))}, it's your turn to style your pop star!</span></div>
+    <div class="prompt-banner">${S.q}</div>
+    <div class="choices">${S.o.map((o,k)=>`<button class="choice ${S.multi?'opt multi':''}" type="button" data-k="${k}" aria-pressed="${sel(k)}" ${S.o[k][2]?`style="background:linear-gradient(135deg,${o[2]});color:#fff;text-shadow:0 2px 0 rgba(74,53,96,.4)"`:''}><span class="ic emo">${o[0]}</span>${o[1]}</button>`).join('')}</div>
+    ${S.multi ? `<div class="row"><span class="progress" id="chCount">${mine.charms.length} of ${S.multi} charms picked</span><button class="btn" type="button" id="chDone" ${mine.charms.length? '' : 'disabled'}>📿 My bracelet is ready!</button></div>` : ''}
+    ${backRow()}`));
+  wireHub();
+  const advance = () => { if (ps.step < PS_STEPS.length - 1) ps.step++; else { ps.turn++; ps.step = 0; if (ps.turn === 1) return popHandoff(); } renderPopStar(); };
+  app.querySelectorAll('[data-k]').forEach(b => b.onclick = () => {
+    const k = +b.dataset.k; SFX.sparkle();
+    if (S.multi) {
+      const i = mine.charms.indexOf(k);
+      if (i >= 0) mine.charms.splice(i,1); else if (mine.charms.length < S.multi) mine.charms.push(k); else { toast('Only 3 charms fit! Tap one to take it off 📿'); return; }
+      app.querySelectorAll('[data-k]').forEach(x => x.setAttribute('aria-pressed', mine.charms.includes(+x.dataset.k)));
+      $('#chCount').textContent = `${mine.charms.length} of ${S.multi} charms picked`; $('#chDone').disabled = !mine.charms.length;
+    } else { mine[S.k] = k; setTimeout(advance, 250); }
+  });
+  if (S.multi) $('#chDone').onclick = advance;
+}
+function popHandoff(){
+  show(favesShell(`<div class="handoff"><div class="ic emo">🎤💖</div><h3>${esc(pname(0))}'s pop star is ready!</h3>
+    <div class="turn" style="margin-top:10px">Now it's ${mini(1)} ${esc(pname(1))}'s turn!</div></div>
+    <div class="row"><button class="btn lav" type="button" id="go">I'm ${esc(pname(1))}, let's style! ✨</button></div>`));
+  $('#go').onclick = renderPopStar;
+}
+function popStarReveal(){
+  const adj = ['Sparkly','Strawberry','Glitter','Cosmic','Bubbly','Cucumber','Twinkle','Sugar'], noun = ['Superstars','Besties','Pop Pals','Heartbeats','Sprinkles','Moonbeams'];
+  const band = `The ${pick(adj)} ${pick(noun)}`;
+  const O = PS_STEPS.map(s => s.o);
+  const stageCard = i => { const p = ps.picks[i], st = O[1][p.stage ?? 0];
+    return `<div class="stagecard" style="background:linear-gradient(135deg,${st[2]})"><h3>🌟 ${esc(pname(i))} 🌟</h3><div>${mini(i)}</div>
+      <ul><li><span class="emo">${O[0][p.outfit ?? 0][0]}</span> ${O[0][p.outfit ?? 0][1]}</li><li><span class="emo">${st[0]}</span> ${st[1]} stage</li><li><span class="emo">${O[2][p.mic ?? 0][0]}</span> ${O[2][p.mic ?? 0][1]}</li></ul>
+      <div class="bracelet" aria-label="Friendship bracelet"><span class="bead"></span><span class="bead"></span>${p.charms.map(k=>`<span class="emo">${O[3][k][0]}</span><span class="bead"></span>`).join('')}<span class="bead"></span></div></div>`; };
+  favesComplete('popstar');
+  show(favesShell(`<div class="popstar-title">🎤✨ Presenting… the pop stars! ✨🎤</div>
+    <div class="reveal-grid">${stageCard(0)}${stageCard(1)}</div>
+    <div class="center"><div class="sub">Your bestie band name is…</div><div class="bandname">🎶 ${band} 🎶</div></div>
+    <p class="sub center" style="font-weight:600">Swap bracelets and give each other a big pop-star wave from your seats! 👋💕</p>
+    ${favesEndRow()}`));
+  wireFavesEnd(goPopStar);
+}
+
+/* Snacky Bestie Quiz */
+const SNACKY = [
+  [['🍓','Strawberries'],['🍉','Watermelon']],
+  [['🥒','Cucumbers'],['🥕','Carrots']],
+  [['🩷','Pink'],['💜','Purple']],
+  [['🎤','Singing'],['🎨','Drawing']],
+  [['🥪','Cucumber sandwiches'],['🍕','Pizza slices']],
+  [['🍓','Strawberry milkshake'],['🍫','Chocolate milkshake']]
+];
+let snk;
+function goSnacky(){ snk = {i:0, turn:0, picks:[], matches:0}; renderSnacky(); }
+function renderSnacky(){
+  if (snk.i >= SNACKY.length) return snackyDone();
+  const Q = SNACKY[snk.i], P = snk.picks[snk.i] || [null,null], both = P[0] !== null && P[1] !== null;
+  const who = side => both ? [0,1].filter(i=>P[i]===side).map(i=>mini(i)).join('') : '';
+  show(favesShell(`<div class="popstar-title">🍓🥒 SNACKY BESTIE QUIZ 🥒🍓</div>
+    <div class="progress">Question ${snk.i+1} of ${SNACKY.length}</div>
+    ${both ? `<div class="ok-msg">${P[0]===P[1] ? 'You matched! 💕' : 'You are totally different! 😂'}</div>` : `<div class="turn">${mini(snk.turn)}<span>${esc(pname(snk.turn))}, which do you like best?</span></div>`}
+    <div class="wyr">
+      <div class="stack"><button class="bigchoice a" type="button" data-s="0" ${both?'disabled':''}><span class="ic emo">${Q[0][0]}</span>${Q[0][1]}</button><div class="pickers">${who(0)}</div></div>
+      <div class="or">OR</div>
+      <div class="stack"><button class="bigchoice b" type="button" data-s="1" ${both?'disabled':''} style="background:var(--mint)"><span class="ic emo">${Q[1][0]}</span>${Q[1][1]}</button><div class="pickers">${who(1)}</div></div>
+    </div>
+    ${both ? `<div class="row"><button class="btn lav" type="button" id="next">${snk.i < SNACKY.length-1 ? 'Next snack ➜' : '🎉 See our results!'}</button></div>` : ''}
+    ${backRow()}`));
+  wireHub();
+  if (!both) app.querySelectorAll('[data-s]').forEach(b => b.onclick = () => {
+    P[snk.turn] = +b.dataset.s; snk.picks[snk.i] = P; snk.turn = 1 - snk.turn; SFX.sparkle();
+    if (P[0] !== null && P[1] !== null) { if (P[0] === P[1]) snk.matches++; SFX.heart(); }
+    renderSnacky();
+  });
+  else $('#next').onclick = () => { snk.i++; snk.turn = snk.i % 2; renderSnacky(); };
+}
+function snackyDone(){
+  favesComplete('snacky');
+  const m = snk.matches;
+  show(favesShell(`<div class="popstar-title">🍓 Snack Time Results! 🥒</div>
+    <div class="faves-hero">${cuteBerry()}${cuteCucumber()}</div>
+    <div class="ok-msg">You matched ${m} out of ${SNACKY.length}! ${m >= 4 ? 'Snack twins! 🍓💕🍓' : m >= 2 ? 'Perfect picnic partners! 🧺💕' : 'More snacks to share with each other! 😂🥒'}</div>
+    ${favesEndRow()}`));
+  wireFavesEnd(goSnacky);
+}
+
+/* Song Star Challenges — original, no real song lyrics */
+const SONG_WORDS = [
+  ['Sparkly','Strawberry','Cucumber','Glitter','Bubblegum','Moonlight'],
+  ['Bestie','Pink','Disco','Rainbow','Sunshine','Dreamy'],
+  ['Party','Parade','Wishes','Heartbeat','Sprinkles','Picnic']
+];
+const SONG_CHALLENGES = [
+  ['🎶','Hum a tiny tune for your new song title — your bestie guesses if it\'s happy or sleepy!'],
+  ['👏','Clap a short rhythm from your seat. Can your bestie copy it?'],
+  ['🥒','Make up a silly rhyme about a cucumber. Example: "A cucumber named Lou wore a sparkly shoe!"'],
+  ['🍓','Sing "strawberry" in your squeakiest voice, then your deepest voice!'],
+  ['🎤','Pretend your hairbrush is a mic and say "Thank you, besties!" like a pop star.'],
+  ['💕','Make up a 4-word chorus about your best friend. Example: "My bestie is sparkly!"'],
+  ['⭐','Choose a sound for your band: "la la", "doo-wop" or "boop boop". Say it together!'],
+  ['🎵','Tap the table softly: 1, 2, 3… then both say your band name!']
+];
+let song;
+function goSong(){ song = {w:[null,null,null], ch: shuffle(SONG_CHALLENGES).slice(0,3), doneCh: new Set()}; renderSong(); }
+function renderSong(){
+  const title = song.w.map((k,i)=> k === null ? '___' : SONG_WORDS[i][k]).join(' ');
+  const ready = song.w.every(k=>k!==null);
+  show(favesShell(`<div class="popstar-title">⭐🎶 SONG STAR CHALLENGES 🎶⭐</div>
+    <p class="sub center">Build your very own song title — pick one word from each row!</p>
+    ${SONG_WORDS.map((row,ri)=>`<div class="chip-row">${row.map((w,k)=>`<button type="button" data-r="${ri}" data-k="${k}" aria-pressed="${song.w[ri]===k}">${w}</button>`).join('')}</div>`).join('')}
+    <div class="songtitle">🎵 "${title}" 🎵<div class="sub" style="font-family:var(--body);font-size:18px;margin-top:4px">by ${esc(pname(0))} &amp; ${esc(pname(1))}</div></div>
+    <div class="row"><button class="tool" type="button" id="rnd">🎲 Surprise me!</button></div>
+    <h3 class="center">🎤 Sit-down song challenges — tap each one when you've tried it!</h3>
+    <div class="choices" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr))">${song.ch.map((c,i)=>`<button class="choice ${song.doneCh.has(i)?'right':''}" type="button" data-c="${i}" style="font-size:17px;font-weight:600"><span class="ic emo">${song.doneCh.has(i)?'✅':c[0]}</span>${c[1]}</button>`).join('')}</div>
+    <div class="row"><button class="btn huge" type="button" id="songDone" ${ready?'':'disabled'}>🌟 We're Song Stars! 🌟</button></div>
+    ${backRow()}`));
+  wireHub();
+  app.querySelectorAll('[data-r]').forEach(b => b.onclick = () => { song.w[+b.dataset.r] = +b.dataset.k; SFX.sparkle(); renderSong(); });
+  $('#rnd').onclick = () => { song.w = SONG_WORDS.map(r => Math.floor(Math.random()*r.length)); SFX.sparkle(); renderSong(); };
+  app.querySelectorAll('[data-c]').forEach(b => b.onclick = () => { const i = +b.dataset.c; song.doneCh.has(i) ? song.doneCh.delete(i) : song.doneCh.add(i); SFX.heart(); renderSong(); });
+  $('#songDone').onclick = () => {
+    const title = song.w.map((k,i)=>SONG_WORDS[i][k]).join(' ');
+    favesComplete('song');
+    show(favesShell(`<div class="popstar-title">🌟 Song Stars! 🌟</div>
+      <div class="songtitle">🎵 "${title}" 🎵<div class="sub" style="font-family:var(--body);font-size:18px;margin-top:4px">the brand-new hit by ${esc(pname(0))} &amp; ${esc(pname(1))} 💕</div></div>
+      <div class="duo" style="gap:6px">${mini(0).replace('mini','mini" style="width:90px;height:104px')}<div class="mid emo">🎤</div>${mini(1).replace('mini','mini" style="width:90px;height:104px')}</div>
+      ${favesEndRow()}`));
+    wireFavesEnd(goSong);
+  };
+}
+
+/* ---------------- FINALE ---------------- */
+function badgeSVG(){
+  return `<svg viewBox="0 0 300 330" role="img" aria-label="Ultimate Playdate Buddies badge">
+    <path d="M110 200 L80 320 L115 300 L135 325 L150 215 Z" fill="#ff8fc1" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/>
+    <path d="M190 200 L220 320 L185 300 L165 325 L150 215 Z" fill="#7cc7ff" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/>
+    <path d="${starPath(150,140,125,100)}" fill="#ffd84d" stroke="${INK}" stroke-width="5" stroke-linejoin="round"/>
+    <circle cx="150" cy="140" r="86" fill="#fff" stroke="${INK}" stroke-width="4"/>
+    <circle cx="150" cy="140" r="76" fill="none" stroke="#ff8fc1" stroke-width="4" stroke-dasharray="6 8"/>
+    <text x="150" y="104" text-anchor="middle" font-family="Sniglet, Fredoka, sans-serif" font-weight="800" font-size="19" fill="${INK}">ULTIMATE</text>
+    <text x="150" y="129" text-anchor="middle" font-family="Sniglet, Fredoka, sans-serif" font-weight="800" font-size="22" fill="#ff4f9a">PLAYDATE</text>
+    <text x="150" y="154" text-anchor="middle" font-family="Sniglet, Fredoka, sans-serif" font-weight="800" font-size="22" fill="#8a5cf0">BUDDIES</text>
+    ${HEART(150,164,1.3,'#ff4f9a')}
+  </svg>`;
+}
+function goFinale(){
+  state.finaleShown = true;
+  show(`<div class="card center stack">
+    <h1 class="big-title" style="font-size:clamp(34px,8vw,64px)">🎉 PLAYDATE COMPLETE! 🎉</h1>
+    <p style="font-family:var(--display);font-weight:800;font-size:clamp(22px,4.4vw,32px);color:var(--lav-deep);margin:0">You two are officially BESTIE BUDDIES! 💕🎀✨</p>
+    <div class="hub-meter emo">${ACTIVITIES.map((_,i)=> i < state.done.length ? '💗' : '🤍').join('')}</div>
+    <div class="duo">
+      <figure>${charSVG(state.players[0], pname(0))}<figcaption>${esc(pname(0))}</figcaption></figure>
+      <div class="badge">${badgeSVG()}</div>
+      <figure>${charSVG(state.players[1], pname(1))}<figcaption>${esc(pname(1))}</figcaption></figure>
+    </div>
+    <p class="sub" style="font-weight:600">🏅 ${esc(pname(0))} and ${esc(pname(1))} each earned the <b>Ultimate Playdate Buddies</b> badge!</p>
+    <div class="row"><button class="btn lav" type="button" id="keep">🎨 Keep playing</button><button class="btn" type="button" id="newPD">🌈 New playdate</button></div>
+  </div>`);
+  SFX.party(); setTimeout(SFX.sparkle, 900); confetti(4200, true);
+  $('#keep').onclick = goHub;
+  $('#newPD').onclick = () => { state = {players: JSON.parse(JSON.stringify(DEFAULTS)), done: [], ready:false}; puzDone.clear(); renderMeter(); goHome(); };
+}
+
+/* ---------------- CONFETTI ---------------- */
+let confettiRAF = null;
+function confetti(ms, big){
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const cv = $('#confetti'), ctx = cv.getContext('2d'); cv.hidden = false;
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  cv.width = innerWidth * dpr; cv.height = innerHeight * dpr; ctx.setTransform(dpr,0,0,dpr,0,0);
+  const cols = ['#ff4f9a','#ff8fc1','#b89cff','#7cc7ff','#ffd84d','#79dcb0','#ffa987'];
+  const shapes = ['rect','circle','heart','star'];
+  const N = big ? 220 : 120;
+  const parts = Array.from({length:N}, () => ({x:Math.random()*innerWidth, y:-20 - Math.random()*innerHeight*.6, vx:-1.5+Math.random()*3, vy:2+Math.random()*3.5,
+    r:Math.random()*6, vr:-.1+Math.random()*.2, s:6+Math.random()*9, c:pick(cols), sh:pick(shapes)}));
+  const start = performance.now();
+  cancelAnimationFrame(confettiRAF);
+  const frame = now => {
+    const t = now - start; ctx.clearRect(0,0,innerWidth,innerHeight);
+    parts.forEach(p => {
+      p.x += p.vx + Math.sin((t/400)+p.s); p.y += p.vy; p.r += p.vr;
+      ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.r); ctx.fillStyle = p.c; ctx.globalAlpha = Math.max(0, 1 - Math.max(0, t - ms) / 900);
+      if (p.sh === 'rect') ctx.fillRect(-p.s/2,-p.s/4,p.s,p.s/2);
+      else if (p.sh === 'circle') { ctx.beginPath(); ctx.arc(0,0,p.s/2.5,0,7); ctx.fill(); }
+      else if (p.sh === 'heart') { const k=p.s/22; ctx.scale(k,k); ctx.fill(new Path2D('M0 6 C0 -2 -12 -4 -12 4 C-12 12 0 18 0 22 C0 18 12 12 12 4 C12 -4 0 -2 0 6Z')); }
+      else { ctx.fill(new Path2D(starPath(0,0,p.s/1.6,p.s/3.2))); }
+      ctx.restore();
+    });
+    if (t < ms + 900) confettiRAF = requestAnimationFrame(frame); else { ctx.clearRect(0,0,innerWidth,innerHeight); cv.hidden = true; }
+  };
+  confettiRAF = requestAnimationFrame(frame);
+}
+
+/* ---------------- BOOT (keeps players & hearts across live updates) ---------------- */
+function start(saved){
+  if (saved && saved.players) { state = saved; (saved.puz || []).forEach(p => puzDone.add(p)); }
+  renderMeter();
+  state.ready ? goHub() : goHome();
+}
+try { window.claude?.hot?.snapshot?.(() => ({...state, puz:[...puzDone]})); } catch(e){}
+window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+</script>
+
+</body></html>

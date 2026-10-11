@@ -1,0 +1,1288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>🐾 VR Pets</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Baloo+2:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --sky:#7fd4ff;
+  --sky2:#ffd6ec;
+  --sun:#ffd23f;
+  --grass:#7ee08a;
+  --card:#ffffff;
+  --ink:#3a2e5c;
+  --ink-soft:#7a6f9c;
+  --pink:#ff6fa5;
+  --purple:#8c6bff;
+  --orange:#ff9f43;
+  --red:#ff5c5c;
+  --teal:#2ec4b6;
+  --shadow: 0 8px 0 rgba(58,46,92,0.15);
+  --radius: 26px;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  font-family:'Baloo 2','Fredoka',sans-serif;
+  color:var(--ink);
+  min-height:100vh;
+  background:linear-gradient(180deg,var(--sky) 0%,var(--sky2) 55%,#fff1f8 100%);
+  overflow-x:hidden;
+  -webkit-tap-highlight-color:transparent;
+  user-select:none;
+}
+#bg-clouds{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.cloud{position:absolute;font-size:48px;opacity:.7;animation:drift linear infinite;}
+@keyframes drift{from{transform:translateX(-10vw)}to{transform:translateX(110vw)}}
+#app{position:relative;z-index:1;max-width:1000px;margin:0 auto;padding:18px 16px 100px;min-height:100vh;}
+
+h1,h2,h3{font-family:'Fredoka',sans-serif;margin:0 0 6px;}
+button{font-family:inherit;cursor:pointer;border:none;}
+.hidden{display:none !important;}
+
+/* ---------- top emoji strip ---------- */
+.emoji-strip{font-size:26px;text-align:center;letter-spacing:6px;line-height:1.6;padding:10px 6px 4px;animation:sway 4s ease-in-out infinite;}
+@keyframes sway{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+
+/* ---------- buttons ---------- */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:16px 30px;border-radius:999px;font-weight:700;font-size:1.2rem;
+  background:var(--pink);color:#fff;box-shadow:0 6px 0 #c2447c;
+  transition:transform .12s, box-shadow .12s;
+}
+.btn:active{transform:translateY(6px);box-shadow:0 0 0 #c2447c;}
+.btn:hover{transform:translateY(-2px);}
+.btn.secondary{background:var(--purple);box-shadow:0 6px 0 #5c3fc2;}
+.btn.teal{background:var(--teal);box-shadow:0 6px 0 #1f9187;}
+.btn.orange{background:var(--orange);box-shadow:0 6px 0 #c26f10;}
+.btn.small{padding:10px 18px;font-size:1rem;}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none;}
+.btn-huge{font-size:1.6rem;padding:22px 48px;}
+
+/* ---------- home ---------- */
+.home-wrap{text-align:center;padding-top:10px;}
+.title-big{font-size:3rem;color:var(--pink);text-shadow:3px 3px 0 #fff, 6px 6px 0 rgba(58,46,92,.15);animation:bob 2.4s ease-in-out infinite;}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-8px) rotate(1deg)}}
+.subtitle{font-size:1.3rem;color:var(--ink-soft);margin-bottom:26px;}
+.home-mascots{font-size:70px;margin:18px 0;}
+.home-mascots span{display:inline-block;animation:bounce 1.6s ease-in-out infinite;}
+.home-mascots span:nth-child(2){animation-delay:.2s}
+.home-mascots span:nth-child(3){animation-delay:.4s}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+
+/* ---------- cards / grids ---------- */
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;}
+.grid{display:grid;gap:14px;}
+.grid-pets{grid-template-columns:repeat(auto-fill,minmax(120px,1fr));}
+.pet-card{
+  background:#fff;border-radius:20px;padding:14px 8px;text-align:center;box-shadow:var(--shadow);
+  border:4px solid transparent;transition:transform .15s,border-color .15s;
+}
+.pet-card .emo{font-size:46px;display:block;margin-bottom:6px;}
+.pet-card:hover{transform:translateY(-4px) scale(1.03);}
+.pet-card.selected{border-color:var(--teal);animation:pop .35s ease;}
+@keyframes pop{0%{transform:scale(1)}50%{transform:scale(1.15)}100%{transform:scale(1)}}
+.pet-name{font-weight:700;font-size:.95rem;}
+
+.page-title{text-align:center;font-size:2rem;color:var(--purple);margin-bottom:4px;}
+.page-sub{text-align:center;color:var(--ink-soft);margin-bottom:18px;font-size:1.05rem;}
+
+/* ---------- create page ---------- */
+.pet-preview-box{text-align:center;margin:12px auto 22px;}
+.pet-preview{
+  font-size:120px;display:inline-block;filter:drop-shadow(0 10px 8px rgba(0,0,0,.15));
+  animation:idle 3s ease-in-out infinite;
+  padding:20px;border-radius:50%;
+}
+@keyframes idle{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-10px) rotate(-3deg)}}
+.color-row{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:14px 0 20px;}
+.color-swatch{width:46px;height:46px;border-radius:50%;border:4px solid #fff;box-shadow:0 3px 0 rgba(0,0,0,.15);transition:transform .15s;}
+.color-swatch:hover{transform:scale(1.15);}
+.color-swatch.selected{outline:4px solid var(--purple);outline-offset:2px;}
+.name-input-wrap{text-align:center;margin:18px 0;}
+input[type=text]{
+  font-family:inherit;font-size:1.3rem;padding:12px 18px;border-radius:16px;border:3px solid #e1d9ff;
+  text-align:center;width:min(320px,90%);outline:none;
+}
+input[type=text]:focus{border-color:var(--purple);}
+.preview-line{font-size:1.15rem;color:var(--ink-soft);margin:10px 0 22px;}
+
+/* ---------- nav bar ---------- */
+.navbar{
+  position:fixed;left:0;right:0;bottom:0;z-index:20;
+  background:#fff;box-shadow:0 -6px 18px rgba(58,46,92,.15);
+  display:flex;justify-content:space-around;padding:8px 4px calc(8px + env(safe-area-inset-bottom));
+}
+.nav-btn{
+  background:none;display:flex;flex-direction:column;align-items:center;gap:2px;
+  font-size:1.5rem;color:var(--ink-soft);padding:4px 8px;border-radius:14px;
+}
+.nav-btn span.lbl{font-size:.65rem;font-weight:700;}
+.nav-btn.active{color:var(--pink);background:#ffe9f2;}
+
+/* ---------- pet home ---------- */
+.pethome-hero{text-align:center;padding:10px 0 6px;}
+.pethome-hero .pet-preview{font-size:150px;}
+.pet-headline{font-size:1.8rem;color:var(--purple);}
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:16px 0 22px;}
+.stat-box{background:#fff;border-radius:18px;padding:10px 6px;text-align:center;box-shadow:var(--shadow);}
+.stat-box .icon{font-size:1.4rem;}
+.stat-box .lbl{font-size:.7rem;color:var(--ink-soft);font-weight:700;}
+.stat-bar{height:10px;border-radius:8px;background:#eee;margin-top:6px;overflow:hidden;}
+.stat-fill{height:100%;border-radius:8px;transition:width .5s ease;}
+.fill-happy{background:var(--pink);}
+.fill-hunger{background:var(--orange);}
+.fill-energy{background:var(--teal);}
+.fill-xp{background:var(--purple);}
+.level-badge{display:inline-block;background:var(--sun);color:#7a5b00;font-weight:800;border-radius:999px;padding:6px 16px;margin-top:6px;box-shadow:0 3px 0 #cc9f00;}
+
+.menu-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:14px;margin-top:6px;}
+.menu-card{
+  background:#fff;border-radius:22px;padding:18px 10px;text-align:center;box-shadow:var(--shadow);
+  transition:transform .15s;
+}
+.menu-card:hover{transform:translateY(-4px);}
+.menu-card .icon{font-size:2.2rem;display:block;margin-bottom:6px;}
+.menu-card .lbl{font-weight:700;}
+
+/* ---------- games grid ---------- */
+.games-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;}
+.game-card{background:#fff;border-radius:22px;padding:16px 10px;text-align:center;box-shadow:var(--shadow);transition:transform .15s;}
+.game-card:hover{transform:translateY(-4px) rotate(-1deg);}
+.game-card .icon{font-size:2.4rem;}
+.game-card .best{font-size:.75rem;color:var(--ink-soft);margin-top:4px;}
+
+/* ---------- game screen ---------- */
+.game-screen{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:20px;}
+.game-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.game-header h2{font-size:1.4rem;color:var(--purple);}
+.game-area{position:relative;background:linear-gradient(180deg,#eaf6ff,#fff);border-radius:18px;min-height:340px;overflow:hidden;padding:14px;}
+.score-pill{background:var(--sun);border-radius:999px;padding:6px 16px;font-weight:800;color:#7a5b00;}
+
+/* tic tac toe */
+.ttt-grid{display:grid;grid-template-columns:repeat(3,90px);grid-template-rows:repeat(3,90px);gap:8px;justify-content:center;margin:20px auto;}
+.ttt-cell{background:#f2f0ff;border-radius:14px;font-size:2.6rem;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 0 #d8d3f5;}
+.ttt-cell:hover{background:#e6e1ff;}
+
+/* memory */
+.mem-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;max-width:420px;margin:10px auto;}
+.mem-card{aspect-ratio:1;background:var(--purple);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.8rem;box-shadow:0 3px 0 #5c3fc2;color:transparent;transition:transform .3s;}
+.mem-card.flipped,.mem-card.matched{background:#fff;color:initial;box-shadow:0 3px 0 #d8d3f5;}
+.mem-card.matched{opacity:.5;}
+
+/* puzzle */
+.pz-grid{display:grid;grid-template-columns:repeat(3,80px);grid-template-rows:repeat(3,80px);gap:6px;justify-content:center;margin:16px auto;}
+.pz-cell{background:var(--teal);color:#fff;font-size:1.6rem;font-weight:800;border-radius:10px;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 0 #1f9187;}
+.pz-cell.empty{background:transparent;box-shadow:none;}
+
+/* catch/food/balloon/target/maze/reaction generic */
+.floaty{position:absolute;font-size:2.2rem;transition:top .05s linear;user-select:none;}
+.controls-row{display:flex;justify-content:center;gap:16px;margin-top:14px;}
+.big-arrow{font-size:1.8rem;background:var(--purple);color:#fff;border-radius:16px;padding:12px 22px;box-shadow:0 5px 0 #5c3fc2;}
+.big-arrow:active{transform:translateY(5px);box-shadow:none;}
+
+/* maze */
+.maze-grid{display:grid;gap:2px;margin:14px auto;justify-content:center;}
+.maze-cell{width:34px;height:34px;background:#eaf6ff;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;}
+.maze-cell.wall{background:#8c6bff;}
+.maze-cell.goal{background:#ffe08a;}
+
+/* reaction */
+.reaction-row{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;margin-top:20px;}
+.reaction-item{font-size:2.6rem;background:#f2f0ff;border-radius:16px;padding:14px 18px;box-shadow:0 3px 0 #d8d3f5;}
+
+/* race */
+.race-track{background:#eaf6ff;border-radius:14px;padding:16px;margin:12px 0;}
+.race-lane{position:relative;height:44px;background:#dff0ff;border-radius:10px;margin-bottom:12px;overflow:hidden;}
+.race-runner{position:absolute;top:2px;left:2px;font-size:2rem;transition:left .1s linear;}
+
+/* snakes and ladders */
+.sl-board{display:grid;grid-template-columns:repeat(6,52px);gap:3px;margin:14px auto;justify-content:center;}
+.sl-cell{width:52px;height:52px;background:#f2f0ff;border-radius:8px;position:relative;font-size:.65rem;display:flex;align-items:flex-end;justify-content:center;color:var(--ink-soft);font-weight:700;}
+.sl-cell.ladder{background:#d7fbe0;}
+.sl-cell.snake{background:#ffd9d9;}
+.sl-token{position:absolute;top:2px;font-size:1.4rem;}
+
+/* dialogs / overlays */
+.overlay{position:fixed;inset:0;background:rgba(58,46,92,.55);display:flex;align-items:center;justify-content:center;z-index:100;padding:20px;}
+.modal{background:#fff;border-radius:28px;padding:30px 26px;text-align:center;max-width:380px;box-shadow:0 14px 0 rgba(58,46,92,.2);animation:pop .35s ease;}
+.modal .big-emoji{font-size:4rem;}
+
+/* confetti */
+.confetti-piece{position:fixed;top:-20px;font-size:1.6rem;z-index:200;animation:fall linear forwards;}
+@keyframes fall{to{transform:translateY(110vh) rotate(360deg);opacity:.2;}}
+
+/* floating hearts/stars */
+.floaty-pop{position:absolute;font-size:1.8rem;animation:floatup 1s ease-out forwards;pointer-events:none;}
+@keyframes floatup{0%{opacity:1;transform:translateY(0) scale(1);}100%{opacity:0;transform:translateY(-70px) scale(1.4);}}
+
+/* rewards */
+.reward-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:12px;}
+.reward-card{background:#fff;border-radius:18px;padding:14px 6px;text-align:center;box-shadow:var(--shadow);}
+.reward-card.locked{opacity:.4;}
+.reward-card .icon{font-size:2rem;}
+.reward-card .lvl{font-size:.7rem;color:var(--ink-soft);font-weight:700;}
+
+/* customize */
+.equip-strip{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:10px 0 20px;}
+.equip-chip{background:#f2f0ff;border-radius:14px;padding:10px 14px;font-size:1.4rem;box-shadow:0 3px 0 #d8d3f5;}
+.equip-chip.selected{background:var(--purple);color:#fff;}
+.equip-chip.locked{opacity:.35;}
+
+.sound-toggle{position:fixed;top:14px;right:14px;z-index:30;background:#fff;border-radius:999px;padding:10px 14px;box-shadow:var(--shadow);font-size:1.2rem;}
+.back-fab{position:fixed;top:14px;left:14px;z-index:30;background:#fff;border-radius:999px;padding:10px 14px;box-shadow:var(--shadow);font-size:1.2rem;}
+
+@media (max-width:480px){
+  .title-big{font-size:2.2rem;}
+  .pet-preview{font-size:90px;}
+  .pethome-hero .pet-preview{font-size:110px;}
+  .ttt-grid{grid-template-columns:repeat(3,70px);grid-template-rows:repeat(3,70px);}
+  .ttt-cell{font-size:2rem;}
+}
+</style>
+</head>
+<body>
+<div id="bg-clouds"></div>
+<button class="sound-toggle" id="soundToggle">🔊</button>
+<button class="back-fab hidden" id="backFab">⬅️</button>
+<div id="app"></div>
+
+<script>
+/* ============================= DATA ============================= */
+const PETS = [
+  {k:'dog',e:'🐶',n:'Dog'},{k:'cat',e:'🐱',n:'Cat'},{k:'bunny',e:'🐰',n:'Bunny'},
+  {k:'hamster',e:'🐹',n:'Hamster'},{k:'fox',e:'🦊',n:'Fox'},{k:'panda',e:'🐼',n:'Panda'},
+  {k:'koala',e:'🐨',n:'Koala'},{k:'tiger',e:'🐯',n:'Tiger'},{k:'lion',e:'🦁',n:'Lion'},
+  {k:'frog',e:'🐸',n:'Frog'},{k:'monkey',e:'🐵',n:'Monkey'},{k:'pig',e:'🐷',n:'Pig'},
+  {k:'cow',e:'🐮',n:'Cow'},{k:'chick',e:'🐥',n:'Chick'},{k:'penguin',e:'🐧',n:'Penguin'},
+  {k:'unicorn',e:'🦄',n:'Unicorn'},{k:'bee',e:'🐝',n:'Bee'},{k:'turtle',e:'🐢',n:'Turtle'},
+  {k:'octopus',e:'🐙',n:'Octopus'},{k:'butterfly',e:'🦋',n:'Butterfly'}
+];
+const COLORS = [
+  {n:'Red',hex:'#FF6B6B'},{n:'Orange',hex:'#FF9F43'},{n:'Yellow',hex:'#FFD23F'},
+  {n:'Green',hex:'#7ED957'},{n:'Blue',hex:'#4DA9FF'},{n:'Purple',hex:'#9B6BFF'},
+  {n:'Pink',hex:'#FF7FC0'},{n:'Light Blue',hex:'#8FE3FF'},{n:'Brown',hex:'#B87A4B'},
+  {n:'White',hex:'#F4F4F4'},{n:'Black',hex:'#4A4458'}
+];
+const ACCESSORIES = {
+  hat:[{k:'none',e:''},{k:'party',e:'🎉',lvl:2},{k:'top',e:'🎩',lvl:4},{k:'crown',e:'👑',lvl:6}],
+  glasses:[{k:'none',e:''},{k:'glasses',e:'👓',lvl:3},{k:'shades',e:'🕶️',lvl:5}],
+  extra:[{k:'none',e:''},{k:'bow',e:'🎀',lvl:2},{k:'backpack',e:'🎒',lvl:4},{k:'wings',e:'🪽',lvl:7},{k:'rainbow',e:'🌈',lvl:8}]
+};
+const GAMES = [
+  {id:'ttt',e:'❌⭕',n:'Tic-Tac-Toe'},
+  {id:'sl',e:'🐍',n:'Snakes & Ladders'},
+  {id:'memory',e:'🧠',n:'Memory Match'},
+  {id:'target',e:'🎯',n:'Pet Target'},
+  {id:'race',e:'🏃',n:'Pet Race'},
+  {id:'puzzle',e:'🧩',n:'Pet Puzzle'},
+  {id:'catch',e:'🍎',n:'Catch the Food'},
+  {id:'balloon',e:'🎈',n:'Balloon Pop'},
+  {id:'maze',e:'🐾',n:'Pet Maze'},
+  {id:'reaction',e:'⭐',n:'Reaction Game'}
+];
+const STORAGE_KEY = 'vrpets-save-v1';
+
+/* ============================= STATE ============================= */
+let state = {
+  created:false,
+  petKey:null, petColor:null, petName:'',
+  level:1, xp:0,
+  happiness:70, hunger:70, energy:80,
+  hat:'none', glasses:'none', extra:'none', bg:'sky',
+  scores:{}, unlocked:['none'],
+  soundOn:true
+};
+let screen = 'home';
+let selectingPet = null;
+let selectingColor = null;
+let gameState = {}; // scratch state for whichever mini-game is active
+
+function xpForLevel(l){ return l*100; }
+function pet(){ return PETS.find(p=>p.k===state.petKey) || PETS[0]; }
+function colorHex(){ return (COLORS.find(c=>c.n===state.petColor)||COLORS[0]).hex; }
+
+/* ---------- persistence via window.storage (resilient to transient errors) ---------- */
+let storageOk = !!(window.storage && window.storage.get && window.storage.set);
+
+async function loadState(){
+  if(storageOk){
+    for(let attempt=0; attempt<3; attempt++){
+      try{
+        const res = await window.storage.get(STORAGE_KEY, false);
+        if(res && res.value){
+          const saved = JSON.parse(res.value);
+          state = Object.assign(state, saved);
+          if(state.created) screen = 'pethome';
+        }
+        break;
+      }catch(e){
+        // key may simply not exist yet on first run, or a transient hiccup - just retry quietly
+        if(attempt<2) await new Promise(r=>setTimeout(r, 300*(attempt+1)));
+      }
+    }
+  }
+  render();
+}
+
+let saveTimer=null;
+let pendingSaveValue=null;
+let saveInFlight=false;
+
+function saveState(){
+  pendingSaveValue = JSON.stringify(state);
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(flushSave, 400);
+}
+
+async function flushSave(){
+  if(!storageOk || pendingSaveValue===null || saveInFlight) return;
+  const valueToSave = pendingSaveValue;
+  pendingSaveValue = null;
+  saveInFlight = true;
+  const maxAttempts = 3;
+  for(let attempt=0; attempt<maxAttempts; attempt++){
+    try{
+      await window.storage.set(STORAGE_KEY, valueToSave, false);
+      saveInFlight = false;
+      // if newer state queued up while we were saving, save that too
+      if(pendingSaveValue!==null){ saveTimer = setTimeout(flushSave, 300); }
+      return;
+    }catch(e){
+      if(attempt<maxAttempts-1){
+        await new Promise(r=>setTimeout(r, 500*(attempt+1)));
+      }
+      // otherwise silently give up for this cycle; state stays safe in memory
+      // and the next change to state will trigger another save attempt
+    }
+  }
+  saveInFlight = false;
+}
+
+/* ============================= UTIL FX ============================= */
+function popFx(container, emoji, x, y){
+  const el = document.createElement('div');
+  el.className='floaty-pop';
+  el.textContent = emoji;
+  el.style.left = x+'px';
+  el.style.top = y+'px';
+  container.appendChild(el);
+  setTimeout(()=>el.remove(),1000);
+}
+function confettiBurst(){
+  const emojis=['🎉','✨','🎊','⭐','🎈'];
+  for(let i=0;i<28;i++){
+    const c=document.createElement('div');
+    c.className='confetti-piece';
+    c.textContent=emojis[Math.floor(Math.random()*emojis.length)];
+    c.style.left=Math.random()*100+'vw';
+    c.style.animationDuration=(1.6+Math.random()*1.2)+'s';
+    c.style.fontSize=(1+Math.random()*1.2)+'rem';
+    document.body.appendChild(c);
+    setTimeout(()=>c.remove(),3000);
+  }
+}
+function playBeep(freq=440,dur=0.12){
+  if(!state.soundOn) return;
+  try{
+    const ctx = playBeep._ctx || (playBeep._ctx = new (window.AudioContext||window.webkitAudioContext)());
+    const o = ctx.createOscillator(); const g = ctx.createGain();
+    o.type='sine'; o.frequency.value=freq;
+    g.gain.setValueAtTime(0.08, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+dur);
+    o.connect(g); g.connect(ctx.destination);
+    o.start(); o.stop(ctx.currentTime+dur);
+  }catch(e){}
+}
+
+/* ============================= STAT / XP LOGIC ============================= */
+function clampStat(v){ return Math.max(0, Math.min(100, v)); }
+
+function addXp(amount){
+  state.xp += amount;
+  let leveled=false;
+  while(state.xp >= xpForLevel(state.level)){
+    state.xp -= xpForLevel(state.level);
+    state.level++;
+    leveled=true;
+  }
+  refreshUnlocks();
+  saveState();
+  return leveled;
+}
+function refreshUnlocks(){
+  const all=[];
+  Object.values(ACCESSORIES).forEach(list=>list.forEach(a=>{ if(a.lvl) all.push(a); }));
+  all.forEach(a=>{
+    if(state.level>=a.lvl && !state.unlocked.includes(a.k)) state.unlocked.push(a.k);
+  });
+}
+function adjustStats({happiness=0,hunger=0,energy=0}){
+  state.happiness = clampStat(state.happiness+happiness);
+  state.hunger = clampStat(state.hunger+hunger);
+  state.energy = clampStat(state.energy+energy);
+  saveState();
+}
+
+function finishGame(gameId, xpEarned, happinessEarned, score){
+  const leveled = addXp(xpEarned);
+  adjustStats({happiness:happinessEarned, energy:-8});
+  if(score!==undefined){
+    if(!state.scores[gameId] || score > state.scores[gameId]) state.scores[gameId]=score;
+  }
+  saveState();
+  showResult(xpEarned, happinessEarned, leveled);
+}
+
+function showResult(xp,happy,leveled){
+  screen='result';
+  gameState.resultData={xp,happy,leveled};
+  render();
+  if(leveled){ confettiBurst(); playBeep(880,.3); }
+}
+
+/* ============================= RENDER ROUTER ============================= */
+function render(){
+  const app = document.getElementById('app');
+  document.getElementById('backFab').classList.toggle('hidden', screen==='home');
+  let html='';
+  switch(screen){
+    case 'home': html=renderHome(); break;
+    case 'choose': html=renderChoose(); break;
+    case 'createpet': html=renderCreate(); break;
+    case 'pethome': html=renderPetHome(); break;
+    case 'games': html=renderGamesList(); break;
+    case 'customize': html=renderCustomize(); break;
+    case 'trophies': html=renderTrophies(); break;
+    case 'result': html=renderResult(); break;
+    default:
+      if(screen.startsWith('game-')) html = renderGameScreen(screen.replace('game-',''));
+      else html=renderHome();
+  }
+  app.innerHTML = html + navBarHtml();
+  afterRender();
+}
+
+function navBarHtml(){
+  if(!state.created) return '';
+  const items=[
+    {id:'pethome',icon:'🏠',lbl:'Home'},
+    {id:'customize',icon:'🎨',lbl:'Customize'},
+    {id:'games',icon:'🎮',lbl:'Games'},
+    {id:'trophies',icon:'🏆',lbl:'Rewards'},
+  ];
+  return `<div class="navbar">${items.map(it=>`
+    <button class="nav-btn ${screen===it.id?'active':''}" data-nav="${it.id}">
+      <span>${it.icon}</span><span class="lbl">${it.lbl}</span>
+    </button>`).join('')}</div>`;
+}
+
+function afterRender(){
+  document.querySelectorAll('[data-nav]').forEach(b=>b.onclick=()=>{ playBeep(500,.08); go(b.dataset.nav); });
+  document.getElementById('backFab').onclick=()=>goBack();
+  wireScreen();
+}
+
+function go(s){ screen=s; window.scrollTo(0,0); render(); }
+let history=['home'];
+function goBack(){
+  if(state.created) go('pethome'); else go('home');
+}
+
+/* ============================= HOME ============================= */
+function renderHome(){
+  return `
+  <div class="emoji-strip">🐶 🐱 🐰 🐹 🦊 🐼 🐨 🐯 🦁 🐸 🐵 🐷 🐮 🐥 🐧 🦄 🐝 🐢 🐙 🦋</div>
+  <div class="home-wrap">
+    <h1 class="title-big">🐾 VR Pets 🐾</h1>
+    <p class="subtitle">Create your dream pet and have fun together!</p>
+    <div class="home-mascots"><span>🐶</span><span>🦄</span><span>🐼</span></div>
+    <button class="btn btn-huge" id="startBtn">▶ START</button>
+    ${state.created?`<div style="margin-top:18px;"><button class="btn secondary small" id="continueBtn">Continue with ${pet().e} ${state.petName}</button></div>`:''}
+  </div>`;
+}
+function wireHome(){
+  const s=document.getElementById('startBtn');
+  if(s) s.onclick=()=>{ playBeep(600,.1); go('choose'); };
+  const c=document.getElementById('continueBtn');
+  if(c) c.onclick=()=>{ go('pethome'); };
+}
+
+/* ============================= CHOOSE PET ============================= */
+function renderChoose(){
+  return `
+  <h2 class="page-title">🐾 Choose Your Pet!</h2>
+  <p class="page-sub">Pick 1 pet to start your adventure!</p>
+  <div class="grid grid-pets">
+    ${PETS.map(p=>`
+      <div class="pet-card ${selectingPet===p.k?'selected':''}" data-pet="${p.k}">
+        <span class="emo">${p.e}</span>
+        <div class="pet-name">${p.n}</div>
+      </div>`).join('')}
+  </div>
+  <div style="text-align:center;margin-top:26px;">
+    <button class="btn" id="continueChoose" ${selectingPet?'':'disabled'}>CONTINUE ➜</button>
+  </div>`;
+}
+function wireChoose(){
+  document.querySelectorAll('[data-pet]').forEach(el=>{
+    el.onclick=()=>{ selectingPet=el.dataset.pet; playBeep(700,.08); render(); };
+  });
+  const c=document.getElementById('continueChoose');
+  if(c) c.onclick=()=>{ if(selectingPet){ go('createpet'); } };
+}
+
+/* ============================= CREATE PET ============================= */
+function renderCreate(){
+  const p = PETS.find(x=>x.k===selectingPet) || PETS[0];
+  const col = selectingColor ? COLORS.find(c=>c.n===selectingColor).hex : '#fce8ff';
+  return `
+  <h2 class="page-title">🎨 Create Your Pet!</h2>
+  <div class="pet-preview-box">
+    <div class="pet-preview" style="background:${col}55;">${p.e}</div>
+  </div>
+  <p class="page-sub">Pick a color for your pet</p>
+  <div class="color-row">
+    ${COLORS.map(c=>`<div class="color-swatch ${selectingColor===c.n?'selected':''}" data-color="${c.n}" style="background:${c.hex}" title="${c.n}"></div>`).join('')}
+  </div>
+  <div class="name-input-wrap">
+    <p style="font-weight:700;">What should we call your pet?</p>
+    <input type="text" id="petNameInput" maxlength="16" placeholder="Type a name..." value="${gameState.nameDraft||''}">
+    <p class="preview-line">My pet is called: <b>${(gameState.nameDraft||'').trim() || '...'}</b></p>
+  </div>
+  <div style="text-align:center;">
+    <button class="btn" id="createPetBtn" ${(selectingColor && (gameState.nameDraft||'').trim())?'':'disabled'}>CREATE MY PET ✨</button>
+  </div>`;
+}
+function wireCreate(){
+  document.querySelectorAll('[data-color]').forEach(el=>{
+    el.onclick=()=>{ selectingColor=el.dataset.color; playBeep(650,.08); render(); };
+  });
+  const input=document.getElementById('petNameInput');
+  if(input){
+    input.oninput=()=>{ gameState.nameDraft=input.value; render(); input.focus(); input.setSelectionRange(input.value.length,input.value.length); };
+  }
+  const btn=document.getElementById('createPetBtn');
+  if(btn) btn.onclick=()=>{
+    state.petKey=selectingPet;
+    state.petColor=selectingColor;
+    state.petName=(gameState.nameDraft||'Pet').trim();
+    state.created=true;
+    saveState();
+    sparkleThenGo();
+  };
+}
+function sparkleThenGo(){
+  confettiBurst();
+  playBeep(880,.25);
+  setTimeout(()=>go('pethome'), 500);
+}
+
+/* ============================= PET HOME ============================= */
+function renderPetHome(){
+  const p=pet();
+  const accHat = ACCESSORIES.hat.find(a=>a.k===state.hat);
+  const accG = ACCESSORIES.glasses.find(a=>a.k===state.glasses);
+  const accE = ACCESSORIES.extra.find(a=>a.k===state.extra);
+  return `
+  <div class="pethome-hero">
+    <div class="pet-preview" id="petSprite" style="background:${colorHex()}55;position:relative;">
+      <span style="position:absolute;top:-6px;left:50%;transform:translateX(-50%);font-size:2.2rem;">${accHat?accHat.e:''}</span>
+      ${p.e}
+      <span style="position:absolute;bottom:18px;left:50%;transform:translateX(-50%);font-size:1.8rem;">${accG?accG.e:''}</span>
+      <span style="position:absolute;bottom:-4px;right:0;font-size:1.8rem;">${accE?accE.e:''}</span>
+    </div>
+    <div class="pet-headline">🐾 ${state.petName}</div>
+    <div class="level-badge">Level ${state.level}</div>
+  </div>
+
+  <div class="stat-row">
+    <div class="stat-box"><div class="icon">❤️</div><div class="lbl">HAPPY</div><div class="stat-bar"><div class="stat-fill fill-happy" style="width:${state.happiness}%"></div></div></div>
+    <div class="stat-box"><div class="icon">🍎</div><div class="lbl">HUNGER</div><div class="stat-bar"><div class="stat-fill fill-hunger" style="width:${state.hunger}%"></div></div></div>
+    <div class="stat-box"><div class="icon">⚡</div><div class="lbl">ENERGY</div><div class="stat-bar"><div class="stat-fill fill-energy" style="width:${state.energy}%"></div></div></div>
+    <div class="stat-box"><div class="icon">⭐</div><div class="lbl">XP</div><div class="stat-bar"><div class="stat-fill fill-xp" style="width:${Math.round(state.xp/xpForLevel(state.level)*100)}%"></div></div></div>
+  </div>
+
+  <div class="menu-grid">
+    <div class="menu-card" data-nav="games"><span class="icon">🎮</span><div class="lbl">Play Games</div></div>
+    <div class="menu-card" id="feedBtn"><span class="icon">🍎</span><div class="lbl">Feed</div></div>
+    <div class="menu-card" id="playToyBtn"><span class="icon">🧸</span><div class="lbl">Play</div></div>
+    <div class="menu-card" id="petBtn"><span class="icon">❤️</span><div class="lbl">Pet</div></div>
+    <div class="menu-card" data-nav="customize"><span class="icon">🎨</span><div class="lbl">Customize</div></div>
+    <div class="menu-card" data-nav="trophies"><span class="icon">🏆</span><div class="lbl">Trophies</div></div>
+  </div>`;
+}
+function wirePetHome(){
+  document.querySelectorAll('[data-nav]').forEach(b=>b.onclick=()=>go(b.dataset.nav));
+  const sprite=document.getElementById('petSprite');
+  const feed=document.getElementById('feedBtn');
+  const toy=document.getElementById('playToyBtn');
+  const petB=document.getElementById('petBtn');
+  if(feed) feed.onclick=(e)=>{
+    adjustStats({hunger:20, happiness:4});
+    popFx(document.getElementById('app'), '🍎', e.clientX-10, e.clientY-10);
+    playBeep(500,.1); render();
+  };
+  if(toy) toy.onclick=(e)=>{
+    adjustStats({happiness:15, energy:-5});
+    popFx(document.getElementById('app'), '🧸', e.clientX-10, e.clientY-10);
+    playBeep(550,.1); render();
+  };
+  if(petB) petB.onclick=(e)=>{
+    adjustStats({happiness:10});
+    const rect=sprite.getBoundingClientRect();
+    popFx(document.getElementById('app'), '❤️', rect.left+rect.width/2-10, rect.top+20);
+    playBeep(750,.1); render();
+  };
+  if(sprite) sprite.onclick=(e)=>{
+    adjustStats({happiness:5});
+    popFx(document.getElementById('app'), '✨', e.clientX-10, e.clientY-10);
+    render();
+  };
+}
+
+/* ============================= GAMES LIST ============================= */
+function renderGamesList(){
+  return `
+  <h2 class="page-title">🎮 Play Games!</h2>
+  <p class="page-sub">Pick a mini-game to earn XP and happiness</p>
+  <div class="games-grid">
+    ${GAMES.map(g=>`
+      <div class="game-card" data-game="${g.id}">
+        <div class="icon">${g.e}</div>
+        <div class="lbl">${g.n}</div>
+        <div class="best">${state.scores[g.id]!==undefined?'Best: '+state.scores[g.id]:'Not played yet'}</div>
+      </div>`).join('')}
+  </div>`;
+}
+function wireGamesList(){
+  document.querySelectorAll('[data-game]').forEach(el=>{
+    el.onclick=()=>{ playBeep(600,.1); startGame(el.dataset.game); };
+  });
+}
+
+/* ============================= GAME SCREEN ROUTER ============================= */
+function startGame(id){
+  gameState = {}; // reset scratch
+  screen = 'game-'+id;
+  render();
+}
+function renderGameScreen(id){
+  const g = GAMES.find(x=>x.id===id);
+  return `<div class="game-screen">
+    <div class="game-header"><h2>${g.e} ${g.n}</h2><span class="score-pill" id="scorePill">Score: 0</span></div>
+    <div class="game-area" id="gameArea"></div>
+  </div>`;
+}
+
+/* ============================= RESULT SCREEN ============================= */
+function renderResult(){
+  const r = gameState.resultData || {xp:0,happy:0,leveled:false};
+  return `
+  <div class="overlay"><div class="modal">
+    <div class="big-emoji">${r.leveled?'🎉':'🌟'}</div>
+    <h2>${r.leveled?'LEVEL UP!':'Great Job!'}</h2>
+    <p>+${r.xp} XP &nbsp; +${r.happy} ❤️ Happiness</p>
+    ${r.leveled?`<p style="color:var(--purple);font-weight:700;">Now Level ${state.level}!</p>`:''}
+    <button class="btn" id="backToGames">🎮 More Games</button>
+    <div style="height:8px;"></div>
+    <button class="btn secondary small" id="backHome2">🏠 Pet Home</button>
+  </div></div>`;
+}
+function wireResult(){
+  document.getElementById('backToGames').onclick=()=>go('games');
+  document.getElementById('backHome2').onclick=()=>go('pethome');
+}
+
+/* ============================= CUSTOMIZE ============================= */
+function renderCustomize(){
+  function chipRow(type,list){
+    return list.map(a=>{
+      const locked = a.lvl && !state.unlocked.includes(a.k);
+      const sel = state[type]===a.k;
+      return `<div class="equip-chip ${sel?'selected':''} ${locked?'locked':''}" data-equip="${type}:${a.k}" data-locked="${locked?1:0}">
+        ${a.k==='none'?'🚫':a.e}${a.lvl?`<div style="font-size:.55rem;">Lv${a.lvl}</div>`:''}
+      </div>`;
+    }).join('');
+  }
+  return `
+  <h2 class="page-title">🎨 Customize Your Pet</h2>
+  <div class="pet-preview-box">
+    <div class="pet-preview" style="background:${colorHex()}55;position:relative;">
+      <span style="position:absolute;top:-6px;left:50%;transform:translateX(-50%);font-size:2rem;">${ACCESSORIES.hat.find(a=>a.k===state.hat).e}</span>
+      ${pet().e}
+      <span style="position:absolute;bottom:16px;left:50%;transform:translateX(-50%);font-size:1.6rem;">${ACCESSORIES.glasses.find(a=>a.k===state.glasses).e}</span>
+      <span style="position:absolute;bottom:-4px;right:0;font-size:1.6rem;">${ACCESSORIES.extra.find(a=>a.k===state.extra).e}</span>
+    </div>
+  </div>
+
+  <p class="page-sub">Body Color</p>
+  <div class="color-row">
+    ${COLORS.map(c=>`<div class="color-swatch ${state.petColor===c.n?'selected':''}" data-recolor="${c.n}" style="background:${c.hex}" title="${c.n}"></div>`).join('')}
+  </div>
+
+  <p class="page-sub">Hats</p>
+  <div class="equip-strip">${chipRow('hat',ACCESSORIES.hat)}</div>
+  <p class="page-sub">Glasses</p>
+  <div class="equip-strip">${chipRow('glasses',ACCESSORIES.glasses)}</div>
+  <p class="page-sub">Extras</p>
+  <div class="equip-strip">${chipRow('extra',ACCESSORIES.extra)}</div>
+
+  <div style="text-align:center;margin-top:10px;">
+    <button class="btn orange" id="randomPetBtn">🎲 Random Pet</button>
+  </div>`;
+}
+function wireCustomize(){
+  document.querySelectorAll('[data-recolor]').forEach(el=>{
+    el.onclick=()=>{ state.petColor=el.dataset.recolor; saveState(); playBeep(650,.08); render(); };
+  });
+  document.querySelectorAll('[data-equip]').forEach(el=>{
+    el.onclick=()=>{
+      if(el.dataset.locked==='1'){ playBeep(200,.15); return; }
+      const [type,key]=el.dataset.equip.split(':');
+      state[type]=key; saveState(); playBeep(700,.1); render();
+    };
+  });
+  const rand=document.getElementById('randomPetBtn');
+  if(rand) rand.onclick=()=>{
+    state.petColor = COLORS[Math.floor(Math.random()*COLORS.length)].n;
+    const unlockedHats = ACCESSORIES.hat.filter(a=>a.k==='none'||state.unlocked.includes(a.k));
+    const unlockedG = ACCESSORIES.glasses.filter(a=>a.k==='none'||state.unlocked.includes(a.k));
+    const unlockedE = ACCESSORIES.extra.filter(a=>a.k==='none'||state.unlocked.includes(a.k));
+    state.hat = unlockedHats[Math.floor(Math.random()*unlockedHats.length)].k;
+    state.glasses = unlockedG[Math.floor(Math.random()*unlockedG.length)].k;
+    state.extra = unlockedE[Math.floor(Math.random()*unlockedE.length)].k;
+    saveState(); confettiBurst(); render();
+  };
+}
+
+/* ============================= TROPHIES ============================= */
+function renderTrophies(){
+  const all=[];
+  Object.values(ACCESSORIES).forEach(list=>list.forEach(a=>{ if(a.lvl) all.push(a); }));
+  all.sort((a,b)=>a.lvl-b.lvl);
+  return `
+  <h2 class="page-title">🏆 Trophies & Rewards</h2>
+  <p class="page-sub">Level ${state.level} &middot; ${state.xp}/${xpForLevel(state.level)} XP to next level</p>
+  <div class="reward-grid">
+    ${all.map(a=>`
+      <div class="reward-card ${state.unlocked.includes(a.k)?'':'locked'}">
+        <div class="icon">${state.unlocked.includes(a.k)?a.e:'🔒'}</div>
+        <div class="lvl">Level ${a.lvl}</div>
+      </div>`).join('')}
+  </div>
+  <h3 style="margin-top:26px;color:var(--purple);">Game High Scores</h3>
+  <div class="reward-grid">
+    ${GAMES.map(g=>`
+      <div class="reward-card">
+        <div class="icon">${g.e}</div>
+        <div class="lvl">${state.scores[g.id]!==undefined?state.scores[g.id]:'—'}</div>
+      </div>`).join('')}
+  </div>`;
+}
+
+/* ============================= SCREEN WIRING DISPATCH ============================= */
+function wireScreen(){
+  if(screen==='home') wireHome();
+  else if(screen==='choose') wireChoose();
+  else if(screen==='createpet') wireCreate();
+  else if(screen==='pethome') wirePetHome();
+  else if(screen==='games') wireGamesList();
+  else if(screen==='customize') wireCustomize();
+  else if(screen==='result') wireResult();
+  else if(screen.startsWith('game-')) initGame(screen.replace('game-',''));
+
+  const st=document.getElementById('soundToggle');
+  if(st){ st.textContent = state.soundOn?'🔊':'🔇'; st.onclick=()=>{ state.soundOn=!state.soundOn; saveState(); render(); }; }
+}
+
+function setScore(v){ const p=document.getElementById('scorePill'); if(p) p.textContent='Score: '+v; }
+
+/* ============================= MINI GAMES ============================= */
+function initGame(id){
+  const area = document.getElementById('gameArea');
+  if(!area) return;
+  clearGameTimers();
+  const fn = GAME_INIT[id];
+  if(fn) fn(area);
+}
+let gTimers=[];
+function clearGameTimers(){ gTimers.forEach(t=>{clearInterval(t);clearTimeout(t);}); gTimers=[]; }
+
+const GAME_INIT = {};
+
+/* ---- 1. Tic Tac Toe ---- */
+GAME_INIT.ttt = (area)=>{
+  const p = pet().e;
+  let board = Array(9).fill(null);
+  let over=false;
+  function winner(b){
+    const lines=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+    for(const [a,b1,c] of lines){ if(b[a] && b[a]===b[b1] && b[a]===b[c]) return b[a]; }
+    if(b.every(x=>x)) return 'draw';
+    return null;
+  }
+  function compMove(b){
+    const empty=b.map((v,i)=>v?null:i).filter(v=>v!==null);
+    // try win
+    for(const i of empty){ const t=[...b]; t[i]='O'; if(winner(t)==='O') return i; }
+    for(const i of empty){ const t=[...b]; t[i]='X'; if(winner(t)==='X') return i; }
+    if(empty.includes(4)) return 4;
+    return empty[Math.floor(Math.random()*empty.length)];
+  }
+  function draw(){
+    area.innerHTML = `<p style="text-align:center;">You are ${p} &nbsp;vs&nbsp; Computer 🤖</p>
+    <div class="ttt-grid">${board.map((v,i)=>`<div class="ttt-cell" data-i="${i}">${v===p?p:(v==='O'?'🤖':'')}</div>`).join('')}</div>
+    <p id="tttMsg" style="text-align:center;font-weight:700;"></p>`;
+    area.querySelectorAll('[data-i]').forEach(c=>c.onclick=()=>{
+      const i=+c.dataset.i;
+      if(over || board[i]) return;
+      board[i]=p; playBeep(600,.08);
+      let w=winner(board);
+      if(!w){
+        const ci=compMove(board);
+        if(ci!==undefined){ board[ci]='O'; }
+        w=winner(board);
+      }
+      if(w){
+        over=true;
+        const msg = w==='draw' ? "It's a draw!" : (w===p ? 'You win! 🎉' : 'Computer wins!');
+        draw();
+        document.getElementById('tttMsg').textContent = msg;
+        const xp = w===p?30:(w==='draw'?15:8);
+        const hap = w===p?15:(w==='draw'?8:4);
+        gTimers.push(setTimeout(()=>finishGame('ttt', xp, hap, w===p?1:0),900));
+        return;
+      }
+      draw();
+    });
+  }
+  draw();
+};
+
+/* ---- 2. Snakes and Ladders ---- */
+GAME_INIT.sl = (area)=>{
+  const SNAKES={16:6,47:26,49:11,56:53,62:19,64:60,87:24,93:73,95:75,98:78};
+  const LADDERS={1:38,4:14,9:31,21:42,28:84,36:44,51:67,71:91,80:100};
+  let pos=1; let rolling=false; let moves=0;
+  function cellNumber(row,col){ // snake path 10 cols x 10 rows bottom to top boustrophedon -> simplify to 6 cols x ~17 rows for compact board (60 cells)
+    return 0;
+  }
+  const SIZE=36; // 6x6 board of 36
+  function buildPath(){
+    // 6 columns, 6 rows, boustrophedon numbering 1..36
+    const cells=[];
+    for(let row=5; row>=0; row--){
+      const rowNums=[];
+      for(let col=0; col<6; col++) rowNums.push(row*6+col+1);
+      if((5-row)%2===1) rowNums.reverse();
+      cells.push(...rowNums);
+    }
+    return cells;
+  }
+  const path = buildPath(); // order left-to-right top-to-bottom rendering, value = square number
+  const SNAKES2={30:12,25:7,33:16,19:2}; const LADDERS2={4:20,8:27,13:29,21:35};
+  function render2(){
+    area.innerHTML = `<p style="text-align:center;">Race your pet to square 36! 🏁</p>
+    <div class="sl-board">${path.map(num=>{
+        let cls='sl-cell';
+        if(LADDERS2[num]) cls+=' ladder';
+        if(SNAKES2[num]) cls+=' snake';
+        return `<div class="${cls}">${num===pos?`<span class="sl-token">${pet().e}</span>`:''}${LADDERS2[num]?'🪜':''}${SNAKES2[num]?'🐍':''}<span>${num}</span></div>`;
+      }).join('')}</div>
+    <div style="text-align:center;">
+      <p>Square: <b>${pos}</b> / 36</p>
+      <button class="btn teal" id="rollDice" ${rolling?'disabled':''}>🎲 Roll Dice</button>
+      <p id="slMsg" style="font-weight:700;"></p>
+    </div>`;
+    const btn=document.getElementById('rollDice');
+    if(btn) btn.onclick=()=>{
+      if(rolling||pos>=36) return;
+      rolling=true; moves++;
+      const roll = 1+Math.floor(Math.random()*6);
+      playBeep(500,.1);
+      let np = Math.min(36,pos+roll);
+      pos = np;
+      let msg = `Rolled a ${roll}!`;
+      if(LADDERS2[pos]){ msg+=' Climbed a ladder! 🪜'; pos=LADDERS2[pos]; playBeep(800,.15); }
+      else if(SNAKES2[pos]){ msg+=' Oh no, a snake! 🐍'; pos=SNAKES2[pos]; playBeep(200,.15); }
+      rolling=false;
+      render2();
+      document.getElementById('slMsg').textContent = msg;
+      if(pos>=36){
+        document.getElementById('slMsg').textContent = 'You reached the finish! 🏆';
+        gTimers.push(setTimeout(()=>finishGame('sl', 35, 15, moves),700));
+      }
+    };
+  }
+  render2();
+};
+
+/* ---- 3. Memory Match ---- */
+GAME_INIT.memory = (area)=>{
+  const emojis=['🐶','🐱','🐰','🦊','🐼','🐸'];
+  let deck = [...emojis, ...emojis].sort(()=>Math.random()-.5);
+  let flipped=[]; let matched=[]; let tries=0; let lock=false;
+  function draw(){
+    area.innerHTML = `<div class="mem-grid">${deck.map((e,i)=>{
+      const isUp = flipped.includes(i)||matched.includes(i);
+      return `<div class="mem-card ${isUp?'flipped':''} ${matched.includes(i)?'matched':''}" data-i="${i}">${isUp?e:'❔'}</div>`;
+    }).join('')}</div><p style="text-align:center;">Tries: ${tries} &nbsp; Pairs found: ${matched.length/2}/${emojis.length}</p>`;
+    area.querySelectorAll('[data-i]').forEach(c=>c.onclick=()=>{
+      const i=+c.dataset.i;
+      if(lock||flipped.includes(i)||matched.includes(i)) return;
+      flipped.push(i); playBeep(600,.06); draw();
+      if(flipped.length===2){
+        lock=true; tries++;
+        const [a,b]=flipped;
+        if(deck[a]===deck[b]){
+          matched.push(a,b); flipped=[]; lock=false; playBeep(800,.15);
+          draw();
+          if(matched.length===deck.length){
+            const xp=Math.max(20, 60-tries*2);
+            gTimers.push(setTimeout(()=>finishGame('memory', xp, 15, tries),600));
+          }
+        }else{
+          gTimers.push(setTimeout(()=>{ flipped=[]; lock=false; draw(); },700));
+        }
+      }
+    });
+  }
+  draw();
+};
+
+/* ---- 4. Pet Target ---- */
+GAME_INIT.target = (area)=>{
+  let score=0; let timeLeft=20;
+  area.innerHTML = `<p style="text-align:center;">Click the targets before time runs out!</p>
+  <p style="text-align:center;font-weight:700;">Time: <span id="tgTime">${timeLeft}</span>s</p>
+  <div style="position:relative;height:260px;" id="tgField"></div>`;
+  const field = document.getElementById('tgField');
+  function spawn(){
+    field.innerHTML='';
+    const t=document.createElement('div');
+    t.className='floaty'; t.textContent='🎯';
+    t.style.left = (Math.random()*80)+'%';
+    t.style.top = (Math.random()*70)+'%';
+    t.onclick=(e)=>{
+      score+=10; setScore(score); playBeep(700,.08);
+      popFx(field, '⭐', e.offsetX, e.offsetY);
+      spawn();
+    };
+    field.appendChild(t);
+  }
+  spawn();
+  const timer=setInterval(()=>{
+    timeLeft--; document.getElementById('tgTime').textContent=timeLeft;
+    if(timeLeft<=0){
+      clearInterval(timer);
+      field.innerHTML='<p style="text-align:center;">Time up!</p>';
+      gTimers.push(setTimeout(()=>finishGame('target', Math.min(50,score), 12, score),500));
+    }
+  },1000);
+  gTimers.push(timer);
+};
+
+/* ---- 5. Pet Race ---- */
+GAME_INIT.race = (area)=>{
+  let you=0, cpu=0; let over=false;
+  area.innerHTML = `<p style="text-align:center;">Tap FASTER to win the race!</p>
+  <div class="race-track">
+    <div class="race-lane"><div class="race-runner" id="youR" style="left:2px;">${pet().e}</div></div>
+    <div class="race-lane"><div class="race-runner" id="cpuR" style="left:2px;">🤖</div></div>
+  </div>
+  <div style="text-align:center;"><button class="btn" id="tapBtn">👆 TAP!</button></div>`;
+  const youR=document.getElementById('youR'), cpuR=document.getElementById('cpuR');
+  const maxLeft = 300;
+  const tap=document.getElementById('tapBtn');
+  tap.onclick=()=>{
+    if(over) return;
+    you=Math.min(100,you+6);
+    youR.style.left = (2+you/100*maxLeft)+'px';
+    playBeep(600,.05);
+    if(you>=100) finish('you');
+  };
+  const cpuTimer=setInterval(()=>{
+    if(over) return;
+    cpu=Math.min(100,cpu + 2 + Math.random()*2.5);
+    cpuR.style.left = (2+cpu/100*maxLeft)+'px';
+    if(cpu>=100) finish('cpu');
+  },200);
+  gTimers.push(cpuTimer);
+  function finish(who){
+    over=true; clearInterval(cpuTimer);
+    const msg = document.createElement('p');
+    msg.style.textAlign='center'; msg.style.fontWeight='700';
+    msg.textContent = who==='you' ? 'You won the race! 🏆' : 'Computer won this time!';
+    area.appendChild(msg);
+    const xp = who==='you'?35:15;
+    gTimers.push(setTimeout(()=>finishGame('race', xp, who==='you'?15:6, who==='you'?1:0),700));
+  }
+};
+
+/* ---- 6. Pet Puzzle (8-puzzle) ---- */
+GAME_INIT.puzzle = (area)=>{
+  let tiles=[1,2,3,4,5,6,7,8,null];
+  // shuffle via random valid moves to guarantee solvability
+  function shuffle(){
+    let blank=8;
+    for(let i=0;i<120;i++){
+      const neighbors = validMoves(blank);
+      const m = neighbors[Math.floor(Math.random()*neighbors.length)];
+      [tiles[blank],tiles[m]]=[tiles[m],tiles[blank]];
+      blank=m;
+    }
+  }
+  function validMoves(blank){
+    const r=Math.floor(blank/3), c=blank%3; const res=[];
+    if(r>0) res.push(blank-3);
+    if(r<2) res.push(blank+3);
+    if(c>0) res.push(blank-1);
+    if(c<2) res.push(blank+1);
+    return res;
+  }
+  shuffle();
+  let moveCount=0;
+  function isSolved(){ return tiles.slice(0,8).every((v,i)=>v===i+1) && tiles[8]===null; }
+  function draw(){
+    area.innerHTML = `<p style="text-align:center;">Arrange the tiles in order 1-8!</p>
+    <div class="pz-grid">${tiles.map((v,i)=>`<div class="pz-cell ${v===null?'empty':''}" data-i="${i}">${v||''}</div>`).join('')}</div>
+    <p style="text-align:center;">Moves: ${moveCount}</p>`;
+    area.querySelectorAll('[data-i]').forEach(c=>c.onclick=()=>{
+      const i=+c.dataset.i;
+      const blank = tiles.indexOf(null);
+      if(validMoves(blank).includes(i)){
+        [tiles[blank],tiles[i]]=[tiles[i],tiles[blank]];
+        moveCount++; playBeep(550,.06);
+        draw();
+        if(isSolved()){
+          const xp=Math.max(20,60-moveCount);
+          gTimers.push(setTimeout(()=>finishGame('puzzle', xp, 15, moveCount),500));
+        }
+      }
+    });
+  }
+  draw();
+};
+
+/* ---- 7. Catch the Food ---- */
+GAME_INIT.catch = (area)=>{
+  let score=0, timeLeft=20, petX=45;
+  area.innerHTML = `<p style="text-align:center;">Catch the falling food!</p>
+  <p style="text-align:center;font-weight:700;">Time: <span id="cfTime">${timeLeft}</span>s</p>
+  <div id="cfField" style="position:relative;height:280px;overflow:hidden;background:#eaf6ff;border-radius:12px;">
+    <div id="cfPet" style="position:absolute;bottom:6px;font-size:2.2rem;left:${petX}%;transform:translateX(-50%);">${pet().e}</div>
+  </div>
+  <div class="controls-row">
+    <button class="big-arrow" id="cfLeft">⬅️</button>
+    <button class="big-arrow" id="cfRight">➡️</button>
+  </div>`;
+  const field=document.getElementById('cfField');
+  const petEl=document.getElementById('cfPet');
+  function move(dx){ petX=Math.max(6,Math.min(94,petX+dx)); petEl.style.left=petX+'%'; }
+  document.getElementById('cfLeft').onclick=()=>move(-8);
+  document.getElementById('cfRight').onclick=()=>move(8);
+  function keyHandler(e){ if(e.key==='ArrowLeft') move(-8); if(e.key==='ArrowRight') move(8); }
+  document.addEventListener('keydown', keyHandler);
+  const foods=['🍎','🍌','🍇','🍕','🍓'];
+  function spawnFood(){
+    const f=document.createElement('div');
+    f.className='floaty'; f.textContent=foods[Math.floor(Math.random()*foods.length)];
+    const x = 6+Math.random()*88;
+    f.style.left=x+'%'; f.style.top='0px';
+    field.appendChild(f);
+    let top=0;
+    const fall=setInterval(()=>{
+      top+=6; f.style.top=top+'px';
+      if(top>230){
+        clearInterval(fall); f.remove();
+      }else if(top>190 && Math.abs(x-petX)<10){
+        clearInterval(fall); f.remove();
+        score+=10; setScore(score); playBeep(700,.08);
+        popFx(field,'✨', (x/100)*field.clientWidth, 200);
+      }
+    },40);
+    gTimers.push(fall);
+  }
+  const spawner=setInterval(spawnFood, 800);
+  gTimers.push(spawner);
+  const timer=setInterval(()=>{
+    timeLeft--; document.getElementById('cfTime').textContent=timeLeft;
+    if(timeLeft<=0){
+      clearInterval(timer); clearInterval(spawner);
+      document.removeEventListener('keydown', keyHandler);
+      gTimers.push(setTimeout(()=>finishGame('catch', Math.min(50,score), 12, score),400));
+    }
+  },1000);
+  gTimers.push(timer);
+};
+
+/* ---- 8. Balloon Pop ---- */
+GAME_INIT.balloon = (area)=>{
+  let score=0, timeLeft=18;
+  area.innerHTML = `<p style="text-align:center;">Pop the balloons before they float away!</p>
+  <p style="text-align:center;font-weight:700;">Time: <span id="bpTime">${timeLeft}</span>s</p>
+  <div id="bpField" style="position:relative;height:300px;overflow:hidden;background:linear-gradient(180deg,#dff0ff,#fff);border-radius:12px;"></div>`;
+  const field=document.getElementById('bpField');
+  const colors=['🎈','🟣🎈'.slice(0,2)]; // just use balloon emoji, color via filter
+  function spawnBalloon(){
+    const b=document.createElement('div');
+    b.className='floaty'; b.textContent='🎈';
+    b.style.left=(4+Math.random()*88)+'%';
+    b.style.top = field.clientHeight+'px';
+    b.style.filter = `hue-rotate(${Math.floor(Math.random()*360)}deg)`;
+    field.appendChild(b);
+    let top=field.clientHeight;
+    const rise=setInterval(()=>{
+      top-=4; b.style.top=top+'px';
+      if(top< -40){ clearInterval(rise); b.remove(); }
+    },40);
+    b.onclick=(e)=>{
+      clearInterval(rise); b.remove();
+      score+=10; setScore(score); playBeep(750,.08);
+      popFx(field,'🎉', e.offsetX, e.offsetY);
+    };
+    gTimers.push(rise);
+  }
+  const spawner=setInterval(spawnBalloon, 650);
+  gTimers.push(spawner);
+  const timer=setInterval(()=>{
+    timeLeft--; document.getElementById('bpTime').textContent=timeLeft;
+    if(timeLeft<=0){
+      clearInterval(timer); clearInterval(spawner);
+      gTimers.push(setTimeout(()=>finishGame('balloon', Math.min(50,score), 12, score),400));
+    }
+  },1000);
+  gTimers.push(timer);
+};
+
+/* ---- 9. Pet Maze ---- */
+GAME_INIT.maze = (area)=>{
+  const layout = [
+    "########",
+    "#S.....#",
+    "#.####.#",
+    "#......#",
+    "#.####.#",
+    "#......#",
+    "#.####G#",
+    "########"
+  ];
+  const rows=layout.length, cols=layout[0].length;
+  let pos=null, goal=null;
+  layout.forEach((row,r)=>[...row].forEach((ch,c)=>{ if(ch==='S') pos={r,c}; if(ch==='G') goal={r,c}; }));
+  let moves=0;
+  function isWall(r,c){ return r<0||c<0||r>=rows||c>=cols||layout[r][c]==='#'; }
+  function draw(){
+    area.innerHTML = `<p style="text-align:center;">Guide your pet to the star! ⭐</p>
+    <div class="maze-grid" style="grid-template-columns:repeat(${cols},34px);">
+      ${layout.map((row,r)=>[...row].map((ch,c)=>{
+        let cls='maze-cell'; let content='';
+        if(ch==='#') cls+=' wall';
+        if(pos.r===r && pos.c===c) content=pet().e;
+        else if(goal.r===r && goal.c===c) { cls+=' goal'; content='⭐'; }
+        return `<div class="${cls}">${content}</div>`;
+      }).join('')).join('')}
+    </div>
+    <div class="controls-row" style="flex-wrap:wrap;">
+      <button class="big-arrow" id="mzUp">⬆️</button>
+    </div>
+    <div class="controls-row">
+      <button class="big-arrow" id="mzLeft">⬅️</button>
+      <button class="big-arrow" id="mzDown">⬇️</button>
+      <button class="big-arrow" id="mzRight">➡️</button>
+    </div>
+    <p style="text-align:center;">Moves: ${moves}</p>`;
+    function tryMove(dr,dc){
+      const nr=pos.r+dr, nc=pos.c+dc;
+      if(!isWall(nr,nc)){ pos={r:nr,c:nc}; moves++; playBeep(550,.06); draw();
+        if(pos.r===goal.r && pos.c===goal.c){
+          const xp=Math.max(20,50-moves);
+          gTimers.push(setTimeout(()=>finishGame('maze', xp, 15, moves),500));
+        }
+      }
+    }
+    document.getElementById('mzUp').onclick=()=>tryMove(-1,0);
+    document.getElementById('mzDown').onclick=()=>tryMove(1,0);
+    document.getElementById('mzLeft').onclick=()=>tryMove(0,-1);
+    document.getElementById('mzRight').onclick=()=>tryMove(0,1);
+  }
+  draw();
+};
+
+/* ---- 10. Reaction Game ---- */
+GAME_INIT.reaction = (area)=>{
+  const pool=['🐶','🐱','🦊','🐼','🐸','🦄','🐝','🐢'];
+  let round=0, totalRounds=6, score=0, startTime=0;
+  function nextRound(){
+    round++;
+    if(round>totalRounds){
+      gTimers.push(setTimeout(()=>finishGame('reaction', Math.min(60,score), 14, score),300));
+      return;
+    }
+    const target = pool[Math.floor(Math.random()*pool.length)];
+    let options = [target];
+    while(options.length<4){
+      const c=pool[Math.floor(Math.random()*pool.length)];
+      if(!options.includes(c)) options.push(c);
+    }
+    options.sort(()=>Math.random()-.5);
+    area.innerHTML = `<p style="text-align:center;">Round ${round}/${totalRounds} — Click this one:</p>
+    <p style="text-align:center;font-size:3.5rem;">${target}</p>
+    <div class="reaction-row">${options.map(o=>`<div class="reaction-item" data-o="${o}">${o}</div>`).join('')}</div>`;
+    startTime = Date.now();
+    area.querySelectorAll('[data-o]').forEach(el=>{
+      el.onclick=()=>{
+        const correct = el.dataset.o===target;
+        const ms = Date.now()-startTime;
+        if(correct){
+          const pts = Math.max(5, 30 - Math.floor(ms/100));
+          score += pts; playBeep(750,.08);
+        }else{
+          playBeep(200,.15);
+        }
+        setScore(score);
+        nextRound();
+      };
+    });
+  }
+  nextRound();
+};
+
+/* ============================= BACKGROUND CLOUDS ============================= */
+function initClouds(){
+  const wrap=document.getElementById('bg-clouds');
+  const emojis=['☁️','☁️','🌤️'];
+  for(let i=0;i<6;i++){
+    const c=document.createElement('div');
+    c.className='cloud';
+    c.textContent=emojis[i%emojis.length];
+    c.style.top=(4+Math.random()*70)+'%';
+    c.style.left='-10vw';
+    c.style.animationDuration=(30+Math.random()*30)+'s';
+    c.style.animationDelay=(-Math.random()*40)+'s';
+    c.style.fontSize=(30+Math.random()*30)+'px';
+    wrap.appendChild(c);
+  }
+}
+
+/* ============================= IDLE STAT DRIFT ============================= */
+setInterval(()=>{
+  if(!state.created) return;
+  state.hunger = clampStat(state.hunger-1);
+  state.happiness = clampStat(state.happiness - (state.hunger<20?2:0.5));
+  state.energy = clampStat(state.energy + (state.energy<100?0.5:0));
+  saveState();
+  if(screen==='pethome') render();
+}, 20000);
+
+/* ============================= INIT ============================= */
+initClouds();
+loadState();
+</script>
+</body>
+</html>

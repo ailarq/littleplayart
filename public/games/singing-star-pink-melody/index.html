@@ -1,0 +1,1896 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Singing Star: Pink Melody</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Titan+One&family=Pacifico&display=swap" rel="stylesheet">
+<style>
+/* Layout: full-screen app, one screen at a time — bubbly frosted panels floating over a pastel stage-glow sky. Single committed pastel look (both host themes). */
+:root{
+  --pink:#ffc9e3; --hot:#ff4fa3; --hot2:#ff7ac0; --lav:#cdb8ff; --lav2:#a88bff; --blue:#bfe6ff; --blue2:#7cc6ff;
+  --cream:#fff8fc; --ink:#5b2466; --ink2:#8a5a95; --gold:#ffcf5c; --mint:#a6f0d2;
+  --panel:rgba(255,255,255,.80); --panel2:rgba(255,255,255,.55); --line:rgba(160,90,170,.20);
+  --shadow:0 10px 30px rgba(140,60,150,.18), 0 2px 6px rgba(140,60,150,.10);
+  --f-display:'Titan One','Baloo 2',ui-rounded,system-ui,sans-serif;
+  --f-body:'Baloo 2',ui-rounded,system-ui,-apple-system,'Segoe UI',sans-serif;
+  --f-script:'Pacifico','Brush Script MT',cursive;
+  --rainbow:linear-gradient(90deg,#ff7eb6,#ffae6b,#ffe36b,#8ef0b5,#7cc8ff,#b99bff);
+  --sky:linear-gradient(160deg,#ffcfe7 0%,#e6d5ff 50%,#c7eaff 100%);
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+.studio>.grid{grid-template-columns:minmax(0,1fr)}
+.panel{min-width:0}
+html,body{height:100%}
+body{margin:0;font-family:var(--f-body);color:var(--ink);background:#f6e2f5;background-image:var(--sky);overflow:hidden;-webkit-tap-highlight-color:transparent;font-size:16px;line-height:1.4}
+button{font-family:inherit;color:inherit}
+input,textarea,select{font-family:inherit;color:var(--ink)}
+:focus-visible{outline:3px solid var(--hot);outline-offset:3px;border-radius:12px}
+h1,h2,h3{margin:0;text-wrap:balance}
+.screen{position:fixed;inset:0;overflow-y:auto;overflow-x:hidden;padding:calc(env(safe-area-inset-top,0px) + 12px) 16px calc(env(safe-area-inset-bottom,0px) + 32px);background:var(--sky)}
+.wrap{max-width:1100px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+
+/* floating decor */
+.decor{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0}
+.decor span{position:absolute;font-size:var(--s,24px);opacity:.75;animation:floaty var(--d,9s) ease-in-out infinite;animation-delay:var(--dl,0s)}
+@keyframes floaty{0%,100%{transform:translateY(0) rotate(-6deg)}50%{transform:translateY(-26px) rotate(8deg)}}
+.screen>.wrap{position:relative;z-index:1}
+
+/* buttons */
+.btn{appearance:none;border:0;cursor:pointer;font-weight:800;font-size:1rem;padding:12px 18px;border-radius:999px;background:#fff;color:var(--ink);box-shadow:0 4px 0 rgba(160,80,170,.25),0 8px 18px rgba(160,80,170,.15);transition:transform .12s ease, box-shadow .12s ease;display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;touch-action:manipulation}
+.btn:hover{transform:translateY(-2px) scale(1.02)}
+.btn:active{transform:translateY(3px) scale(.98);box-shadow:0 1px 0 rgba(160,80,170,.25)}
+.btn[disabled]{opacity:.5;cursor:not-allowed;transform:none}
+.btn.pink{background:linear-gradient(180deg,#ff8fc8,#ff4fa3);color:#fff;text-shadow:0 1px 0 rgba(150,0,70,.3)}
+.btn.lav{background:linear-gradient(180deg,#d9c8ff,#a88bff);color:#fff;text-shadow:0 1px 0 rgba(70,20,150,.3)}
+.btn.blue{background:linear-gradient(180deg,#d6f0ff,#7cc6ff);color:#1f4c7a}
+.btn.gold{background:linear-gradient(180deg,#ffe596,#ffc23d);color:#7a4a00}
+.btn.mint{background:linear-gradient(180deg,#d4fbe9,#7fe3b9);color:#155c43}
+.btn.rainbow{background:var(--rainbow);background-size:200% 100%;color:#fff;text-shadow:0 2px 0 rgba(120,40,120,.35);animation:rbshift 4s linear infinite}
+@keyframes rbshift{to{background-position:200% 0}}
+.btn.sm{min-height:36px;padding:6px 12px;font-size:.9rem}
+.btn.xl{font-family:var(--f-display);font-weight:400;font-size:clamp(1.3rem,4.5vw,2rem);padding:18px 34px;min-height:70px;letter-spacing:.5px}
+.btn.on{outline:3px solid var(--hot);outline-offset:2px}
+.btn-icon{appearance:none;border:0;background:#fff;border-radius:50%;width:46px;height:46px;font-size:1.3rem;cursor:pointer;box-shadow:0 3px 0 rgba(160,80,170,.25);flex:none}
+
+.panel{background:var(--panel);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-radius:26px;padding:18px;box-shadow:var(--shadow);border:2px solid rgba(255,255,255,.9)}
+.panel h3{font-family:var(--f-display);font-weight:400;font-size:1.25rem;color:var(--hot);margin-bottom:10px;letter-spacing:.3px}
+.muted{color:var(--ink2);font-size:.92rem}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.grid{display:grid;gap:12px}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;background:#fff;font-weight:700;font-size:.9rem;box-shadow:0 2px 0 rgba(160,80,170,.18)}
+.eyebrow{text-transform:uppercase;letter-spacing:.12em;font-size:.72rem;font-weight:800;color:var(--ink2)}
+
+/* topbar */
+.topbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.topbar h2{font-family:var(--f-display);font-weight:400;font-size:clamp(1.3rem,4vw,2rem);color:var(--hot);text-shadow:0 3px 0 #fff;flex:1;min-width:160px}
+.wallet{display:flex;gap:8px;flex-wrap:wrap}
+.wallet .chip{font-variant-numeric:tabular-nums}
+
+/* HOME */
+#scr-home{display:flex;flex-direction:column;align-items:center}
+.home-stage{position:fixed;left:50%;bottom:-6vh;transform:translateX(-50%);width:min(1100px,140vw);height:60vh;pointer-events:none;z-index:0}
+.home-stage .arch{position:absolute;inset:0;border-radius:50% 50% 0 0/60% 60% 0 0;background:radial-gradient(ellipse at 50% 100%,rgba(255,255,255,.95),rgba(255,210,235,.6) 40%,rgba(205,184,255,.25) 65%,transparent 72%)}
+.home-stage .bulbs{position:absolute;inset:6% 8% auto 8%;height:30%;display:flex;justify-content:space-between}
+.home-stage .bulbs i{width:14px;height:14px;border-radius:50%;background:#fff;box-shadow:0 0 12px 4px #ffd1ec;animation:twink 1.6s ease-in-out infinite;animation-delay:calc(var(--i)*.13s)}
+.home-stage .floor{position:absolute;left:12%;right:12%;bottom:6vh;height:8vh;border-radius:50%;background:radial-gradient(ellipse,#fff 0%,#ffd6ec 45%,rgba(255,180,220,0) 70%)}
+@keyframes twink{0%,100%{opacity:.4;transform:scale(.8)}50%{opacity:1;transform:scale(1.15)}}
+.home-inner{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:14px;width:100%;max-width:760px;padding-top:2vh;text-align:center}
+.logo{font-family:var(--f-display);font-size:clamp(2.6rem,10vw,5.2rem);line-height:.95;color:#fff;letter-spacing:1px;
+  text-shadow:0 4px 0 #ff4fa3,0 8px 0 #c86bff,0 14px 26px rgba(160,60,170,.35);animation:logoPop 3s ease-in-out infinite}
+.logo .mic{display:inline-block;animation:micSwing 2.4s ease-in-out infinite}
+@keyframes micSwing{0%,100%{transform:rotate(-12deg)}50%{transform:rotate(12deg)}}
+@keyframes logoPop{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}
+.sub{font-family:var(--f-script);font-size:clamp(1.6rem,6vw,2.6rem);color:var(--hot);text-shadow:0 2px 0 #fff;margin-top:-4px}
+.home-singer{width:min(200px,38vw);filter:drop-shadow(0 10px 20px rgba(200,80,170,.35))}
+.home-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;width:100%}
+.home-grid .btn{border-radius:22px;flex-direction:column;gap:2px;padding:12px 8px;min-height:74px;font-size:.95rem}
+.home-grid .btn .ic{font-size:1.6rem;line-height:1}
+.home-wide{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%}
+.home-wide .btn{font-size:1.05rem;min-height:58px;border-radius:22px}
+.rank-pill{display:inline-flex;gap:8px;align-items:center;background:#fff;padding:6px 14px;border-radius:999px;font-weight:800;box-shadow:0 3px 0 rgba(160,80,170,.2)}
+@media (max-width:520px){.home-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.home-wide{grid-template-columns:1fr}}
+
+/* CARDS */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+.card{background:#fff;border-radius:22px;padding:14px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:8px;position:relative;border:3px solid transparent;min-width:0}
+.card.sel{border-color:var(--hot)}
+.card.locked{filter:grayscale(.6);opacity:.8}
+.card .t{font-weight:800;font-size:1.08rem;line-height:1.2}
+.card .meta{display:flex;flex-wrap:wrap;gap:6px;font-size:.82rem}
+.card .meta span{background:#fbeefb;border-radius:999px;padding:2px 9px;font-weight:700}
+.song-art{height:84px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:2.6rem;position:relative;overflow:hidden}
+.song-art::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 30% 20%,rgba(255,255,255,.7),transparent 45%)}
+.rankbadge{font-family:var(--f-display);font-size:1rem;width:32px;height:32px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#fff;background:#ccc}
+.rk-S{background:linear-gradient(135deg,#ffd76b,#ff7ac0)}.rk-A{background:linear-gradient(135deg,#ff8fc8,#a88bff)}.rk-B{background:linear-gradient(135deg,#7cc6ff,#a88bff)}.rk-C{background:linear-gradient(135deg,#7fe3b9,#7cc6ff)}
+
+.tabs{display:flex;gap:8px;overflow-x:auto;padding:4px 2px 8px;scrollbar-width:thin}
+.tabs .btn{flex:none}
+
+/* SINGER */
+.singer-layout{display:grid;grid-template-columns:minmax(0,340px) minmax(0,1fr);gap:16px;align-items:start}
+.singer-preview{position:sticky;top:0;display:flex;flex-direction:column;align-items:center;gap:10px;background:radial-gradient(ellipse at 50% 90%,#fff 0%,rgba(255,255,255,.3) 55%,transparent 70%),linear-gradient(180deg,#ffd9ee,#e3d6ff);border-radius:30px;padding:16px;box-shadow:var(--shadow)}
+.singer-preview .singer-wrap{width:min(240px,60vw)}
+.opt-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px}
+.opt{appearance:none;border:3px solid transparent;background:#fff;border-radius:18px;padding:8px 6px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;font-weight:700;font-size:.8rem;box-shadow:0 3px 0 rgba(160,80,170,.18);position:relative;min-height:74px;text-align:center}
+.opt .sw{width:34px;height:34px;border-radius:50%;box-shadow:inset 0 -3px 0 rgba(0,0,0,.12)}
+.opt .em{font-size:1.6rem;line-height:1.1}
+.opt.sel{border-color:var(--hot);background:#fff0f8}
+.opt.lock{opacity:.6}
+.opt .lk{position:absolute;top:4px;right:6px;font-size:.8rem}
+.name-input{width:100%;border:3px solid #ffd1ea;border-radius:16px;padding:10px 14px;font-size:1.1rem;font-weight:700;background:#fff}
+@media (max-width:760px){.singer-layout{grid-template-columns:1fr}.singer-preview{position:relative}}
+
+/* singer svg + moves */
+.singer-wrap{position:relative;transform-origin:50% 90%}
+.singer-wrap svg{width:100%;height:auto;display:block;overflow:visible}
+.singer-wrap .arm-l{transform-origin:80px 150px;transform-box:view-box;animation:armSway 2s ease-in-out infinite}
+.singer-wrap .arm-r{transform-origin:120px 150px;transform-box:view-box}
+.singer-wrap .aura>*{animation:twink 1.8s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+.singer-wrap .aura>*:nth-child(2n){animation-delay:.6s}.singer-wrap .aura>*:nth-child(3n){animation-delay:1.1s}
+@keyframes armSway{0%,100%{transform:rotate(0)}50%{transform:rotate(8deg)}}
+.singer-wrap.bop{animation:bop var(--beat,.5s) ease-in-out infinite alternate}
+@keyframes bop{from{transform:translateY(0) scale(1,1)}to{transform:translateY(-6px) scale(1.01,.99)}}
+.singer-wrap.mv-spin{animation:mvSpin .9s ease-in-out}
+.singer-wrap.mv-jump{animation:mvJump .8s cubic-bezier(.3,1.6,.5,1)}
+.singer-wrap.mv-pose{animation:mvPose .9s ease-in-out}
+.singer-wrap.mv-mic{animation:mvMic .9s ease-in-out}
+.singer-wrap.mv-mic .arm-r{animation:armUp .9s ease-in-out}
+.singer-wrap.mv-wave .arm-l{animation:wave .3s ease-in-out 3 alternate}
+.singer-wrap.mv-wave{animation:mvPose .9s ease-in-out}
+.singer-wrap.mv-heart{animation:mvHeart .9s ease-in-out}
+@keyframes mvSpin{0%{transform:perspective(600px) rotateY(0)}100%{transform:perspective(600px) rotateY(360deg)}}
+@keyframes mvJump{0%,100%{transform:translateY(0)}40%{transform:translateY(-22%) scale(1.05)}70%{transform:translateY(0) scale(1.06,.94)}}
+@keyframes mvPose{0%,100%{transform:rotate(0) scale(1)}40%,70%{transform:rotate(-8deg) scale(1.1)}}
+@keyframes mvMic{0%,100%{transform:rotate(0)}30%,70%{transform:rotate(6deg) translateY(-4%)}}
+@keyframes armUp{0%,100%{transform:rotate(0)}30%,70%{transform:rotate(-40deg)}}
+@keyframes wave{from{transform:rotate(0)}to{transform:rotate(-150deg)}}
+@keyframes mvHeart{0%,100%{transform:scale(1)}30%{transform:scale(1.12) rotate(4deg)}60%{transform:scale(1.12) rotate(-4deg)}}
+
+/* SONG SELECT */
+.diff{color:#ffb800;letter-spacing:1px}
+.stage-chip{display:flex;align-items:center;gap:8px}
+.stage-thumb{width:100%;height:70px;border-radius:14px}
+
+/* PLAY */
+#scr-play{padding:0;overflow:hidden;background:#2a1640}
+.play{position:absolute;inset:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,440px);grid-template-rows:auto minmax(0,1fr) auto;grid-template-areas:"hud hud" "stage lane" "stage ctrl";padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.hud{grid-area:hud;display:flex;align-items:center;gap:8px;padding:8px 12px;background:linear-gradient(180deg,rgba(40,10,60,.85),rgba(40,10,60,.55));color:#fff;flex-wrap:wrap}
+.hud .songname{font-weight:800;flex:1;min-width:120px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hud .stat{background:rgba(255,255,255,.14);border-radius:14px;padding:4px 10px;text-align:center;min-width:64px;font-variant-numeric:tabular-nums}
+.hud .stat b{display:block;font-size:1.05rem;line-height:1.1}
+.hud .stat small{font-size:.66rem;opacity:.85;letter-spacing:.06em;text-transform:uppercase}
+.hud .btn-icon{width:40px;height:40px;font-size:1.1rem}
+.progress{height:6px;border-radius:9px;background:rgba(255,255,255,.2);overflow:hidden;width:100%}
+.progress i{display:block;height:100%;width:0;background:var(--rainbow)}
+.stage-view{grid-area:stage;position:relative;overflow:hidden;min-height:0}
+.stage-view canvas{position:absolute;inset:0;width:100%;height:100%}
+.stage-view .singer-wrap{position:absolute;left:50%;bottom:16%;width:min(34%,230px);max-height:62%;aspect-ratio:2/3;margin-left:calc(min(34%,230px)/-2);z-index:2}
+.audience{position:absolute;left:0;right:0;bottom:0;height:18%;display:flex;justify-content:space-around;align-items:flex-end;z-index:3;padding:0 4px;font-size:clamp(1.3rem,3.2vw,2.2rem);background:linear-gradient(0deg,rgba(40,10,60,.85),transparent)}
+.audience span{animation:crowd 1s ease-in-out infinite alternate;animation-delay:calc(var(--i)*.11s);display:inline-block}
+.audience.hype span{animation-duration:.35s}
+@keyframes crowd{from{transform:translateY(0)}to{transform:translateY(-6px)}}
+.react{position:absolute;z-index:4;font-size:1.6rem;pointer-events:none;animation:rise 1.4s ease-out forwards}
+@keyframes rise{from{transform:translateY(0) scale(.6);opacity:1}to{transform:translateY(-120px) scale(1.2);opacity:0}}
+.lane-wrap{grid-area:lane;position:relative;min-height:0;background:rgba(30,10,50,.72)}
+.lane-wrap canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none}
+.judge{position:absolute;left:50%;top:38%;transform:translate(-50%,-50%);font-family:var(--f-display);font-size:clamp(1.6rem,5vw,2.4rem);color:#fff;pointer-events:none;text-shadow:0 3px 0 var(--hot),0 0 18px rgba(255,120,200,.8);white-space:nowrap}
+.judge.pop{animation:judgePop .5s ease-out}
+@keyframes judgePop{0%{transform:translate(-50%,-50%) scale(.4);opacity:0}30%{transform:translate(-50%,-50%) scale(1.2);opacity:1}100%{transform:translate(-50%,-60%) scale(1);opacity:.0}}
+.combo-banner{position:absolute;left:50%;top:22%;transform:translateX(-50%);z-index:6;font-family:var(--f-display);font-size:clamp(1.8rem,7vw,3.6rem);color:#fff;text-shadow:0 4px 0 #ff4fa3,0 0 30px #ffb3e0;pointer-events:none;white-space:nowrap;animation:banner 1.6s ease-out forwards}
+@keyframes banner{0%{transform:translateX(-50%) scale(.3) rotate(-10deg);opacity:0}20%{transform:translateX(-50%) scale(1.15) rotate(3deg);opacity:1}80%{opacity:1}100%{transform:translateX(-50%) scale(1) translateY(-30px);opacity:0}}
+.cue{position:absolute;left:50%;top:8%;transform:translateX(-50%);z-index:6;background:rgba(255,255,255,.92);color:var(--hot);font-weight:800;padding:8px 18px;border-radius:999px;font-size:1.05rem;white-space:nowrap;box-shadow:0 0 0 4px rgba(255,120,200,.4),0 0 30px rgba(255,120,200,.7)}
+.meter{position:absolute;left:10px;top:10px;z-index:5;background:rgba(40,10,60,.6);border-radius:16px;padding:8px 10px;color:#fff;width:150px;font-size:.78rem;display:flex;flex-direction:column;gap:5px}
+.meter .bar{height:8px;border-radius:8px;background:rgba(255,255,255,.2);overflow:hidden}
+.meter .bar i{display:block;height:100%;width:0;border-radius:8px;transition:width .2s}
+.meter .lbl{display:flex;justify-content:space-between;font-variant-numeric:tabular-nums}
+.meter .star i{background:var(--rainbow)}
+.meter.super{box-shadow:0 0 0 3px #ffe36b,0 0 24px #ffe36b}
+.ctrl{grid-area:ctrl;display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:8px;background:rgba(30,10,50,.85)}
+.ctrl .lane-btn{appearance:none;border:0;border-radius:18px;min-height:64px;font-weight:800;color:#fff;font-size:1.3rem;cursor:pointer;touch-action:none;box-shadow:inset 0 -5px 0 rgba(0,0,0,.18);display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.1;user-select:none;-webkit-user-select:none}
+.ctrl .lane-btn small{font-size:.7rem;opacity:.9}
+.ctrl .lane-btn.down{transform:scale(.94);filter:brightness(1.25)}
+.ctrl .move-btn{grid-column:1/-1;min-height:48px;border-radius:999px;background:linear-gradient(90deg,#ffd76b,#ff8fc8,#b99bff);font-size:1.05rem;position:relative;overflow:hidden}
+.ctrl .move-btn.ready{animation:pulse .5s ease-in-out infinite alternate}
+.ctrl .move-btn .ring{position:absolute;left:0;top:0;bottom:0;background:rgba(255,255,255,.35);width:0}
+@keyframes pulse{from{box-shadow:0 0 0 0 rgba(255,230,120,.8)}to{box-shadow:0 0 0 8px rgba(255,230,120,0)}}
+.countdown{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--f-display);font-size:5rem;color:#fff;z-index:8;pointer-events:none;text-shadow:0 5px 0 var(--hot)}
+.overlay{position:fixed;inset:0;background:rgba(60,20,80,.55);display:flex;align-items:center;justify-content:center;z-index:50;padding:16px;backdrop-filter:blur(4px)}
+.overlay .panel{max-width:460px;width:100%;text-align:center;display:flex;flex-direction:column;gap:12px;max-height:90vh;overflow:auto}
+.lyric{position:absolute;left:50%;bottom:20%;transform:translateX(-50%);z-index:5;color:#fff;font-weight:800;background:rgba(40,10,60,.55);padding:4px 14px;border-radius:999px;max-width:90%;text-align:center;font-size:1rem}
+@media (max-width:820px){
+  .play{grid-template-columns:1fr;grid-template-rows:auto 34% minmax(0,1fr) auto;grid-template-areas:"hud" "stage" "lane" "ctrl"}
+  .meter{width:128px;font-size:.7rem;padding:6px 8px}
+  .hud .stat{min-width:52px;padding:3px 6px}
+}
+
+/* RESULTS */
+.results{max-width:640px;margin:0 auto;text-align:center}
+.results .big{font-family:var(--f-display);font-size:clamp(1.6rem,6vw,2.6rem);color:var(--hot);text-shadow:0 3px 0 #fff}
+.stat-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.stat-grid div{background:#fff;border-radius:18px;padding:10px 6px;box-shadow:0 3px 0 rgba(160,80,170,.15)}
+.stat-grid b{display:block;font-size:1.6rem;font-variant-numeric:tabular-nums;color:var(--ink)}
+.stat-grid small{font-weight:700;color:var(--ink2);font-size:.8rem}
+.total{font-family:var(--f-display);font-size:clamp(2.6rem,11vw,4.4rem);background:var(--rainbow);-webkit-background-clip:text;background-clip:text;color:transparent;font-variant-numeric:tabular-nums;filter:drop-shadow(0 3px 0 #fff)}
+.bigrank{width:120px;height:120px;border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center;font-family:var(--f-display);font-size:4rem;color:#fff;box-shadow:0 0 0 8px #fff,0 0 40px rgba(255,120,200,.7);animation:stamp .7s cubic-bezier(.2,1.8,.4,1) both;animation-delay:.9s}
+@keyframes stamp{from{transform:scale(3) rotate(-30deg);opacity:0}to{transform:scale(1) rotate(0);opacity:1}}
+@media (max-width:480px){.stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+#fxCanvas{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:60}
+
+/* ACH */
+.ach{display:flex;gap:12px;align-items:center;background:#fff;border-radius:20px;padding:12px;box-shadow:0 3px 0 rgba(160,80,170,.15)}
+.ach .badge{width:56px;height:56px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-size:1.8rem;background:linear-gradient(135deg,#ffd6ec,#e0d4ff)}
+.ach.got .badge{background:linear-gradient(135deg,#ffe596,#ff8fc8);box-shadow:0 0 0 3px #fff,0 0 16px rgba(255,150,200,.8)}
+.ach:not(.got){opacity:.65}
+.ach:not(.got) .badge{filter:grayscale(1)}
+.toasts{position:fixed;top:calc(env(safe-area-inset-top,0px) + 12px);left:50%;transform:translateX(-50%);z-index:70;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none;width:min(440px,calc(100% - 32px))}
+.toast{background:#fff;border-radius:22px;padding:10px 16px;box-shadow:0 10px 30px rgba(160,60,160,.35);display:flex;align-items:center;gap:12px;animation:toastIn .5s cubic-bezier(.2,1.6,.4,1),toastOut .4s ease-in 3.4s forwards;width:100%;border:3px solid #ffd1ea}
+.toast .badge{font-size:2rem;animation:spinBadge 1s ease-out}
+.toast b{display:block;color:var(--hot)}
+@keyframes toastIn{from{transform:translateY(-40px) scale(.6);opacity:0}}
+@keyframes toastOut{to{transform:translateY(-30px);opacity:0}}
+@keyframes spinBadge{from{transform:rotate(-360deg) scale(.2)}}
+
+/* CAREER */
+.xpbar{height:18px;border-radius:12px;background:#fff;overflow:hidden;box-shadow:inset 0 2px 4px rgba(0,0,0,.08)}
+.xpbar i{display:block;height:100%;background:var(--rainbow)}
+.ranks{display:flex;gap:6px;flex-wrap:wrap}
+.ranks span{padding:4px 10px;border-radius:999px;background:#fff;font-weight:700;font-size:.85rem;opacity:.55}
+.ranks span.got{opacity:1;box-shadow:0 0 0 2px var(--hot)}
+.gig{display:grid;grid-template-columns:64px minmax(0,1fr) auto;gap:12px;align-items:center;background:#fff;border-radius:22px;padding:12px;box-shadow:0 3px 0 rgba(160,80,170,.15)}
+.gig .num{width:64px;height:64px;border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:2rem}
+.gig.done{box-shadow:0 0 0 3px var(--mint)}
+.gig.locked{opacity:.6}
+@media (max-width:520px){.gig{grid-template-columns:52px minmax(0,1fr)}.gig .num{width:52px;height:52px}.gig>.btn{grid-column:1/-1}}
+
+/* SETTINGS */
+.set-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:2px dashed var(--line);flex-wrap:wrap}
+.set-row:last-child{border:0}
+input[type=range]{accent-color:var(--hot);width:min(260px,100%)}
+.toggle{appearance:none;width:58px;height:32px;border-radius:999px;background:#e8d6ee;position:relative;cursor:pointer;border:0;flex:none}
+.toggle::after{content:"";position:absolute;left:4px;top:4px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 2px 4px rgba(0,0,0,.2);transition:left .2s}
+.toggle[aria-checked=true]{background:var(--hot)}
+.toggle[aria-checked=true]::after{left:30px}
+
+/* STUDIO */
+.studio{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,340px);gap:16px;align-items:start}
+.booth{position:sticky;top:0;display:flex;flex-direction:column;gap:12px}
+.booth .panel{padding:14px}
+.cover{position:relative;aspect-ratio:1;width:100%;max-width:100%;border-radius:22px;overflow:hidden;box-shadow:0 10px 30px rgba(160,60,160,.3),0 0 0 4px #fff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:12%}
+.cover .st{position:absolute;font-size:var(--fs,1.6rem);transform:rotate(var(--r,0deg));filter:drop-shadow(0 2px 2px rgba(0,0,0,.15))}
+.cover .ct{font-family:var(--f-display);color:#fff;font-size:clamp(1rem,5cqi,1.6rem);text-shadow:0 3px 0 rgba(200,40,140,.6),0 0 16px rgba(255,255,255,.8);position:relative;z-index:2;line-height:1.15;word-break:break-word}
+.cover .cn{font-family:var(--f-script);color:#fff;position:relative;z-index:2;text-shadow:0 2px 0 rgba(160,40,140,.5);margin-top:6px}
+.cover-box{container-type:inline-size}
+.record{width:64px;height:64px;border-radius:50%;background:radial-gradient(circle,#ff8fc8 0 16%,#222 17% 20%,#3a2a44 21% 60%,#2a1a34 61% 100%);box-shadow:0 0 0 3px #fff;flex:none;position:relative}
+.record::after{content:"";position:absolute;inset:8px;border-radius:50%;border:1px solid rgba(255,255,255,.15)}
+.record.spin{animation:spin 1.6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.eq{display:flex;align-items:flex-end;gap:4px;height:48px;flex:1}
+.eq i{flex:1;border-radius:6px 6px 2px 2px;height:12%;transition:height .12s ease;background:linear-gradient(0deg,#ff8fc8,#b99bff,#7cc6ff)}
+.mini-stage{position:relative;height:190px;border-radius:20px;overflow:hidden;background:linear-gradient(180deg,#ffd9ee,#d9d0ff)}
+.mini-stage canvas{position:absolute;inset:0;width:100%;height:100%}
+.mini-stage .singer-wrap{position:absolute;left:50%;bottom:6px;width:110px;margin-left:-55px;z-index:2}
+.mini-stage .sec{position:absolute;left:10px;top:8px;z-index:3;font-weight:800;background:#fff;border-radius:999px;padding:2px 10px;font-size:.8rem}
+.rbprog{height:14px;border-radius:10px;background:#fff;overflow:hidden;box-shadow:inset 0 2px 4px rgba(0,0,0,.08)}
+.rbprog i{display:block;height:100%;width:0;background:var(--rainbow)}
+.step-h{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.step-h .n{width:34px;height:34px;border-radius:50%;background:var(--rainbow);color:#fff;font-family:var(--f-display);display:flex;align-items:center;justify-content:center;flex:none;text-shadow:0 1px 0 rgba(0,0,0,.2)}
+.step-h h3{margin:0}
+.beat-card{appearance:none;border:3px solid transparent;background:#fff;border-radius:18px;padding:10px;display:flex;flex-direction:column;gap:6px;align-items:center;box-shadow:0 3px 0 rgba(160,80,170,.18);cursor:pointer;text-align:center;font-weight:800}
+.beat-card.sel{border-color:var(--hot);background:#fff0f8}
+.beat-card .em{font-size:2rem}
+.beat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:10px}
+.piano-scroll{overflow-x:auto;border-radius:16px;background:#fff;box-shadow:inset 0 2px 6px rgba(0,0,0,.06)}
+.piano{position:relative;min-width:680px;display:grid;grid-template-columns:44px repeat(32,1fr);user-select:none;-webkit-user-select:none;touch-action:none}
+.piano .lbl{font-size:.7rem;font-weight:800;display:flex;align-items:center;justify-content:center;height:30px;color:#fff}
+.piano .cell{height:30px;border-right:1px solid #f3e3f5;border-bottom:1px solid #f3e3f5;cursor:pointer}
+.piano .cell.beat{border-left:2px solid #ecd1f0}
+.piano .cell.bar{border-left:3px solid #d9b3e0}
+.piano .cell:hover{background:#fff2fa}
+.pnote{position:absolute;height:26px;border-radius:10px;box-shadow:0 2px 0 rgba(0,0,0,.15),0 0 10px rgba(255,120,200,.5);cursor:grab;display:flex;align-items:center;padding-left:4px;font-size:.75rem;color:#fff;font-weight:800;z-index:2;animation:noteIn .3s cubic-bezier(.2,1.8,.4,1)}
+.pnote.sel{outline:3px solid var(--ink);outline-offset:1px}
+.pnote.lit{filter:brightness(1.3);transform:scale(1.08)}
+@keyframes noteIn{from{transform:scale(.3)}}
+.playhead{position:absolute;top:0;bottom:0;width:3px;background:var(--hot);box-shadow:0 0 10px var(--hot);z-index:3;pointer-events:none;left:44px;display:none}
+.tools{display:flex;flex-wrap:wrap;gap:6px}
+.vgrid{position:relative;display:grid;grid-template-columns:52px repeat(16,1fr);gap:0;min-width:520px}
+.vgrid .vl{font-size:.75rem;font-weight:800;display:flex;align-items:center;height:40px}
+.vgrid .vc{height:40px;display:flex;align-items:center;justify-content:center;cursor:pointer;border-left:1px dashed #efdcf2}
+.vgrid .vc i{width:14px;height:14px;border-radius:50%;background:#f1e4f4;transition:transform .15s}
+.vgrid .vc.on i{background:var(--hot);box-shadow:0 0 12px var(--hot);transform:scale(1.5)}
+.vgrid svg{position:absolute;left:52px;top:0;width:calc(100% - 52px);height:120px;pointer-events:none;overflow:visible}
+.vgrid .vc.lit i{background:#ffe36b;box-shadow:0 0 14px #ffe36b}
+.timeline{display:grid;grid-template-columns:repeat(24,minmax(28px,1fr));gap:4px;min-width:720px}
+.timeline .tb{appearance:none;border:0;height:52px;border-radius:10px;background:#fff;box-shadow:0 2px 0 rgba(160,80,170,.18);cursor:pointer;font-size:1.2rem;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0}
+.timeline .tb small{font-size:.6rem;font-weight:800;color:var(--ink2)}
+.timeline .tb.ch{background:#fff0f8}
+.timeline .tb.lit{box-shadow:0 0 0 3px var(--hot)}
+.sec-row{display:grid;grid-template-columns:repeat(24,minmax(28px,1fr));gap:4px;min-width:720px;font-size:.66rem;font-weight:800;color:var(--ink2);margin-bottom:4px}
+.sec-row span{border-bottom:3px solid var(--lav);padding-bottom:2px;white-space:nowrap;overflow:hidden}
+textarea{width:100%;min-height:80px;border:3px solid #ffd1ea;border-radius:16px;padding:10px;font-size:1rem;resize:vertical;background:#fff}
+.swatch{width:44px;height:44px;border-radius:14px;border:3px solid #fff;box-shadow:0 2px 0 rgba(160,80,170,.25);cursor:pointer;appearance:none;padding:0}
+.swatch.sel{outline:3px solid var(--hot);outline-offset:2px}
+.floatnote{position:absolute;pointer-events:none;font-size:1.4rem;transition:transform .15s}
+.floatnote.bounce{transform:translateY(-10px) scale(1.2)}
+.perform-huge{width:100%;font-size:clamp(1.1rem,2.2vw,1.45rem)!important;line-height:1.2}
+@media (max-width:860px){.studio{grid-template-columns:1fr}.booth{position:relative;order:-1}}
+.song-row{display:grid;grid-template-columns:90px minmax(0,1fr);gap:12px;align-items:center}
+.song-row .cover{padding:6%;border-radius:14px}
+.song-row .cover .ct{font-size:.7rem}.song-row .cover .cn{font-size:.55rem}
+.song-row .cover .st{font-size:.8rem}
+.empty{text-align:center;padding:24px;color:var(--ink2)}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition:none!important}}
+.reduced *,.reduced *::before,.reduced *::after{animation-duration:.01ms!important;animation-iteration-count:1!important}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+</style>
+</head><body>
+
+<div class="decor" id="decor" aria-hidden="true"></div>
+
+<section class="screen" id="scr-home" aria-label="Home"></section>
+<section class="screen" id="scr-singer" hidden aria-label="Create your singer"></section>
+<section class="screen" id="scr-songs" hidden aria-label="Song select"></section>
+<section class="screen" id="scr-results" hidden aria-label="Results"></section>
+<section class="screen" id="scr-shop" hidden aria-label="Outfit shop"></section>
+<section class="screen" id="scr-ach" hidden aria-label="Achievements"></section>
+<section class="screen" id="scr-career" hidden aria-label="Career"></section>
+<section class="screen" id="scr-settings" hidden aria-label="Settings"></section>
+<section class="screen" id="scr-studio" hidden aria-label="Make your own song"></section>
+<section class="screen" id="scr-mysongs" hidden aria-label="My songs"></section>
+
+<section class="screen" id="scr-play" hidden aria-label="Performance">
+  <div class="play">
+    <div class="hud">
+      <button class="btn-icon" data-act="pause" aria-label="Pause">⏸️</button>
+      <div class="songname" id="hudSong">Song</div>
+      <div class="stat"><b id="hudScore">0</b><small>⭐ Score</small></div>
+      <div class="stat"><b id="hudCombo">0</b><small>💖 Combo</small></div>
+      <div class="progress" aria-hidden="true"><i id="hudProg"></i></div>
+    </div>
+    <div class="stage-view" id="stageView">
+      <canvas id="stageCanvas"></canvas>
+      <div class="singer-wrap bop" id="playSinger"></div>
+      <div class="audience" id="audience" aria-hidden="true"></div>
+      <div class="meter" id="meter" aria-label="Vocal meter">
+        <div class="lbl"><span>🎵 Pitch</span><b id="mPitch">100%</b></div><div class="bar"><i id="bPitch" style="background:#ff8fc8"></i></div>
+        <div class="lbl"><span>🎤 Timing</span><b id="mTiming">100%</b></div><div class="bar"><i id="bTiming" style="background:#7cc6ff"></i></div>
+        <div class="lbl"><span>🌟 Star power</span><b id="mStar">0%</b></div><div class="bar star"><i id="bStar"></i></div>
+        <div class="lbl" id="micRow" hidden><span>🎙️ Voice</span><b id="mMic">–</b></div>
+      </div>
+      <div class="lyric" id="lyricLine" hidden></div>
+      <div id="cueBox"></div>
+      <div id="bannerBox"></div>
+    </div>
+    <div class="lane-wrap" id="laneWrap">
+      <canvas id="laneCanvas" aria-label="Note highway. Tap a lane or press D F J K."></canvas>
+      <div class="judge" id="judge" aria-live="polite"></div>
+      <div class="countdown" id="countdown"></div>
+    </div>
+    <div class="ctrl" id="ctrl">
+      <button class="lane-btn" data-lane="0" style="background:linear-gradient(180deg,#ff9fd0,#ff4fa3)" aria-label="Low note lane (D)">🎵<small>LOW · D</small></button>
+      <button class="lane-btn" data-lane="1" style="background:linear-gradient(180deg,#dccbff,#a88bff)" aria-label="Middle note lane (F)">🎵<small>MID · F</small></button>
+      <button class="lane-btn" data-lane="2" style="background:linear-gradient(180deg,#bfe6ff,#56b4ff)" aria-label="High note lane (J)">🎵<small>HIGH · J</small></button>
+      <button class="lane-btn" data-lane="3" style="background:linear-gradient(180deg,#ffe79e,#ffb52e)" aria-label="Top note lane (K)">🎵<small>TOP · K</small></button>
+      <button class="lane-btn move-btn" id="moveBtn" aria-label="Performance move (Space)"><span class="ring" id="moveRing"></span><span style="position:relative">💃 MOVE! <small>· SPACE</small></span></button>
+    </div>
+  </div>
+</section>
+
+<div id="overlayBox"></div>
+<div class="toasts" id="toasts" aria-live="polite"></div>
+<canvas id="fxCanvas" aria-hidden="true"></canvas>
+<script>
+"use strict";
+/* ================= DATA ================= */
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const fmt = n => Math.round(n).toLocaleString('en-US');
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function rng(seed){ let s = seed >>> 0 || 1; return () => { s ^= s << 13; s >>>= 0; s ^= s >> 17; s ^= s << 5; s >>>= 0; return s / 4294967296; }; }
+function hashStr(str){ let h = 2166136261; for (const c of str) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; }
+
+const RANKS = [
+  {name:'Beginner Singer', e:'🌸', xp:0},
+  {name:'Rising Star', e:'🎀', xp:800},
+  {name:'Pop Performer', e:'💖', xp:2500},
+  {name:'Superstar', e:'⭐️', xp:5000},
+  {name:'Mega Star', e:'🌈', xp:9000},
+  {name:'Singing Legend', e:'🏆', xp:15000},
+];
+
+const HAIRS = [
+  {id:'ponytail', name:'Ponytail', e:'🎀', cost:0},
+  {id:'long', name:'Long hair', e:'💇', cost:0},
+  {id:'bun', name:'Bun', e:'🍡', cost:0},
+  {id:'short', name:'Short hair', e:'✂️', cost:0},
+  {id:'high', name:'High ponytail', e:'⛲', cost:200},
+  {id:'braids', name:'Braids', e:'🪢', cost:250},
+  {id:'curly', name:'Curly hair', e:'🌀', cost:250},
+  {id:'wavy', name:'Wavy hair', e:'🌊', cost:250},
+];
+const HAIR_COLORS = [
+  {id:'choc', name:'Chocolate', c:'#6b3e2e'}, {id:'black', name:'Midnight', c:'#2d2233'}, {id:'blonde', name:'Golden', c:'#f2c35b'},
+  {id:'straw', name:'Strawberry', c:'#e8774f'}, {id:'pink', name:'Bubblegum', c:'#ff7ab8'}, {id:'lav', name:'Lavender', c:'#b18cff'},
+  {id:'blue', name:'Baby blue', c:'#6cc0ff'}, {id:'mint', name:'Mint', c:'#5fd6a8'}, {id:'rainbow', name:'Rainbow', c:'rainbow'},
+];
+const SKINS = ['#ffe3d3','#f7cfae','#e0a97e','#b87a50','#8a5636'];
+const OUTFITS = [
+  {id:'pink', name:'Pink Sparkle', e:'🩷', cost:0, top:'#ff8cc6', sk:['#ffc0e0','#ff5fae'], pat:'dots', trim:'#ffffff', pink:true},
+  {id:'blue', name:'Baby Blue Glitter', e:'🩵', cost:0, top:'#8fd3ff', sk:['#dff4ff','#6cbcff'], pat:'glitter', trim:'#ffffff'},
+  {id:'heart', name:'Heart Dress', e:'💕', cost:0, top:'#ff6fa8', sk:['#ffd6e8','#ff8fbf'], pat:'hearts', trim:'#ffffff', pink:true},
+  {id:'bow', name:'Pink Bow', e:'🎀', cost:0, top:'#ffb6d9', sk:['#ffe4f0','#ffa0cc'], pat:'bow', trim:'#ff4fa3', pink:true},
+  {id:'rainbow', name:'Rainbow Star', e:'🌈', cost:300, top:'#ffffff', sk:['rainbow'], pat:'star', trim:'#ffcf5c'},
+  {id:'whitegold', name:'White & Gold', e:'🤍', cost:400, top:'#fffaf0', sk:['#ffffff','#ffe6a8'], pat:'gold', trim:'#f0b429'},
+  {id:'galaxy', name:'Purple Galaxy', e:'💜', cost:500, top:'#6b4fd8', sk:['#2f2380','#b06bff'], pat:'stars', trim:'#ffd36e'},
+  {id:'starry', name:'Starry Night', e:'⭐️', cost:500, top:'#2c3e8f', sk:['#1d2766','#5b6fd8'], pat:'stars', trim:'#ffe36b'},
+  {id:'mint', name:'Mint Candy', e:'🍬', cost:350, top:'#7fe3b9', sk:['#e0fff2','#7fe3b9'], pat:'dots', trim:'#ffffff'},
+  {id:'sunset', name:'Sunset Glow', e:'🌅', cost:450, top:'#ff9a7a', sk:['#ffd36e','#ff6fa8'], pat:'glitter', trim:'#ffffff'},
+  {id:'lemon', name:'Lemon Pop', e:'🍋', cost:350, top:'#ffe36b', sk:['#fff7c9','#ffd23d'], pat:'dots', trim:'#ff7ab8'},
+  {id:'redtee', name:'Red Tee & Jeans', e:'👖', cost:0, top:'#e8363f', sk:['#4a78c2'], bottom:'jeans', topType:'tee', trim:'#2f5597'},
+  {id:'startee', name:'Star Tee & Jeans', e:'🌟', cost:0, top:'#ffffff', sk:['#5b8bd6'], bottom:'jeans', topType:'tee', pat:'star', trim:'#2f5597', print:'#ff4fa3'},
+  {id:'hoodie', name:'Pink Hoodie & Jeans', e:'🩷', cost:200, top:'#ff8fc8', sk:['#3f68ad'], bottom:'jeans', topType:'hoodie', trim:'#2f5597', pink:true},
+  {id:'jacket', name:'Denim Jacket Look', e:'🧥', cost:300, top:'#5b8bd6', inner:'#ffffff', sk:['#2d2d3a'], bottom:'jeans', topType:'jacket', trim:'#1f1f2a'},
+  {id:'overalls', name:'Denim Overalls', e:'👩‍🌾', cost:250, top:'#ffe36b', sk:['#4a78c2'], bottom:'jeans', topType:'overalls', trim:'#2f5597'},
+  {id:'shorts', name:'Tee & Denim Shorts', e:'🩳', cost:200, top:'#7fe3b9', sk:['#6b9be0'], bottom:'shorts', topType:'tee', pat:'hearts', trim:'#2f5597', print:'#ff4fa3'},
+  {id:'sporty', name:'Sporty Tracksuit', e:'🏃‍♀️', cost:250, top:'#a88bff', sk:['#a88bff'], bottom:'joggers', topType:'jacket', inner:'#ffffff', trim:'#ffffff'},
+  {id:'stripes', name:'Striped Tee & Jeans', e:'🦓', cost:200, top:'#ffffff', stripe:'#1f2b6b', sk:['#4a78c2'], bottom:'jeans', topType:'tee', trim:'#2f5597'},
+  {id:'lavdream', name:'Lavender Dream', e:'🪻', cost:400, top:'#c3a6ff', sk:['#efe6ff','#a88bff'], pat:'hearts', trim:'#ffffff'},
+];
+const SHOES = [
+  {id:'pinksn', name:'Pink Sneakers', e:'👟', cost:0, c:'#ff7ab8', sole:'#fff', type:'sneaker'},
+  {id:'whitesn', name:'White Sneakers', e:'🤍', cost:0, c:'#ffffff', sole:'#ffb6d9', type:'sneaker'},
+  {id:'flats', name:'Ballet Flats', e:'🩰', cost:150, c:'#ffc2dd', sole:'#ff8fc8', type:'flat'},
+  {id:'glitter', name:'Glitter Boots', e:'✨', cost:250, c:'#c9a6ff', sole:'#fff', type:'boot'},
+  {id:'rainbow', name:'Rainbow Boots', e:'🌈', cost:300, c:'rainbow', sole:'#fff', type:'boot'},
+  {id:'starsn', name:'Star Sneakers', e:'⭐', cost:300, c:'#7cc6ff', sole:'#ffe36b', type:'sneaker'},
+  {id:'gold', name:'Gold Boots', e:'👢', cost:400, c:'#ffcf5c', sole:'#fff', type:'boot'},
+];
+const MICS = [
+  {id:'classic', name:'Classic Silver', e:'🎤', cost:0, head:'#d8dde6', body:'#7a7f8c'},
+  {id:'pink', name:'Pink Sparkle', e:'💗', cost:0, head:'#ffb6d9', body:'#ff4fa3'},
+  {id:'star', name:'Gold Star', e:'🌟', cost:250, head:'#ffe596', body:'#f0b429', deco:'star'},
+  {id:'heart', name:'Heart Mic', e:'💖', cost:300, head:'#ff8fc8', body:'#ffffff', deco:'heart'},
+  {id:'rainbow', name:'Rainbow Mic', e:'🌈', cost:400, head:'rainbow', body:'#b99bff'},
+  {id:'crystal', name:'Crystal Mic', e:'💎', cost:500, head:'#c7f1ff', body:'#a88bff', deco:'gem'},
+];
+const ACCS = [
+  {id:'none', name:'None', e:'🚫', cost:0},
+  {id:'bow', name:'Hair Bow', e:'🎀', cost:0},
+  {id:'clips', name:'Star Clips', e:'⭐', cost:0},
+  {id:'tiara', name:'Tiara', e:'👑', cost:300},
+  {id:'phones', name:'Headphones', e:'🎧', cost:250},
+  {id:'glasses', name:'Heart Glasses', e:'😍', cost:250},
+  {id:'flowers', name:'Flower Crown', e:'🌸', cost:300},
+  {id:'ears', name:'Kitty Ears', e:'🐱', cost:300},
+];
+const FX = [
+  {id:'none', name:'No Sparkle', e:'🚫', cost:0, p:[]},
+  {id:'sparkle', name:'Sparkles', e:'✨', cost:0, p:['✨']},
+  {id:'hearts', name:'Floating Hearts', e:'💖', cost:200, p:['💖','💕']},
+  {id:'stars', name:'Star Shower', e:'⭐', cost:250, p:['⭐','🌟']},
+  {id:'bubbles', name:'Bubbles', e:'🫧', cost:250, p:['🫧']},
+  {id:'butterfly', name:'Butterflies', e:'🦋', cost:350, p:['🦋']},
+  {id:'rainbow', name:'Rainbow Aura', e:'🌈', cost:400, p:['🌈','✨']},
+];
+const SHOP_CATS = [
+  {id:'outfits', name:'Outfits', e:'👗', list:OUTFITS, key:'outfit'},
+  {id:'mics', name:'Microphones', e:'🎤', list:MICS, key:'mic'},
+  {id:'hairs', name:'Hairstyles', e:'💇', list:HAIRS, key:'hair'},
+  {id:'shoes', name:'Shoes', e:'👟', list:SHOES, key:'shoes'},
+  {id:'accs', name:'Accessories', e:'🎀', list:ACCS, key:'acc'},
+  {id:'fx', name:'Stage Effects', e:'✨', list:FX, key:'fx'},
+];
+
+const STAGES = [
+  {id:'bedroom', name:'Pink Bedroom Stage', e:'🌸', gems:0, rank:0, bg:['#ffd6ea','#ffb3d6'], ui:'linear-gradient(160deg,#ffe0ef,#ffb3d6)'},
+  {id:'rainbow', name:'Rainbow Stage', e:'🌈', gems:5, rank:0, bg:['#bfe6ff','#ffd1ea'], ui:'linear-gradient(160deg,#bfe6ff,#ffd1ea 60%,#fff1b8)'},
+  {id:'starry', name:'Starry Night Stage', e:'⭐️', gems:8, rank:1, bg:['#1f2b6b','#5b3f9e'], ui:'linear-gradient(160deg,#1f2b6b,#6b4fb8)'},
+  {id:'cloud', name:'Cloud Stage', e:'🩵', gems:10, rank:2, bg:['#9fd8ff','#e8f6ff'], ui:'linear-gradient(160deg,#9fd8ff,#f3fbff)'},
+  {id:'galaxy', name:'Galaxy Stage', e:'💜', gems:15, rank:3, bg:['#1a0f3d','#5a1f7a'], ui:'linear-gradient(160deg,#1a0f3d,#7a2f9a)'},
+  {id:'grand', name:'Grand Concert Stage', e:'🏆', gems:25, rank:4, bg:['#2a0f3f','#6b1f5a'], ui:'linear-gradient(160deg,#2a0f3f,#b0307a)'},
+];
+
+/* chord progressions as [semitone, quality] per bar */
+const P_I_V_vi_IV = [[0,'M'],[7,'M'],[9,'m'],[5,'M']];
+const BEATS = [
+  {id:'bubble', name:'Bubble Pop', e:'🎀', bpm:104, kick:'x...x...x...x...', snare:'....x.......x...', hat:'..x...x...x...x.', clap:'', bass:'1...1.5.1...1.5.', prog:P_I_V_vi_IV, pad:'triangle', arp:'x.x.x.x.x.x.x.x.', arpW:'square', col:'#ff8fc8'},
+  {id:'rainbow', name:'Rainbow Dance', e:'🌈', bpm:120, kick:'x...x...x...x...', snare:'', hat:'x.o.x.o.x.o.x.o.', clap:'....x.......x...', bass:'..1...1...1...1.', prog:[[9,'m'],[5,'M'],[0,'M'],[7,'M']], pad:'sawtooth', arp:'x..x..x.x..x..x.', arpW:'triangle', col:'#ffb36b'},
+  {id:'sweet', name:'Sweet Pop', e:'💖', bpm:92, kick:'x.....x...x.....', snare:'....x.......x...', hat:'x.x.x.x.x.x.x.x.', clap:'', bass:'1.....1...5.....', prog:[[0,'M'],[9,'m'],[5,'M'],[7,'M']], pad:'triangle', arp:'x...x...x...x...', arpW:'sine', col:'#ff6fa8'},
+  {id:'star', name:'Star Beat', e:'⭐️', bpm:112, kick:'x..x..x...x..x..', snare:'....x.......x...', hat:'x.xxx.xxx.xxx.xx', clap:'', bass:'1..1..1...5..5..', prog:[[5,'M'],[7,'M'],[4,'m'],[9,'m']], pad:'triangle', arp:'x.x.x.x.x.x.x.x.', arpW:'triangle', col:'#ffcf5c'},
+  {id:'cloudy', name:'Cloudy Dreams', e:'🩵', bpm:84, kick:'x.......x.......', snare:'........x.......', hat:'..x...x...x...x.', clap:'', bass:'1.......5.......', prog:[[0,'M'],[4,'m'],[5,'M'],[7,'M']], pad:'sine', arp:'x..x..x..x..x...', arpW:'sine', col:'#7cc6ff'},
+  {id:'galaxy', name:'Galaxy Groove', e:'💜', bpm:116, kick:'x...x...x...x..x', snare:'....x.......x...', hat:'.x.x.x.x.x.x.x.x', clap:'', bass:'1.1.1.1.8.8.5.5.', prog:[[9,'m'],[5,'M'],[0,'M'],[7,'M']], pad:'sawtooth', arp:'xxxxxxxxxxxxxxxx', arpW:'square', col:'#a88bff'},
+  {id:'super', name:'Super Dance', e:'🔥', bpm:128, kick:'x...x...x...x...', snare:'', hat:'..o...o...o...o.', clap:'....x.......x...', bass:'.1.1.1.1.1.1.1.1', prog:[[9,'m'],[7,'M'],[5,'M'],[7,'M']], pad:'sawtooth', arp:'x.xx.xx.x.xx.xx.', arpW:'square', col:'#ff4f7a'},
+];
+const beatById = id => BEATS.find(b => b.id === id) || BEATS[0];
+const PENTA = [0,2,4,7,9,12,14,16];
+const NOTE_NAMES = ['Do','Re','Mi','Sol','La','Do↑','Re↑','Mi↑'];
+const LANE_COL = ['#ff4fa3','#a88bff','#56b4ff','#ffb52e'];
+const LANE_LIGHT = ['#ffb3da','#dccbff','#c4e8ff','#ffe3a0'];
+
+const SONGS = [
+  {id:'sparkle', title:'Sparkle Tonight', cat:'easy', diff:1, bpm:96, beat:'bubble', rank:0, art:['#ffc9e3','#ff8fc8'], e:'✨'},
+  {id:'pinksky', title:'Pink Sky', cat:'easy', diff:1, bpm:90, beat:'sweet', rank:0, art:['#ffd6ea','#c9b6ff'], e:'🩷'},
+  {id:'rainbowheart', title:'Rainbow Heart', cat:'happy', diff:2, bpm:106, beat:'rainbow', rank:0, art:['#ffe36b','#ff8fc8'], e:'🌈'},
+  {id:'shine', title:'Shine Like a Star', cat:'pop', diff:2, bpm:110, beat:'star', rank:0, art:['#fff1b8','#ffcf5c'], e:'⭐️'},
+  {id:'clouds', title:'Dancing in the Clouds', cat:'dance', diff:3, bpm:118, beat:'super', rank:1, art:['#bfe6ff','#e6d5ff'], e:'☁️'},
+  {id:'dreambig', title:'Dream Big', cat:'pop', diff:3, bpm:112, beat:'sweet', rank:1, art:['#e6d5ff','#ff8fc8'], e:'💭'},
+  {id:'candycomet', title:'Candy Comet', cat:'happy', diff:3, bpm:120, beat:'rainbow', rank:2, art:['#a6f0d2','#ffc9e3'], e:'🍭'},
+  {id:'moonbubble', title:'Moonlight Bubblegum', cat:'dance', diff:4, bpm:124, beat:'bubble', rank:2, art:['#c9b6ff','#7cc6ff'], e:'🌙'},
+  {id:'glitter', title:'Glitter Galaxy', cat:'challenge', diff:4, bpm:126, beat:'galaxy', rank:3, art:['#5a3fb8','#ff8fc8'], e:'🪐'},
+  {id:'supernova', title:'Superstar Supernova', cat:'challenge', diff:5, bpm:136, beat:'super', rank:4, art:['#ff4fa3','#ffcf5c'], e:'💥'},
+];
+const CATS = [{id:'all', name:'All', e:'🎶'},{id:'easy', name:'Easy', e:'🌸'},{id:'pop', name:'Pop', e:'💖'},{id:'happy', name:'Happy', e:'🌈'},{id:'challenge', name:'Challenge', e:'⭐️'},{id:'dance', name:'Dance Pop', e:'🎀'}];
+
+const GIGS = [
+  {id:'g1', name:'Bedroom Concert', e:'🌸', stage:'bedroom', song:'sparkle', need:'C', fame:0, gems:3, coins:150},
+  {id:'g2', name:'School Talent Show', e:'🏫', stage:'rainbow', song:'pinksky', need:'B', fame:30, gems:3, coins:200},
+  {id:'g3', name:'Park Festival', e:'🎡', stage:'cloud', song:'rainbowheart', need:'B', fame:80, gems:4, coins:250},
+  {id:'g4', name:'Starlight Contest', e:'⭐️', stage:'starry', song:'shine', need:'B', fame:150, gems:5, coins:300},
+  {id:'g5', name:'Dance Pop Battle', e:'🎀', stage:'rainbow', song:'clouds', need:'B', fame:240, gems:5, coins:350},
+  {id:'g6', name:'Galaxy Tour', e:'💜', stage:'galaxy', song:'glitter', need:'B', fame:360, gems:6, coins:400},
+  {id:'g7', name:'Mega Music Fest', e:'🌈', stage:'cloud', song:'moonbubble', need:'B', fame:500, gems:6, coins:450},
+  {id:'g8', name:'Grand Concert Finale', e:'🏆', stage:'grand', song:'supernova', need:'A', fame:650, gems:10, coins:800},
+];
+const RANK_ORDER = {S:4, A:3, B:2, C:1};
+
+const MOMENTS = [
+  {id:'dance', name:'Dance Break', e:'💃', move:'spin', fx:'confetti'},
+  {id:'sparkle', name:'Sparkle Explosion', e:'✨', move:'pose', fx:'sparkle'},
+  {id:'bignote', name:'Big Note', e:'🎤', move:'mic', fx:'notes'},
+  {id:'heart', name:'Heart Pose', e:'🎀', move:'heart', fx:'hearts'},
+  {id:'superstar', name:'Superstar Pose', e:'⭐️', move:'jump', fx:'stars'},
+  {id:'finale', name:'Rainbow Finale', e:'🌈', move:'wave', fx:'rainbow'},
+];
+const MOVES = {spin:{e:'💃', n:'SPIN'}, pose:{e:'✨', n:'POSE'}, mic:{e:'🎤', n:'MIC MOVE'}, jump:{e:'⭐️', n:'JUMP'}, wave:{e:'🎀', n:'WAVE'}, heart:{e:'💖', n:'HEART POSE'}};
+
+const CHORUSES = [
+  {id:'sparkle', name:'Sparkle Chorus', e:'💖', notes:[[0,4,2],[2,5,2],[4,6,2],[6,7,2],[8,6,2],[10,5,2],[12,4,4],[16,4,2],[18,5,2],[20,6,2],[22,5,2],[24,4,2],[26,3,2],[28,4,4]]},
+  {id:'rainbow', name:'Rainbow Chorus', e:'🌈', notes:[[0,2,2],[2,4,2],[4,6,2],[6,7,4],[10,6,2],[12,4,4],[16,3,2],[18,5,2],[20,7,2],[22,6,2],[24,5,2],[26,4,2],[28,2,4]]},
+  {id:'superstar', name:'Superstar Chorus', e:'⭐️', notes:[[0,7,1],[1,7,1],[2,6,2],[4,7,2],[6,5,2],[8,7,1],[9,7,1],[10,6,2],[12,4,4],[16,5,1],[17,5,1],[18,6,2],[20,7,2],[22,6,2],[24,5,2],[26,6,2],[28,7,4]]},
+  {id:'bubblegum', name:'Bubblegum Chorus', e:'🎀', notes:[[0,3,1],[1,5,1],[2,3,1],[3,5,1],[4,6,2],[6,5,2],[8,3,1],[9,5,1],[10,3,1],[11,5,1],[12,4,4],[16,2,1],[17,4,1],[18,2,1],[19,4,1],[20,5,2],[22,4,2],[24,3,2],[26,2,2],[28,3,4]]},
+];
+const COVER_BGS = [
+  'linear-gradient(135deg,#ffb3da,#c9b6ff)', 'linear-gradient(135deg,#7cc6ff,#ffc9e3)', 'linear-gradient(135deg,#ffe36b,#ff8fc8)',
+  'linear-gradient(160deg,#2c1f6b,#a04fd8)', 'linear-gradient(135deg,#a6f0d2,#7cc6ff)', 'linear-gradient(90deg,#ff7eb6,#ffae6b,#ffe36b,#8ef0b5,#7cc8ff,#b99bff)'];
+const STICKERS = [
+  {id:'hearts', name:'Stickers', e:'💖', spots:[[8,10,'💖',-12],[80,70,'💕',10],[14,78,'💗',6]]},
+  {id:'stars', name:'Stars', e:'⭐️', spots:[[78,8,'⭐',12],[6,50,'🌟',-8],[86,42,'✦',0]]},
+  {id:'rainbows', name:'Rainbows', e:'🌈', spots:[[40,4,'🌈',0],[70,82,'🌈',-10]]},
+  {id:'bows', name:'Bows', e:'🎀', spots:[[60,6,'🎀',14],[4,24,'🎀',-14]]},
+  {id:'sparkles', name:'Sparkles', e:'✨', spots:[[24,20,'✨',0],[70,24,'✨',0],[30,86,'✨',0],[88,88,'✨',0]]},
+  {id:'mic', name:'Microphone', e:'🎤', spots:[[44,68,'🎤',-14]]},
+];
+const LYRIC_PROMPTS = ['🌸 Write about something that makes you happy!','🌈 Describe your dream adventure!','⭐️ What makes you feel like a superstar?'];
+const TITLE_IDEAS = ['💖 My Pink Dream','🌈 Rainbow Rush','⭐️ Shine Bright','🎀 Glitter Heart','🩷 Dancing Queen'];
+
+const ACHS = [
+  {id:'first_song', e:'🎤', n:'First Song', d:'Finish your first song'},
+  {id:'first_perfect', e:'🌟', n:'First Perfect', d:'Hit a PERFECT note'},
+  {id:'combo25', e:'🔥', n:'25 Combo', d:'Reach a 25 combo'},
+  {id:'pink_superstar', e:'💖', n:'Pink Superstar', d:'Get an A or S rank wearing a pink outfit'},
+  {id:'rainbow_performer', e:'🌈', n:'Rainbow Performer', d:'Reach a 50 combo and light up the rainbow'},
+  {id:'first_s', e:'🏆', n:'First S Rank', d:'Earn an S rank'},
+  {id:'perfect_perf', e:'✨', n:'Perfect Performance', d:'Finish a song without missing a note'},
+  {id:'outfit_collector', e:'🎀', n:'Outfit Collector', d:'Own 8 outfits'},
+  {id:'ten_songs', e:'⭐️', n:'10 Songs Completed', d:'Finish 10 songs'},
+  {id:'super_mode', e:'🌠', n:'Superstar Mode', d:'Fill the Star Power meter'},
+  {id:'legend', e:'👑', n:'Singing Legend', d:'Reach the Singing Legend career rank'},
+  {id:'first_created', e:'🎧', n:'First Song Created', d:'Save your first original song', c:1},
+  {id:'song_maker', e:'🎵', n:'Song Maker', d:'Create 3 songs', c:1},
+  {id:'hit_maker', e:'💖', n:'Hit Maker', d:'Create 5 songs', c:1},
+  {id:'rainbow_composer', e:'🌈', n:'Rainbow Composer', d:'Use every performance moment in your songs', c:1},
+  {id:'superstar_composer', e:'⭐️', n:'Superstar Composer', d:'Perform your own song', c:1},
+  {id:'biggest_hit', e:'🎤', n:'My Biggest Hit', d:'Get an S rank on your own song', c:1},
+];
+const BAD = ['stupid','idiot','dumb','hate','kill','damn','hell','crap','shut up','ugly','loser','sucks'];
+function clean(t){ let s = String(t || ''); for (const w of BAD) s = s.replace(new RegExp('\\b' + w.replace(' ', '\\s+') + '\\b', 'gi'), '✨'); return s; }
+
+/* ================= STATE ================= */
+const SAVE_KEY = 'pinkMelodySave_v1';
+function freshState(){
+  const own = {};
+  SHOP_CATS.forEach(c => own[c.id] = c.list.filter(i => !i.cost).map(i => i.id));
+  return {
+    name:'Star', singer:{hair:'ponytail', hairColor:'pink', skin:0, outfit:'pink', shoes:'pinksn', mic:'pink', acc:'bow', fx:'sparkle'},
+    coins:150, gems:5, xp:0, fame:0, own, stagesOwned:['bedroom','rainbow'], stage:'bedroom',
+    scores:{}, ach:{}, stats:{songs:0, momentsUsed:[]}, career:{cleared:[]}, challenge:0,
+    settings:{sound:true, music:.6, sfx:.8, voice:.8, speed:1.9, offset:0, guide:true, mic:false, reduced:false},
+    mySongs:[], draft:null, seenIntro:false,
+  };
+}
+let S = freshState();
+function load(){
+  try { const raw = sessionStorage.getItem(SAVE_KEY); if (raw) { const d = JSON.parse(raw); S = Object.assign(freshState(), d); S.settings = Object.assign(freshState().settings, d.settings || {}); }
+    SHOP_CATS.forEach(c => { S.own[c.id] ||= []; c.list.forEach(i => { if (!i.cost && !S.own[c.id].includes(i.id)) S.own[c.id].push(i.id); }); });
+    if (!S.easyV2) { S.easyV2 = true; if (S.settings.speed < 1.9) S.settings.speed = 1.9; } } catch(e){}
+}
+function save(){ try { sessionStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch(e){} }
+function rankIdx(xp = S.xp){ let r = 0; RANKS.forEach((k, i) => { if (xp >= k.xp) r = i; }); return r; }
+const owns = (cat, id) => S.own[cat].includes(id);
+
+/* ================= AUDIO ================= */
+const A = {ctx:null};
+function initAudio(){
+  if (A.ctx) { if (A.ctx.state === 'suspended') A.ctx.resume(); return A.ctx; }
+  const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return null;
+  const c = A.ctx = new AC();
+  A.master = c.createGain(); const comp = c.createDynamicsCompressor(); comp.threshold.value = -14; comp.ratio.value = 4;
+  A.master.connect(comp); comp.connect(c.destination);
+  A.music = c.createGain(); A.music.connect(A.master);
+  A.sfx = c.createGain(); A.sfx.connect(A.master);
+  A.voice = c.createGain(); A.voice.connect(A.master);
+  const len = c.sampleRate; const nb = c.createBuffer(1, len, c.sampleRate); const d = nb.getChannelData(0);
+  for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1; A.noise = nb;
+  applyVolumes(); return c;
+}
+function applyVolumes(){
+  if (!A.ctx) return; const s = S.settings, t = A.ctx.currentTime;
+  A.master.gain.setTargetAtTime(s.sound ? 1 : 0, t, .02);
+  A.music.gain.setTargetAtTime(s.music, t, .02); A.sfx.gain.setTargetAtTime(s.sfx, t, .02); A.voice.gain.setTargetAtTime(s.voice, t, .02);
+}
+const mtof = m => 440 * Math.pow(2, (m - 69) / 12);
+function env(g, t, a, peak, d, sus, rel, end){
+  g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(peak, t + a);
+  g.gain.setTargetAtTime(peak * sus, t + a, d); g.gain.setTargetAtTime(0.0001, end, rel);
+}
+function osc(type, f, t, stop, dest, gainV = 1){
+  const o = A.ctx.createOscillator(); o.type = type; o.frequency.setValueAtTime(f, t);
+  const g = A.ctx.createGain(); g.gain.value = gainV; o.connect(g); g.connect(dest); o.start(t); o.stop(stop); return {o, g};
+}
+function noiseSrc(t, dur, dest){ const s = A.ctx.createBufferSource(); s.buffer = A.noise; s.connect(dest); s.start(t, Math.random() * .5, dur + .05); return s; }
+const INST = {
+  kick(t, v, out){ const g = A.ctx.createGain(); g.connect(out); const o = A.ctx.createOscillator(); o.frequency.setValueAtTime(150, t); o.frequency.exponentialRampToValueAtTime(42, t + .14); o.connect(g); g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(.001, t + .3); o.start(t); o.stop(t + .32); },
+  snare(t, v, out){ const g = A.ctx.createGain(); const f = A.ctx.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = 1900; f.Q.value = .8; f.connect(g); g.connect(out); noiseSrc(t, .2, f); g.gain.setValueAtTime(v * .7, t); g.gain.exponentialRampToValueAtTime(.001, t + .18);
+    const tg = A.ctx.createGain(); tg.connect(out); const o = A.ctx.createOscillator(); o.frequency.value = 210; o.connect(tg); tg.gain.setValueAtTime(v * .4, t); tg.gain.exponentialRampToValueAtTime(.001, t + .08); o.start(t); o.stop(t + .1); },
+  clap(t, v, out){ const f = A.ctx.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = 1500; f.Q.value = 1.2; const g = A.ctx.createGain(); f.connect(g); g.connect(out); noiseSrc(t, .25, f);
+    g.gain.setValueAtTime(.0001, t); [0, .012, .024].forEach(o => { g.gain.setValueAtTime(v * .8, t + o); g.gain.exponentialRampToValueAtTime(v * .1, t + o + .01); }); g.gain.exponentialRampToValueAtTime(.001, t + .22); },
+  hat(t, v, out, open){ const f = A.ctx.createBiquadFilter(); f.type = 'highpass'; f.frequency.value = 7000; const g = A.ctx.createGain(); f.connect(g); g.connect(out); noiseSrc(t, open ? .25 : .06, f); g.gain.setValueAtTime(v * .35, t); g.gain.exponentialRampToValueAtTime(.001, t + (open ? .22 : .05)); },
+  bass(t, m, dur, v, out){ const f = A.ctx.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 600; f.Q.value = 3; const g = A.ctx.createGain(); f.connect(g); g.connect(out);
+    osc('sawtooth', mtof(m), t, t + dur + .2, f, .6); osc('sine', mtof(m), t, t + dur + .2, f, .8); env(g, t, .01, v, .1, .6, .05, t + dur); },
+  pad(t, ms, dur, v, out, type){ const f = A.ctx.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = type === 'sawtooth' ? 1400 : 2400; const g = A.ctx.createGain(); f.connect(g); g.connect(out);
+    ms.forEach(m => { osc(type, mtof(m) * 1.003, t, t + dur + .6, f, .25); osc(type, mtof(m) * .997, t, t + dur + .6, f, .25); }); env(g, t, .25, v, .5, .7, .2, t + dur); },
+  pluck(t, m, dur, v, out, type = 'triangle'){ const g = A.ctx.createGain(); g.connect(out); osc(type, mtof(m), t, t + dur + .4, g, type === 'square' ? .35 : 1); osc('sine', mtof(m + 12), t, t + dur + .4, g, .3);
+    g.gain.setValueAtTime(.0001, t); g.gain.linearRampToValueAtTime(v, t + .008); g.gain.exponentialRampToValueAtTime(.001, t + Math.min(.6, dur + .25)); },
+  keys(t, m, dur, v, out){ const g = A.ctx.createGain(); g.connect(out); osc('triangle', mtof(m), t, t + dur + .5, g); osc('sine', mtof(m + 12), t, t + dur + .5, g, .35); osc('sine', mtof(m + 19), t, t + dur + .5, g, .08);
+    env(g, t, .01, v, .25, .45, .12, t + dur); },
+  vocal(t, m, dur, v, out, vowel = 'ah'){
+    const f0 = mtof(m), c = A.ctx; const g = c.createGain(); g.connect(out);
+    const F = vowel === 'oo' ? [[380, 7, 1], [900, 9, .4], [2600, 12, .15]] : [[820, 6, 1], [1250, 8, .6], [2900, 12, .25]];
+    const mix = c.createGain(); mix.gain.value = .55;
+    F.forEach(([fr, q, a]) => { const b = c.createBiquadFilter(); b.type = 'bandpass'; b.frequency.value = fr; b.Q.value = q; const ga = c.createGain(); ga.gain.value = a * 2.2; mix.connect(b); b.connect(ga); ga.connect(g); });
+    const s1 = osc('sawtooth', f0, t, t + dur + .4, mix); const s2 = osc('sine', f0, t, t + dur + .4, g, .55);
+    const lfo = c.createOscillator(); lfo.frequency.value = 5.6; const lg = c.createGain(); lg.gain.setValueAtTime(0, t); lg.gain.linearRampToValueAtTime(f0 * .012, t + .25);
+    lfo.connect(lg); lg.connect(s1.o.frequency); lg.connect(s2.o.frequency); lfo.start(t); lfo.stop(t + dur + .4);
+    s1.o.frequency.setValueAtTime(f0 * .97, t); s1.o.frequency.linearRampToValueAtTime(f0, t + .05);
+    env(g, t, .03, v, .2, .75, .08, t + dur);
+  },
+};
+/* sound effects */
+const SFX = {
+  ok(){ return initAudio() && S.settings.sound; },
+  click(){ if (!this.ok()) return; const t = A.ctx.currentTime; INST.pluck(t, 84, .05, .12, A.sfx, 'sine'); },
+  sparkle(){ if (!this.ok()) return; const t = A.ctx.currentTime; [88, 92, 95, 100].forEach((m, i) => INST.pluck(t + i * .05, m, .05, .08, A.sfx, 'sine')); },
+  coin(){ if (!this.ok()) return; const t = A.ctx.currentTime; INST.pluck(t, 88, .05, .15, A.sfx, 'square'); INST.pluck(t + .07, 95, .1, .15, A.sfx, 'square'); },
+  miss(){ if (!this.ok()) return; const t = A.ctx.currentTime; const g = A.ctx.createGain(); g.connect(A.sfx); const o = osc('sine', 300, t, t + .25, g); o.o.frequency.exponentialRampToValueAtTime(160, t + .2); g.gain.setValueAtTime(.08, t); g.gain.exponentialRampToValueAtTime(.001, t + .22); },
+  applause(dur = 1.6, v = .5){ if (!this.ok()) return; const t = A.ctx.currentTime; const n = Math.floor(dur * 40); for (let i = 0; i < n; i++) { const tt = t + Math.random() * dur; const fade = 1 - (tt - t) / dur; INST.clap(tt, v * (.3 + .7 * fade) * Math.random(), A.sfx); } },
+  cheer(v = .35){ if (!this.ok()) return; const t = A.ctx.currentTime; const f = A.ctx.createBiquadFilter(); f.type = 'bandpass'; f.Q.value = 2; f.frequency.setValueAtTime(500, t); f.frequency.linearRampToValueAtTime(1300, t + .5); f.frequency.linearRampToValueAtTime(900, t + 1.4);
+    const g = A.ctx.createGain(); f.connect(g); g.connect(A.sfx); noiseSrc(t, 1.6, f); g.gain.setValueAtTime(.0001, t); g.gain.linearRampToValueAtTime(v, t + .3); g.gain.exponentialRampToValueAtTime(.001, t + 1.6); this.applause(1.4, .35); },
+  fanfare(){ if (!this.ok()) return; const t = A.ctx.currentTime; [72, 76, 79, 84].forEach((m, i) => INST.pluck(t + i * .09, m, .15, .18, A.sfx, 'square')); INST.pad(t + .36, [72, 76, 79, 84], .6, .12, A.sfx, 'triangle'); setTimeout(() => this.sparkle(), 400); },
+  beep(hi){ if (!this.ok()) return; INST.pluck(A.ctx.currentTime, hi ? 84 : 76, .1, .15, A.sfx, 'sine'); },
+};
+
+/* ============ SEQUENCER ============ */
+function chordNotes(root, q, base){ const r = base + root; return q === 'm' ? [r, r + 3, r + 7] : [r, r + 4, r + 7]; }
+class Seq {
+  constructor(track, o = {}){
+    this.tr = track; this.o = Object.assign({loop:false, startStep:0, endStep:track.bars * 16, lead:.15, speed:1, mix:{beat:1, mel:1, fx:1}, guide:false, playVocal:true, playMelody:true}, o);
+    this.stepDur = 60 / (track.bpm * this.o.speed) / 4; this.beat = beatById(track.beat);
+    this.melMap = {}; (track.melody || []).forEach(n => (this.melMap[n.s] ||= []).push(n));
+    this.vocMap = {}; (track.vocal || []).forEach(n => (this.vocMap[n.s] ||= []).push(n));
+    this.running = false; this.k = 0;
+  }
+  start(){
+    if (!initAudio()) return false;
+    const c = A.ctx; this.bus = c.createGain(); this.bus.connect(A.music); this.vbus = c.createGain(); this.vbus.connect(A.voice);
+    this.setMix(this.o.mix);
+    this.t0 = c.currentTime + this.o.lead; this.k = 0; this.running = true; this.paused = false;
+    this.timer = setInterval(() => this.sched(), 25); this.sched(); return true;
+  }
+  setMix(m){ this.o.mix = m; if (this.bus) { this.bus.gain.value = 1; } }
+  get len(){ return this.o.endStep - this.o.startStep; }
+  stepAt(k){ return this.o.loop ? this.o.startStep + (k % this.len) : this.o.startStep + k; }
+  sched(){
+    if (!this.running || this.paused) return; const c = A.ctx;
+    while (this.t0 + this.k * this.stepDur < c.currentTime + .12) {
+      if (!this.o.loop && this.k >= this.len) { this.running = !!this.o.holdOpen; if (!this.o.holdOpen) { clearInterval(this.timer); this.o.onEnd && setTimeout(this.o.onEnd, 1400); } else this.k++; return; }
+      const s = this.stepAt(this.k), t = this.t0 + this.k * this.stepDur;
+      this.play(s, t); const kk = this.k;
+      if (this.o.onStep) { const d = Math.max(0, (t - c.currentTime) * 1000); setTimeout(() => this.running && !this.paused && this.o.onStep(s, kk), d); }
+      this.k++;
+    }
+  }
+  play(s, t){
+    const b = this.beat, i = s % 16, bar = Math.floor(s / 16), tr = this.tr, mx = this.o.mix, out = this.bus, sd = this.stepDur;
+    const sec = tr.sectionAt ? tr.sectionAt(bar) : 'verse';
+    const key = tr.key || 60; const bv = mx.beat;
+    const [root, q] = b.prog[bar % b.prog.length];
+    const light = sec === 'intro' || sec === 'outro';
+    if (bv > 0) {
+      if (b.kick[i] === 'x' && !(light && i % 8)) INST.kick(t, .9 * bv, out);
+      if (!light) { if (b.snare[i] === 'x') INST.snare(t, .55 * bv, out); if (b.clap[i] === 'x') INST.clap(t, .6 * bv, out); }
+      if (b.hat[i] === 'x' || b.hat[i] === 'o') INST.hat(t, .5 * bv, out, b.hat[i] === 'o');
+      const bs = b.bass[i]; if (bs && bs !== '.' && !light) { const off = bs === '5' ? 7 : bs === '8' ? 12 : 0; INST.bass(t, key - 24 + root + off, sd * 1.6, .45 * bv, out); }
+      if (i === 0) INST.pad(t, chordNotes(root, q, key - 12), sd * 16, .09 * bv, out, b.pad);
+      if (b.arp[i] === 'x' && !light) { const ch = chordNotes(root, q, key); const n = ch[(s >> 1) % 3] + ((s >> 3) % 2 ? 12 : 0); INST.pluck(t, n, sd, .05 * bv, out, b.arpW); }
+    }
+    if (this.o.playMelody) (this.melMap[s] || []).forEach(n => INST.keys(t, n.m, n.l * sd, (this.o.guide ? .07 : .16) * mx.mel, out));
+    if (this.o.playVocal) (this.vocMap[s] || []).forEach(n => INST.vocal(t, n.m, n.l * sd * .95, .12 * mx.mel, this.vbus, 'oo'));
+  }
+  pos(){ if (!A.ctx) return 0; const now = this.paused ? this.pauseAt : A.ctx.currentTime; return (now - this.t0) + this.o.startStep * this.stepDur; }
+  pause(){ if (!this.running || this.paused) return; this.paused = true; this.pauseAt = A.ctx.currentTime; this.bus.gain.setTargetAtTime(0, this.pauseAt, .01); this.vbus.gain.setTargetAtTime(0, this.pauseAt, .01); }
+  resume(){ if (!this.paused) return; const c = A.ctx; const el = this.pauseAt - this.t0; this.t0 = c.currentTime + .05 - el; this.paused = false;
+    // skip steps that were scheduled before pause
+    this.k = Math.max(0, Math.ceil((c.currentTime + .05 - this.t0) / this.stepDur)); this.bus.gain.setTargetAtTime(1, c.currentTime, .01); this.vbus.gain.setTargetAtTime(1, c.currentTime, .01); }
+  stop(){ this.running = false; clearInterval(this.timer); if (this.bus && A.ctx) { const t = A.ctx.currentTime; this.bus.gain.setTargetAtTime(0, t, .03); this.vbus.gain.setTargetAtTime(0, t, .03); const b = this.bus, v = this.vbus; setTimeout(() => { try { b.disconnect(); v.disconnect(); } catch(e){} }, 600); } }
+}
+
+/* menu music */
+let menuSeq = null;
+function menuMusic(on){
+  if (on && S.settings.sound && S.settings.music > 0) {
+    if (menuSeq || !A.ctx) return;
+    const tr = {bpm:84, beat:'cloudy', bars:8, key:60, melody:[], sectionAt:() => 'verse'};
+    const mel = [[0,7],[4,9],[8,12],[12,11 - 2],[16,7],[20,4],[24,5],[28,7],[32,12],[36,14],[40,16],[44,14],[48,12],[52,9],[56,7],[60,4]];
+    tr.melody = mel.map(([s, d]) => ({s:s * 2, m:72 + d, l:6}));
+    menuSeq = new Seq(tr, {loop:true, mix:{beat:.45, mel:.5, fx:1}}); menuSeq.start();
+  } else if (!on && menuSeq) { menuSeq.stop(); menuSeq = null; }
+}
+
+/* ============ TRACK BUILDERS ============ */
+const SECTIONS_STD = [['intro','Intro',2],['verse','Verse 1',4],['chorus','Chorus',4],['verse','Verse 2',4],['chorus','Chorus',4],['bridge','Bridge',4],['chorus','Final Chorus',4],['outro','Outro',2]];
+const SECTIONS_CUSTOM = [['intro','Intro',2],['verse','Verse 1',4],['chorus','Chorus',4],['verse','Verse 2',4],['chorus','Chorus',4],['chorus','Final Chorus',4],['outro','Outro',2]];
+function layout(secs){ let bar = 0; return secs.map(([type, name, bars]) => { const o = {type, name, bar, bars}; bar += bars; return o; }); }
+function finishTrack(tr){
+  tr.bars = tr.sections.reduce((a, s) => a + s.bars, 0);
+  tr.sectionAt = bar => { const s = tr.sections.find(x => bar >= x.bar && bar < x.bar + x.bars); return s ? s.type : 'outro'; };
+  tr.sectionObj = bar => tr.sections.find(x => bar >= x.bar && bar < x.bar + x.bars) || tr.sections[tr.sections.length - 1];
+  return tr;
+}
+/* melody generator: pentatonic random walk; 8th-note grid, 32 steps = 4 bars */
+function genPhrase(r, diff){
+  const q = [0, .42, .55, .64, .72, .8][diff], e = [0, .03, .08, .16, .26, .36][diff], sx = [0, 0, 0, 0, .04, .1][diff];
+  const out = []; let p = 3 + Math.floor(r() * 2);
+  for (let s = 0; s < 32; s++) {
+    const onQ = s % 2 === 0; const prob = onQ ? q : e;
+    if (s % 8 === 7 && diff < 4) continue;
+    if (s % 8 === 6 && diff < 2) continue;
+    if (r() < prob) {
+      p = clamp(p + Math.round((r() - .5) * 3.2), 0, 7);
+      if (s % 8 === 0 && r() < .5) p = [0, 2, 4, 5][Math.floor(r() * 4)];
+      out.push({s, p, l:1, h:0});
+      if (r() < sx) out.push({s, p:clamp(p + 1, 0, 7), l:1, h:.5});
+    }
+  }
+  // lengthen notes into gaps
+  out.forEach((n, i) => { const nx = out[i + 1]; const gap = nx ? nx.s - n.s : 32 - n.s; if (!n.h && gap >= 2) n.l = Math.min(gap, 4); });
+  return out;
+}
+function buildStdTrack(song, speed = 1){
+  const r = rng(hashStr(song.id));
+  const verse = genPhrase(r, song.diff), chorus = genPhrase(r, Math.min(5, song.diff + (song.diff < 3 ? 1 : 0))), bridge = genPhrase(r, song.diff);
+  chorus.forEach(n => n.p = clamp(n.p + 1, 0, 7));
+  const tr = {id:song.id, title:song.title, bpm:song.bpm, beat:song.beat, key:60 + (hashStr(song.id) % 5) - 2, sections:layout(SECTIONS_STD), melody:[], moves:[], lyrics:null};
+  tr.sections.forEach((sec, si) => {
+    const ph = sec.type === 'verse' ? verse : sec.type === 'chorus' ? chorus : sec.type === 'bridge' ? bridge : null;
+    if (ph) ph.forEach(n => tr.melody.push({s:sec.bar * 16 + n.s * 2 + Math.round((n.h || 0) * 2), p:n.p, m:tr.key + 12 + PENTA[n.p], l:n.l * 2, lane:n.p >> 1}));
+    if (sec.type === 'chorus' || sec.type === 'bridge') { const mv = Object.keys(MOVES)[(si * 3 + hashStr(song.id)) % 6]; tr.moves.push({s:(sec.bar + sec.bars) * 16 - 4, move:mv}); }
+  });
+  tr.melody.sort((a, b) => a.s - b.s);
+  return finishTrack(tr);
+}
+function buildCustomTrack(cs){
+  const tr = {id:cs.id, custom:true, title:cs.title || 'My Song', bpm:beatById(cs.beat).bpm, beat:cs.beat, key:60, sections:layout(SECTIONS_CUSTOM), melody:[], vocal:[], moves:[], moments:[], lyrics:cs.lyrics};
+  const ch = CHORUSES.find(c => c.id === cs.chorus) || CHORUSES[0];
+  tr.sections.forEach(sec => {
+    const base = sec.bar * 16;
+    if (sec.type === 'verse') {
+      cs.melody.forEach(n => tr.melody.push({s:base + n.s * 2, p:n.p, m:72 + PENTA[n.p], l:n.l * 2, lane:n.p >> 1}));
+      cs.vocal.forEach((v, i) => { if (v >= 0) tr.vocal.push({s:base + i * 4, m:[64, 67, 72][v], l:4}); });
+    } else if (sec.type === 'chorus') {
+      ch.notes.forEach(([s, p, l]) => tr.melody.push({s:base + s * 2, p, m:72 + PENTA[p], l:l * 2, lane:p >> 1}));
+      cs.vocal.forEach((v, i) => { if (v >= 0) tr.vocal.push({s:base + i * 4, m:[64, 67, 72][v] + 0, l:4}); });
+    }
+  });
+  Object.entries(cs.moments || {}).forEach(([bar, id]) => { const m = MOMENTS.find(x => x.id === id); if (m) { tr.moments.push({bar:+bar, id}); tr.moves.push({s:+bar * 16 + 8, move:m.move, fx:m.fx, moment:m}); } });
+  tr.melody.sort((a, b) => a.s - b.s);
+  return finishTrack(tr);
+}
+</script>
+<script>
+/* ================= SINGER SVG ================= */
+let UID = 0;
+function shade(hex, amt){ if (!hex || hex[0] !== '#') return hex; let n = parseInt(hex.slice(1), 16); let r = (n >> 16) + amt, g = ((n >> 8) & 255) + amt, b = (n & 255) + amt; r = clamp(r, 0, 255); g = clamp(g, 0, 255); b = clamp(b, 0, 255); return '#' + ((r << 16) | (g << 8) | b).toString(16).padStart(6, '0'); }
+function singerSVG(c){
+  const id = 'sg' + (++UID);
+  const O = OUTFITS.find(o => o.id === c.outfit) || OUTFITS[0];
+  const hc = (HAIR_COLORS.find(h => h.id === c.hairColor) || HAIR_COLORS[0]).c;
+  const H = hc === 'rainbow' ? `url(#${id}rh)` : hc, Hd = hc === 'rainbow' ? '#c86bff' : shade(hc, -35);
+  const skin = SKINS[c.skin] || SKINS[0], skinD = shade(skin, -25);
+  const sh = SHOES.find(s => s.id === c.shoes) || SHOES[0]; const shC = sh.c === 'rainbow' ? `url(#${id}rb)` : sh.c;
+  const mic = MICS.find(m => m.id === c.mic) || MICS[0]; const micH = mic.head === 'rainbow' ? `url(#${id}rb)` : mic.head;
+  const skirtFill = O.sk[0] === 'rainbow' ? `url(#${id}rb)` : `url(#${id}sk)`;
+  const defs = `<defs>
+    <linearGradient id="${id}rb" x1="0" x2="1"><stop offset="0" stop-color="#ff7eb6"/><stop offset=".2" stop-color="#ffae6b"/><stop offset=".4" stop-color="#ffe36b"/><stop offset=".6" stop-color="#8ef0b5"/><stop offset=".8" stop-color="#7cc8ff"/><stop offset="1" stop-color="#b99bff"/></linearGradient>
+    <linearGradient id="${id}rh" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff7ab8"/><stop offset=".35" stop-color="#b18cff"/><stop offset=".7" stop-color="#6cc0ff"/><stop offset="1" stop-color="#5fd6a8"/></linearGradient>
+    <linearGradient id="${id}sk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${O.sk[0]}"/><stop offset="1" stop-color="${O.sk[1] || O.sk[0]}"/></linearGradient>
+    <radialGradient id="${id}bl"><stop offset="0" stop-color="#ff7ab8" stop-opacity=".55"/><stop offset="1" stop-color="#ff7ab8" stop-opacity="0"/></radialGradient>
+    <clipPath id="${id}cl"><path d="M84 176 L50 236 Q100 250 150 236 L116 176 Z"/></clipPath>
+  </defs>`;
+  // back hair
+  let back = '', front = '', extra = '';
+  const bangs = `<path d="M56 88 Q58 44 100 42 Q142 44 144 88 Q136 74 126 80 Q118 66 106 74 Q96 62 86 76 Q76 66 66 80 Q60 80 56 88Z" fill="${H}"/>`;
+  switch (c.hair) {
+    case 'long': back = `<path d="M52 86 Q46 150 56 214 Q100 226 144 214 Q154 150 148 86 Q146 40 100 38 Q54 40 52 86Z" fill="${H}"/>`; front = bangs; break;
+    case 'wavy': back = `<path d="M52 86 Q40 120 54 140 Q42 165 56 188 Q48 205 62 215 Q100 228 138 215 Q152 205 144 188 Q158 165 146 140 Q160 120 148 86 Q146 40 100 38 Q54 40 52 86Z" fill="${H}"/>`; front = bangs; break;
+    case 'short': back = `<path d="M50 90 Q46 136 62 140 L138 140 Q154 136 150 90 Q148 40 100 38 Q52 40 50 90Z" fill="${H}"/>`; front = `<path d="M54 92 Q56 42 100 40 Q144 42 146 92 Q130 64 100 62 Q74 64 64 76 Q58 84 54 92Z" fill="${H}"/>`; break;
+    case 'bun': back = `<circle cx="100" cy="34" r="22" fill="${H}"/><circle cx="100" cy="34" r="22" fill="none" stroke="${Hd}" stroke-width="2" stroke-dasharray="6 5"/><path d="M52 92 Q50 120 60 126 L140 126 Q150 120 148 92 Q146 42 100 40 Q54 42 52 92Z" fill="${H}"/>`; front = bangs + `<rect x="90" y="50" width="20" height="6" rx="3" fill="#ff4fa3"/>`; break;
+    case 'ponytail': back = `<path d="M52 92 Q50 122 60 128 L140 128 Q150 122 148 92 Q146 42 100 40 Q54 42 52 92Z" fill="${H}"/><path d="M140 70 Q176 90 164 150 Q160 176 146 190 Q158 150 146 110 Q140 90 132 80Z" fill="${H}" stroke="${Hd}" stroke-width="1.5"/><circle cx="140" cy="74" r="7" fill="#ff4fa3"/>`; front = bangs; break;
+    case 'high': back = `<path d="M52 92 Q50 122 60 128 L140 128 Q150 122 148 92 Q146 42 100 40 Q54 42 52 92Z" fill="${H}"/><path d="M100 30 Q150 8 164 60 Q172 100 156 140 Q158 96 140 70 Q124 44 100 40Z" fill="${H}" stroke="${Hd}" stroke-width="1.5"/>`; front = bangs + `<ellipse cx="102" cy="34" rx="12" ry="7" fill="#ff4fa3"/>`; break;
+    case 'braids': {
+      back = `<path d="M52 92 Q50 122 60 128 L140 128 Q150 122 148 92 Q146 42 100 40 Q54 42 52 92Z" fill="${H}"/>`;
+      let br = ''; for (let i = 0; i < 6; i++) { const y = 112 + i * 16, r = 10 - i * .6; br += `<ellipse cx="54" cy="${y}" rx="${r}" ry="9" fill="${H}" stroke="${Hd}" stroke-width="1.5"/><ellipse cx="146" cy="${y}" rx="${r}" ry="9" fill="${H}" stroke="${Hd}" stroke-width="1.5"/>`; }
+      br += `<circle cx="54" cy="206" r="5" fill="#ff4fa3"/><circle cx="146" cy="206" r="5" fill="#ff4fa3"/>`;
+      extra = br; front = bangs; break; }
+    case 'curly': {
+      let cc = ''; const pts = [[58,70],[52,96],[54,122],[62,146],[142,70],[148,96],[146,122],[138,146],[70,48],[88,38],[112,38],[130,48],[60,168],[140,168]];
+      pts.forEach(([x, y]) => cc += `<circle cx="${x}" cy="${y}" r="17" fill="${H}"/>`);
+      back = cc; let fc = ''; [[66,68],[82,56],[100,52],[118,56],[134,68]].forEach(([x, y]) => fc += `<circle cx="${x}" cy="${y}" r="13" fill="${H}" stroke="${Hd}" stroke-width="1"/>`);
+      front = fc; break; }
+  }
+  // outfit patterns
+  let pat = '';
+  const deco = (sym, list, col) => list.map(([x, y]) => sym === 'heart' ? `<path transform="translate(${x} ${y}) scale(.5)" d="M0 4 C-8 -6 -16 4 0 14 C16 4 8 -6 0 4Z" fill="${col}"/>` : sym === 'star' ? `<path transform="translate(${x} ${y}) scale(.45)" d="M0 -10 L3 -3 L10 -3 L4 2 L6 10 L0 5 L-6 10 L-4 2 L-10 -3 L-3 -3Z" fill="${col}"/>` : `<circle cx="${x}" cy="${y}" r="${sym === 'glit' ? 1.6 : 3}" fill="${col}"/>`).join('');
+  const spots = [[70,200],[90,190],[110,204],[130,196],[80,222],[100,226],[122,222],[62,226],[140,226],[100,210]];
+  if (O.pat === 'dots') pat = deco('dot', spots, '#ffffffcc');
+  if (O.pat === 'glitter') pat = deco('glit', spots.concat([[75,210],[118,212],[95,200],[132,212],[86,232],[112,232]]), '#ffffff');
+  if (O.pat === 'hearts') pat = deco('heart', spots.slice(0, 8), '#ffffff');
+  if (O.pat === 'stars') pat = deco('star', spots, '#ffe36b');
+  if (O.pat === 'star') pat = deco('star', [[100,210],[76,222],[124,222]], '#ffffff');
+  if (O.pat === 'gold') pat = deco('glit', spots, '#f0b429') + `<path d="M52 232 Q100 246 148 232" stroke="#f0b429" stroke-width="4" fill="none"/>`;
+  const bowWaist = O.pat === 'bow' ? `<g transform="translate(100 176)"><path d="M0 0 L-16 -9 L-16 9Z M0 0 L16 -9 L16 9Z" fill="#ff4fa3"/><circle r="4" fill="#ff7ab8"/></g>` : '';
+  // shoes
+  const shoe = x => sh.type === 'boot' ? `<path d="M${x - 8} 250 L${x + 7} 250 L${x + 7} 270 Q${x + 16} 272 ${x + 15} 280 L${x - 9} 280 Z" fill="${shC}" stroke="${sh.sole}" stroke-width="2"/>`
+    : sh.type === 'flat' ? `<ellipse cx="${x + 2}" cy="276" rx="12" ry="6" fill="${shC}"/><path d="M${x - 6} 272 Q${x + 2} 266 ${x + 10} 272" stroke="#fff" stroke-width="2" fill="none"/>`
+    : `<path d="M${x - 10} 270 Q${x - 10} 262 ${x} 262 Q${x + 12} 264 ${x + 15} 272 L${x + 15} 278 L${x - 10} 278 Z" fill="${shC}"/><rect x="${x - 11}" y="276" width="27" height="5" rx="2.5" fill="${sh.sole}"/>${sh.id === 'starsn' ? `<path transform="translate(${x + 2} 270) scale(.35)" d="M0 -10 L3 -3 L10 -3 L4 2 L6 10 L0 5 L-6 10 L-4 2 L-10 -3 L-3 -3Z" fill="#ffe36b"/>` : ''}`;
+  // accessory
+  const A1 = {
+    none:'', bow:`<g transform="translate(138 52) rotate(20)"><path d="M0 0 L-18 -11 L-18 11Z M0 0 L18 -11 L18 11Z" fill="#ff4fa3"/><circle r="5" fill="#ff8fc8"/></g>`,
+    clips:[[66,70],[132,66]].map(([x, y]) => `<path transform="translate(${x} ${y}) scale(.7)" d="M0 -10 L3 -3 L10 -3 L4 2 L6 10 L0 5 L-6 10 L-4 2 L-10 -3 L-3 -3Z" fill="#ffe36b" stroke="#fff" stroke-width="1.5"/>`).join(''),
+    tiara:`<path d="M72 48 L80 30 L90 44 L100 22 L110 44 L120 30 L128 48 Z" fill="#ffd76b" stroke="#fff" stroke-width="2"/><circle cx="100" cy="36" r="4" fill="#ff4fa3"/><circle cx="80" cy="40" r="2.5" fill="#7cc6ff"/><circle cx="120" cy="40" r="2.5" fill="#7cc6ff"/>`,
+    phones:`<path d="M56 94 Q56 30 100 30 Q144 30 144 94" stroke="#ff8fc8" stroke-width="7" fill="none"/><rect x="44" y="82" width="16" height="28" rx="7" fill="#ff4fa3"/><rect x="140" y="82" width="16" height="28" rx="7" fill="#ff4fa3"/>`,
+    glasses:[84, 116].map(x => `<path transform="translate(${x} 88) scale(1.1)" d="M0 4 C-8 -6 -16 4 0 14 C16 4 8 -6 0 4Z" fill="#ff4fa3" fill-opacity=".75" stroke="#fff" stroke-width="1.5"/>`).join('') + `<path d="M92 94 L108 94" stroke="#ff4fa3" stroke-width="2.5"/>`,
+    flowers:[64,80,100,120,136].map((x, i) => `<g transform="translate(${x} ${[58,46,42,46,58][i]})">${[0,72,144,216,288].map(a => `<circle cx="${Math.cos(a * Math.PI / 180) * 5}" cy="${Math.sin(a * Math.PI / 180) * 5}" r="4" fill="${['#ff8fc8','#ffe36b','#b99bff','#7cc6ff','#ff8fc8'][i]}"/>`).join('')}<circle r="3" fill="#fff"/></g>`).join(''),
+    ears:`<path d="M58 60 L62 24 L86 46Z" fill="${H}" stroke="#ff8fc8" stroke-width="3"/><path d="M142 60 L138 24 L114 46Z" fill="${H}" stroke="#ff8fc8" stroke-width="3"/><path d="M64 50 L66 34 L78 46Z M136 50 L134 34 L122 46Z" fill="#ffb6d9"/>`,
+  }[c.acc] || '';
+  // aura
+  const fx = FX.find(f => f.id === c.fx) || FX[0];
+  let aura = '';
+  const ap = [[26,60],[176,80],[18,160],[184,190],[40,250],[166,262],[100,6],[30,110],[172,140]];
+  if (fx.id === 'sparkle') aura = ap.map(([x, y]) => `<path transform="translate(${x} ${y})" d="M0 -9 Q1.5 -1.5 9 0 Q1.5 1.5 0 9 Q-1.5 1.5 -9 0 Q-1.5 -1.5 0 -9Z" fill="#fff" stroke="#ffd1ec"/>`).join('');
+  if (fx.id === 'hearts') aura = ap.map(([x, y]) => `<path transform="translate(${x} ${y}) scale(.8)" d="M0 4 C-8 -6 -16 4 0 14 C16 4 8 -6 0 4Z" fill="#ff7ab8"/>`).join('');
+  if (fx.id === 'stars') aura = ap.map(([x, y]) => `<path transform="translate(${x} ${y}) scale(.7)" d="M0 -10 L3 -3 L10 -3 L4 2 L6 10 L0 5 L-6 10 L-4 2 L-10 -3 L-3 -3Z" fill="#ffd23d"/>`).join('');
+  if (fx.id === 'bubbles') aura = ap.map(([x, y], i) => `<circle cx="${x}" cy="${y}" r="${5 + i % 3 * 2}" fill="#bfe6ff" fill-opacity=".5" stroke="#fff" stroke-width="1.5"/>`).join('');
+  if (fx.id === 'butterfly') aura = ap.slice(0, 6).map(([x, y], i) => `<g transform="translate(${x} ${y})"><ellipse cx="-4" cy="0" rx="5" ry="7" fill="${['#b99bff','#7cc6ff','#ff8fc8'][i % 3]}"/><ellipse cx="4" cy="0" rx="5" ry="7" fill="${['#b99bff','#7cc6ff','#ff8fc8'][i % 3]}"/><rect x="-1" y="-6" width="2" height="12" fill="#5b2466"/></g>`).join('');
+  if (fx.id === 'rainbow') aura = `<ellipse cx="100" cy="150" rx="92" ry="140" fill="none" stroke="url(#${id}rb)" stroke-width="6" opacity=".55"/>` + ap.slice(0, 5).map(([x, y]) => `<path transform="translate(${x} ${y})" d="M0 -8 Q1.5 -1.5 8 0 Q1.5 1.5 0 8 Q-1.5 1.5 -8 0 Q-1.5 -1.5 0 -8Z" fill="#fff"/>`).join('');
+  const micDeco = mic.deco === 'star' ? `<path transform="translate(0 -6) scale(.4)" d="M0 -10 L3 -3 L10 -3 L4 2 L6 10 L0 5 L-6 10 L-4 2 L-10 -3 L-3 -3Z" fill="#fff"/>` : mic.deco === 'heart' ? `<path transform="translate(0 -9) scale(.45)" d="M0 4 C-8 -6 -16 4 0 14 C16 4 8 -6 0 4Z" fill="#ff4fa3"/>` : mic.deco === 'gem' ? `<path d="M0 -12 L5 -6 L0 0 L-5 -6Z" fill="#fff" opacity=".8"/>` : '';
+  return `<svg viewBox="0 0 200 300" role="img" aria-label="${esc(S.name)} the singer">${defs}
+  <g class="aura">${aura}</g>
+  <ellipse cx="100" cy="284" rx="46" ry="8" fill="#000" opacity=".12"/>
+  ${back}${extra}
+  <rect x="87" y="228" width="10" height="44" rx="5" fill="${skin}"/><rect x="103" y="228" width="10" height="44" rx="5" fill="${skin}"/>
+  ${shoe(90)}${shoe(107)}
+  ${O.bottom ? pantsSVG(O) : `<path d="M84 176 L50 236 Q100 250 150 236 L116 176 Z" fill="${skirtFill}"/>
+  <g clip-path="url(#${id}cl)">${pat}</g>
+  <path d="M50 236 Q100 250 150 236" stroke="${O.trim}" stroke-width="4" fill="none" stroke-linecap="round"/>`}
+  ${O.topType === 'hoodie' ? `<path d="M84 142 Q100 156 116 142 Q112 132 100 132 Q88 132 84 142Z" fill="${shade(O.top, -25)}"/>` : ''}
+  <path d="M80 142 Q100 134 120 142 L119 ${O.bottom ? 186 : 180} Q100 ${O.bottom ? 190 : 186} 81 ${O.bottom ? 186 : 180} Z" fill="${O.top}"/>
+  ${topDetail(O, id)}
+  <path d="M82 ${O.bottom ? 184 : 178} Q100 ${O.bottom ? 190 : 184} 118 ${O.bottom ? 184 : 178}" stroke="${O.trim}" stroke-width="4" fill="none"/>
+  ${O.bottom ? '' : O.pat === 'star' || O.pat === 'stars' ? `<path transform="translate(100 160) scale(.8)" d="M0 -10 L3 -3 L10 -3 L4 2 L6 10 L0 5 L-6 10 L-4 2 L-10 -3 L-3 -3Z" fill="${O.trim}"/>` : O.pat === 'hearts' ? `<path transform="translate(100 154) scale(.8)" d="M0 4 C-8 -6 -16 4 0 14 C16 4 8 -6 0 4Z" fill="#fff"/>` : ''}
+  ${bowWaist}
+  <rect x="94" y="126" width="12" height="18" rx="5" fill="${skinD}"/>
+  <g class="arm-l"><path d="M82 148 Q62 166 60 190" stroke="${skin}" stroke-width="10" stroke-linecap="round" fill="none"/><circle cx="60" cy="192" r="7" fill="${skin}"/><path d="M82 146 Q74 150 72 160" stroke="${O.top}" stroke-width="12" stroke-linecap="round" fill="none"/></g>
+  <circle cx="100" cy="90" r="46" fill="${skin}"/>
+  <ellipse cx="58" cy="96" rx="6" ry="9" fill="${skin}"/><ellipse cx="142" cy="96" rx="6" ry="9" fill="${skin}"/>
+  <ellipse cx="80" cy="106" rx="11" ry="7" fill="url(#${id}bl)"/><ellipse cx="120" cy="106" rx="11" ry="7" fill="url(#${id}bl)"/>
+  <g><ellipse cx="84" cy="94" rx="7" ry="9.5" fill="#3a1f45"/><ellipse cx="116" cy="94" rx="7" ry="9.5" fill="#3a1f45"/>
+  <circle cx="86.5" cy="90" r="3" fill="#fff"/><circle cx="118.5" cy="90" r="3" fill="#fff"/><circle cx="82" cy="98" r="1.5" fill="#fff"/><circle cx="114" cy="98" r="1.5" fill="#fff"/>
+  <path d="M76 86 L73 82 M78 84 L76 80 M124 86 L127 82 M122 84 L124 80" stroke="#3a1f45" stroke-width="1.6" stroke-linecap="round"/></g>
+  <ellipse cx="100" cy="112" rx="6" ry="5" fill="#c2385f"/><ellipse cx="100" cy="114" rx="3.5" ry="2" fill="#ff8fa8"/>
+  ${front}
+  ${A1}
+  <g class="arm-r"><path d="M118 148 Q144 160 132 138" stroke="${skin}" stroke-width="10" stroke-linecap="round" fill="none"/><path d="M118 146 Q126 150 128 158" stroke="${O.top}" stroke-width="12" stroke-linecap="round" fill="none"/>
+    <g transform="translate(126 124) rotate(35)"><rect x="-3.5" y="0" width="7" height="24" rx="3.5" fill="${mic.body}"/><circle cx="0" cy="-4" r="9" fill="${micH}" stroke="#fff" stroke-width="1.5"/><path d="M-6 -6 L6 -6 M-7 -2 L7 -2 M-6 2 L6 2" stroke="rgba(0,0,0,.18)" stroke-width="1"/>${micDeco}</g>
+    <circle cx="131" cy="138" r="7" fill="${skin}"/></g>
+  </svg>`;
+}
+function pantsSVG(O){
+  const c = O.sk[0], d = shade(c, -30), l = shade(c, 30);
+  if (O.bottom === 'shorts') return `<path d="M81 182 L119 182 L121 214 L102 214 L100 200 L98 214 L79 214 Z" fill="${c}"/><path d="M80 210 L98 210 M102 210 L120 210" stroke="${l}" stroke-width="3"/><path d="M100 186 L100 200" stroke="${d}" stroke-width="1.5"/>`;
+  const jog = O.bottom === 'joggers';
+  return `<path d="M81 182 L119 182 L118 266 L103 266 L100 204 L97 266 L82 266 Z" fill="${c}"/>
+    ${jog ? `<path d="M83 186 L84 264 M117 186 L116 264" stroke="#fff" stroke-width="3"/><rect x="81" y="258" width="17" height="8" rx="3" fill="${d}"/><rect x="102" y="258" width="17" height="8" rx="3" fill="${d}"/>`
+      : `<path d="M100 186 L100 204" stroke="${d}" stroke-width="1.5"/><path d="M85 190 Q90 196 95 190 M105 190 Q110 196 115 190" stroke="${d}" stroke-width="1.5" fill="none"/>
+      <path d="M86 214 L86 250 M114 214 L114 250" stroke="${l}" stroke-width="4" stroke-linecap="round" opacity=".6"/>
+      <rect x="81" y="258" width="17" height="8" rx="2" fill="${l}"/><rect x="102" y="258" width="17" height="8" rx="2" fill="${l}"/>
+      <path d="M90 200 L90 260 M110 200 L110 260" stroke="#ffcf5c" stroke-width="1" stroke-dasharray="3 3" opacity=".7"/>`}`;
+}
+function topDetail(O, id){
+  const star = col => `<path transform="translate(100 162) scale(.9)" d="M0 -10 L3 -3 L10 -3 L4 2 L6 10 L0 5 L-6 10 L-4 2 L-10 -3 L-3 -3Z" fill="${col}"/>`;
+  const heart = col => `<path transform="translate(100 156) scale(.9)" d="M0 4 C-8 -6 -16 4 0 14 C16 4 8 -6 0 4Z" fill="${col}"/>`;
+  if (!O.topType) return '';
+  let h = `<path d="M92 139 Q100 146 108 139" stroke="${shade(O.top, -30)}" stroke-width="2.5" fill="none"/>`;
+  if (O.stripe) h += [150, 160, 170, 180].map(y => `<path d="M81 ${y} L119 ${y}" stroke="${O.stripe}" stroke-width="4"/>`).join('');
+  if (O.topType === 'tee') { if (O.pat === 'star') h += star(O.print); if (O.pat === 'hearts') h += heart(O.print); }
+  if (O.topType === 'hoodie') h += `<path d="M96 142 L95 156 M104 142 L105 156" stroke="#fff" stroke-width="2" stroke-linecap="round"/><path d="M88 168 L112 168 L109 180 L91 180 Z" fill="${shade(O.top, -20)}"/>` + heart('#ffffff');
+  if (O.topType === 'jacket') h += `<path d="M93 138 L100 186 L107 138 Q100 142 93 138Z" fill="${O.inner}"/><path d="M93 138 L100 186 M107 138 L100 186" stroke="${shade(O.top, -30)}" stroke-width="2"/><circle cx="90" cy="160" r="1.8" fill="#ffcf5c"/><circle cx="110" cy="160" r="1.8" fill="#ffcf5c"/>`;
+  if (O.topType === 'overalls') h += `<rect x="88" y="156" width="24" height="30" rx="3" fill="${O.sk[0]}"/><path d="M88 158 L84 140 M112 158 L116 140" stroke="${O.sk[0]}" stroke-width="5" stroke-linecap="round"/><circle cx="90" cy="159" r="2" fill="#ffcf5c"/><circle cx="110" cy="159" r="2" fill="#ffcf5c"/><rect x="95" y="164" width="10" height="8" rx="2" fill="${shade(O.sk[0], -25)}"/>`;
+  return h;
+}
+function renderSingerInto(el){ if (el) el.innerHTML = singerSVG(S.singer); }
+function doMove(el, move){ if (!el) return; el.classList.remove('bop', ...Object.keys(MOVES).map(m => 'mv-' + m)); void el.offsetWidth; el.classList.add('mv-' + move); clearTimeout(el._mt); el._mt = setTimeout(() => { el.classList.remove('mv-' + move); el.classList.add('bop'); }, 950); }
+
+/* ================= UI HELPERS ================= */
+function wallet(){ const r = RANKS[rankIdx()]; return `<div class="wallet"><span class="chip" title="Coins">💰 ${fmt(S.coins)}</span><span class="chip" title="Gems">💎 ${fmt(S.gems)}</span><span class="chip" title="Fame">🎤 ${fmt(S.fame)}</span><span class="chip" title="Career rank">${r.e} ${fmt(S.xp)} XP</span></div>`; }
+function topbar(title, back = 'home'){ return `<header class="topbar"><button class="btn-icon" data-act="go" data-to="${back}" aria-label="Back">${back === 'home' ? '🏠' : '⬅️'}</button><h2>${title}</h2>${wallet()}</header>`; }
+function toast(badge, title, text){ const t = document.createElement('div'); t.className = 'toast'; t.innerHTML = `<span class="badge">${badge}</span><div><b>${esc(title)}</b><span class="muted">${esc(text)}</span></div>`; $('#toasts').appendChild(t); setTimeout(() => t.remove(), 4000); }
+function unlock(id){
+  if (S.ach[id]) return; const a = ACHS.find(x => x.id === id); if (!a) return;
+  S.ach[id] = Date.now(); S.gems += 2; S.coins += 100; save();
+  toast(a.e, '🏅 Achievement unlocked: ' + a.n, a.d + ' · +2 💎 +100 💰'); SFX.fanfare(); burst(innerWidth / 2, 80, 40, ['✨','⭐','💖','🎉']);
+}
+function overlay(html){ $('#overlayBox').innerHTML = `<div class="overlay" role="dialog" aria-modal="true"><div class="panel">${html}</div></div>`; const f = $('#overlayBox button'); f && f.focus(); }
+function closeOverlay(){ $('#overlayBox').innerHTML = ''; }
+
+/* decor */
+function decor(on){
+  const d = $('#decor'); if (!on) { d.innerHTML = ''; return; }
+  if (d.children.length) return;
+  const items = ['🎤','🎵','💖','⭐️','✨','☁️','🎶','🩷','💜','🩵','🌸','🎀'];
+  let h = ''; for (let i = 0; i < 18; i++) h += `<span style="left:${(i * 37) % 100}%;top:${(i * 53) % 100}%;--s:${18 + (i % 4) * 8}px;--d:${7 + i % 5}s;--dl:${-i * .7}s">${items[i % items.length]}</span>`;
+  d.innerHTML = h;
+}
+
+/* ================= FX CANVAS (confetti etc.) ================= */
+const FXC = {parts:[], run:false};
+function fxLoop(){
+  const cv = $('#fxCanvas'), c = cv.getContext('2d'); const dpr = Math.min(2, devicePixelRatio || 1);
+  if (cv.width !== innerWidth * dpr) { cv.width = innerWidth * dpr; cv.height = innerHeight * dpr; }
+  c.setTransform(dpr, 0, 0, dpr, 0, 0); c.clearRect(0, 0, innerWidth, innerHeight);
+  FXC.parts = FXC.parts.filter(p => p.life > 0);
+  for (const p of FXC.parts) {
+    p.x += p.vx; p.y += p.vy; p.vy += p.g; p.rot += p.vr; p.life -= 1;
+    c.save(); c.globalAlpha = Math.min(1, p.life / 30); c.translate(p.x, p.y); c.rotate(p.rot);
+    if (p.t) { c.font = p.size + 'px serif'; c.textAlign = 'center'; c.fillText(p.t, 0, 0); } else { c.fillStyle = p.col; c.fillRect(-p.size / 2, -p.size / 4, p.size, p.size / 2); }
+    c.restore();
+  }
+  if (FXC.parts.length) requestAnimationFrame(fxLoop); else { FXC.run = false; c.clearRect(0, 0, innerWidth, innerHeight); }
+}
+function startFx(){ if (!FXC.run) { FXC.run = true; requestAnimationFrame(fxLoop); } }
+function confetti(n = 120){
+  if (S.settings.reduced) return; const cols = ['#ff4fa3','#ffcf5c','#7cc6ff','#a88bff','#7fe3b9','#ff9a7a'];
+  for (let i = 0; i < n; i++) FXC.parts.push({x:Math.random() * innerWidth, y:-20 - Math.random() * 200, vx:(Math.random() - .5) * 3, vy:2 + Math.random() * 3, g:.04, rot:Math.random() * 6, vr:(Math.random() - .5) * .3, size:8 + Math.random() * 8, col:cols[i % cols.length], life:220 + Math.random() * 80, t:Math.random() < .15 ? ['💖','⭐','✨'][i % 3] : null});
+  startFx();
+}
+function burst(x, y, n, emo){
+  if (S.settings.reduced) return;
+  for (let i = 0; i < n; i++) { const a = Math.random() * Math.PI * 2, s = 2 + Math.random() * 5; FXC.parts.push({x, y, vx:Math.cos(a) * s, vy:Math.sin(a) * s - 2, g:.12, rot:0, vr:(Math.random() - .5) * .2, size:18 + Math.random() * 12, life:60 + Math.random() * 30, t:emo[i % emo.length]}); }
+  startFx();
+}
+
+/* ================= SCREENS ================= */
+let CUR = 'home';
+const RENDER = {};
+function go(to){
+  if (CUR === 'play' && to !== 'play') endGameCleanup();
+  if (CUR === 'studio' && to !== 'studio') studioStop();
+  CUR = to; $$('.screen').forEach(s => s.hidden = s.id !== 'scr-' + to);
+  decor(to !== 'play');
+  RENDER[to] && RENDER[to]();
+  const sc = $('#scr-' + to); if (sc) sc.scrollTop = 0;
+  menuMusic(!['play', 'studio'].includes(to));
+}
+
+RENDER.home = () => {
+  const r = RANKS[rankIdx()];
+  $('#scr-home').innerHTML = `
+  <div class="home-stage" aria-hidden="true"><div class="arch"></div><div class="bulbs">${Array.from({length:13}, (_, i) => `<i style="--i:${i}"></i>`).join('')}</div><div class="floor"></div></div>
+  <div class="home-inner">
+    <div class="rank-pill">${r.e} ${esc(S.name)} · ${r.name}</div>
+    <h1 class="logo"><span class="mic">🎤</span> SINGING STAR <span class="mic">🎤</span></h1>
+    <div class="sub">Pink Melody 💕</div>
+    <div class="singer-wrap bop home-singer" id="homeSinger"></div>
+    <button class="btn rainbow xl" data-act="go" data-to="songs" data-mode="quick">🌈 ▶ START SINGING</button>
+    <div class="home-wide">
+      <button class="btn pink" data-act="go" data-to="studio">🎧 MAKE YOUR OWN SONG 🎧</button>
+      <button class="btn lav" data-act="go" data-to="singer">👧 CREATE YOUR SINGER</button>
+    </div>
+    <div class="home-grid">
+      <button class="btn" data-act="go" data-to="songs"><span class="ic">🎤</span>Sing</button>
+      <button class="btn" data-act="go" data-to="singer"><span class="ic">👗</span>Outfits</button>
+      <button class="btn" data-act="go" data-to="shop"><span class="ic">🛍️</span>Shop</button>
+      <button class="btn" data-act="go" data-to="career"><span class="ic">🌟</span>Career</button>
+      <button class="btn" data-act="go" data-to="ach"><span class="ic">🏆</span>Achievements</button>
+      <button class="btn" data-act="go" data-to="mysongs"><span class="ic">💿</span>My Songs</button>
+    </div>
+    <div class="row" style="justify-content:center">
+      <button class="btn sm" data-act="go" data-to="settings">⚙️ Settings</button>
+      <button class="btn sm" data-act="toggleSound" aria-pressed="${S.settings.sound}">${S.settings.sound ? '🔊 Sound on' : '🔇 Sound off'}</button>
+    </div>
+    ${wallet()}
+    <p class="muted" style="max-width:520px">Keys: <b>D F J K</b> (or ← ↓ ↑ →) to sing notes, <b>Space</b> for moves, <b>Esc</b> to pause. Tap the buttons on touch screens. All songs are original and made for this game.</p>
+  </div>`;
+  renderSingerInto($('#homeSinger'));
+};
+
+/* ---- singer creator ---- */
+let singerTab = 'hair';
+RENDER.singer = () => {
+  const tabs = [['hair','💇 Hair'],['color','🎨 Hair color'],['skin','🧒 Skin'],['outfit','👗 Outfit'],['shoes','👟 Shoes'],['mic','🎤 Mic'],['acc','🎀 Accessories'],['fx','✨ Sparkle']];
+  const cfg = {hair:['hairs', HAIRS, 'hair'], outfit:['outfits', OUTFITS, 'outfit'], shoes:['shoes', SHOES, 'shoes'], mic:['mics', MICS, 'mic'], acc:['accs', ACCS, 'acc'], fx:['fx', FX, 'fx']};
+  let opts = '';
+  if (singerTab === 'color') opts = HAIR_COLORS.map(h => `<button class="opt ${S.singer.hairColor === h.id ? 'sel' : ''}" data-act="setSinger" data-k="hairColor" data-v="${h.id}"><span class="sw" style="background:${h.c === 'rainbow' ? 'var(--rainbow)' : h.c}"></span>${h.name}</button>`).join('');
+  else if (singerTab === 'skin') opts = SKINS.map((c, i) => `<button class="opt ${S.singer.skin === i ? 'sel' : ''}" data-act="setSinger" data-k="skin" data-v="${i}" aria-label="Skin tone ${i + 1}"><span class="sw" style="background:${c}"></span>Tone ${i + 1}</button>`).join('');
+  else { const [cat, list, key] = cfg[singerTab]; opts = list.map(it => { const o = owns(cat, it.id); return `<button class="opt ${S.singer[key] === it.id ? 'sel' : ''} ${o ? '' : 'lock'}" data-act="setSinger" data-k="${key}" data-v="${it.id}" data-cat="${cat}">${o ? '' : '<span class="lk">🔒</span>'}<span class="em">${it.e}</span>${it.name}${o ? '' : `<small>💰 ${it.cost}</small>`}</button>`; }).join(''); }
+  $('#scr-singer').innerHTML = `<div class="wrap">${topbar('👧 Create Your Singer')}
+  <div class="singer-layout">
+    <div class="singer-preview"><div class="singer-wrap bop" id="crSinger"></div>
+      <label class="sr" for="singerName">Singer name</label>
+      <input class="name-input" id="singerName" maxlength="18" value="${esc(S.name)}" placeholder="Your star name" aria-label="Singer name">
+      <div class="row"><button class="btn sm" data-act="previewMove" data-m="spin">💃 Spin</button><button class="btn sm" data-act="previewMove" data-m="wave">🎀 Wave</button><button class="btn sm" data-act="previewMove" data-m="jump">⭐️ Jump</button></div>
+    </div>
+    <div class="panel"><div class="tabs" role="tablist">${tabs.map(([id, n]) => `<button class="btn sm ${singerTab === id ? 'pink' : ''}" role="tab" aria-selected="${singerTab === id}" data-act="singerTab" data-t="${id}">${n}</button>`).join('')}</div>
+      <div class="opt-grid">${opts}</div>
+      <p class="muted" style="margin:12px 0 0">🔒 Locked items can be bought in the 🛍️ Shop with coins you earn by singing.</p>
+      <div class="row" style="margin-top:12px"><button class="btn pink" data-act="go" data-to="songs">🎤 Let's sing!</button><button class="btn" data-act="go" data-to="shop">🛍️ Visit the shop</button><button class="btn" data-act="randomSinger">🎲 Surprise look</button></div>
+    </div>
+  </div></div>`;
+  renderSingerInto($('#crSinger'));
+  $('#singerName').addEventListener('input', e => { S.name = clean(e.target.value).slice(0, 18) || 'Star'; save(); });
+};
+
+/* ---- song select ---- */
+let songMode = 'quick', songCat = 'all', freeStage = null;
+const MODES = [['quick','🎤 Quick Sing','Pick a song and start right away.'],['practice','🌸 Practice','Practice one section at your own speed. No score pressure.'],['career','🏆 Career','Play gigs to climb from Beginner to Legend.'],['challenge','💖 Challenge','Songs get faster and harder as you win.'],['free','🎀 Free Performance','Pick any stage, outfit and song just for fun.']];
+function songStats(id){ return S.scores[id] || null; }
+RENDER.songs = () => {
+  const ri = rankIdx();
+  const list = SONGS.filter(s => songCat === 'all' || s.cat === songCat);
+  let top = '';
+  if (songMode === 'challenge') {
+    const lvl = S.challenge, next = SONGS.slice().sort((a, b) => a.diff - b.diff || a.bpm - b.bpm)[lvl % SONGS.length], speed = 1 + Math.floor(lvl / SONGS.length) * .1 + (lvl % SONGS.length) * .01;
+    top = `<div class="panel"><h3>💖 Challenge Ladder · Level ${lvl + 1}</h3><p class="muted">Get a B or better to climb to the next level. Each level is a little tougher. Current speed: ${Math.round(speed * 100)}%</p>
+    <div class="row"><span class="chip">${next.e} ${next.title}</span><span class="chip diff">${'★'.repeat(next.diff)}</span><button class="btn pink" data-act="playSong" data-id="${next.id}" data-challenge="1">▶ Start Level ${lvl + 1}</button></div></div>`;
+  }
+  if (songMode === 'free') {
+    freeStage ||= S.stage;
+    top = `<div class="panel"><h3>🎀 Choose your stage</h3><div class="cards" style="grid-template-columns:repeat(auto-fill,minmax(150px,1fr))">${STAGES.map(st => { const own = S.stagesOwned.includes(st.id); return `<button class="card ${freeStage === st.id ? 'sel' : ''} ${own ? '' : 'locked'}" data-act="pickFreeStage" data-id="${st.id}" style="cursor:pointer;border-width:3px"><div class="stage-thumb" style="background:${st.ui}"></div><span class="t">${st.e} ${st.name}</span>${own ? '' : '<small>🔒 Unlock in Career</small>'}</button>`; }).join('')}</div>
+    <div class="row" style="margin-top:10px"><button class="btn" data-act="go" data-to="singer">👗 Change outfit</button><span class="muted">Free Performance gives small rewards and never affects best scores.</span></div></div>`;
+  }
+  $('#scr-songs').innerHTML = `<div class="wrap">${topbar('🎵 Song Select')}
+    <div class="tabs" role="tablist" aria-label="Game mode">${MODES.map(([id, n]) => `<button class="btn ${songMode === id ? 'pink' : ''}" role="tab" aria-selected="${songMode === id}" data-act="songMode" data-m="${id}">${n}</button>`).join('')}</div>
+    <p class="muted" style="margin:-6px 0 0">${MODES.find(m => m[0] === songMode)[2]}</p>
+    ${top}
+    <div class="tabs" aria-label="Category">${CATS.map(c => `<button class="btn sm ${songCat === c.id ? 'lav' : ''}" data-act="songCat" data-c="${c.id}">${c.e} ${c.name}</button>`).join('')}</div>
+    <div class="cards">${list.map(s => { const st = songStats(s.id), locked = s.rank > ri && songMode !== 'free' && !S.career.cleared.some(g => GIGS.find(x => x.id === g).song === s.id);
+      return `<div class="card ${locked ? 'locked' : ''}"><div class="song-art" style="background:linear-gradient(135deg,${s.art[0]},${s.art[1]})">${s.e}</div>
+      <span class="t">🎵 ${s.title}</span>
+      <div class="meta"><span class="diff" title="Difficulty">⭐ ${'★'.repeat(s.diff)}${'☆'.repeat(5 - s.diff)}</span><span>🎵 ${s.bpm} BPM</span><span>${CATS.find(c => c.id === s.cat).e} ${CATS.find(c => c.id === s.cat).name}</span></div>
+      <div class="meta"><span>💖 Best: ${st ? fmt(st.best) : '—'}</span><span>🏆 Rank: ${st && st.rank ? `<b>${st.rank}</b>` : '—'}</span></div>
+      ${locked ? `<button class="btn sm" disabled>🔒 Reach ${RANKS[s.rank].e} ${RANKS[s.rank].name}</button>` : `<button class="btn ${songMode === 'practice' ? 'blue' : 'pink'} sm" data-act="${songMode === 'practice' ? 'practicePick' : 'playSong'}" data-id="${s.id}">${songMode === 'practice' ? '🌸 Practice' : '▶ Sing'}</button>`}
+      </div>`; }).join('')}
+      ${S.mySongs.length ? `<div class="card"><div class="song-art" style="background:var(--rainbow)">🎧</div><span class="t">Your own songs</span><span class="muted">You have ${S.mySongs.length} original song${S.mySongs.length > 1 ? 's' : ''}.</span><button class="btn sm lav" data-act="go" data-to="mysongs">💿 My Songs</button></div>` : ''}
+    </div></div>`;
+};
+
+/* ---- shop ---- */
+let shopCat = 'outfits';
+RENDER.shop = () => {
+  const cat = SHOP_CATS.find(c => c.id === shopCat);
+  $('#scr-shop').innerHTML = `<div class="wrap">${topbar('🛍️ Outfit Shop')}
+  <p class="muted" style="margin:0">Spend the 💰 coins you earn from performances. Everything here uses in-game coins only.</p>
+  <div class="tabs">${SHOP_CATS.map(c => `<button class="btn sm ${shopCat === c.id ? 'pink' : ''}" data-act="shopCat" data-c="${c.id}">${c.e} ${c.name}</button>`).join('')}</div>
+  <div class="cards">${cat.list.map(it => { const o = owns(cat.id, it.id), eq = S.singer[cat.key] === it.id;
+    const preview = Object.assign({}, S.singer, {[cat.key]:it.id});
+    return `<div class="card"><div class="singer-wrap" style="width:110px;margin:0 auto">${singerSVG(preview)}</div><span class="t">${it.e} ${it.name}</span>
+    ${o ? (eq ? '<button class="btn sm mint" disabled>✅ Wearing</button>' : `<button class="btn sm lav" data-act="equip" data-cat="${cat.id}" data-id="${it.id}">✨ Wear it</button>`) : `<button class="btn sm gold" data-act="buy" data-cat="${cat.id}" data-id="${it.id}" ${S.coins < it.cost ? 'disabled' : ''}>💰 ${it.cost} · Buy</button>`}</div>`; }).join('')}</div></div>`;
+};
+
+/* ---- achievements ---- */
+RENDER.ach = () => {
+  const got = ACHS.filter(a => S.ach[a.id]).length;
+  const block = list => list.map(a => `<div class="ach ${S.ach[a.id] ? 'got' : ''}"><div class="badge">${a.e}</div><div><b>${a.n}</b><div class="muted">${a.d}</div>${S.ach[a.id] ? '<small>✅ Unlocked</small>' : '<small>🔒 Locked</small>'}</div></div>`).join('');
+  $('#scr-ach').innerHTML = `<div class="wrap">${topbar('🏆 Achievements')}
+  <div class="panel"><h3>${got} / ${ACHS.length} unlocked</h3><div class="xpbar"><i style="width:${got / ACHS.length * 100}%"></i></div><p class="muted">Each achievement gives +2 💎 and +100 💰.</p></div>
+  <div class="panel"><h3>🎤 Singing</h3><div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(260px,1fr))">${block(ACHS.filter(a => !a.c))}</div></div>
+  <div class="panel"><h3>🎧 Song Creator</h3><div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(260px,1fr))">${block(ACHS.filter(a => a.c))}</div></div></div>`;
+};
+
+/* ---- career ---- */
+function gigState(i){ const g = GIGS[i]; if (S.career.cleared.includes(g.id)) return 'done'; if (i > 0 && !S.career.cleared.includes(GIGS[i - 1].id)) return 'locked'; if (S.fame < g.fame) return 'fame'; return 'open'; }
+RENDER.career = () => {
+  const ri = rankIdx(), r = RANKS[ri], nx = RANKS[ri + 1];
+  const pct = nx ? (S.xp - r.xp) / (nx.xp - r.xp) * 100 : 100;
+  $('#scr-career').innerHTML = `<div class="wrap">${topbar('🌟 Career Mode')}
+  <div class="panel"><div class="row" style="justify-content:space-between"><div><div class="eyebrow">Your rank</div><h3 style="font-size:1.6rem;margin:0">${r.e} ${r.name}</h3></div><div class="singer-wrap bop" style="width:80px" id="carSinger"></div></div>
+    <div class="xpbar" style="margin:10px 0 6px"><i style="width:${pct}%"></i></div>
+    <div class="muted">${nx ? `⭐ ${fmt(S.xp)} / ${fmt(nx.xp)} XP to ${nx.e} ${nx.name}` : '🏆 You reached the top! You are a Singing Legend!'}</div>
+    <div class="ranks" style="margin-top:10px">${RANKS.map((k, i) => `<span class="${i <= ri ? 'got' : ''}">${k.e} ${k.name}</span>`).join('')}</div>
+    <p class="muted">Earn ⭐ XP, 💎 gems and 🎤 fame from every song. Rank ups unlock new songs; gems unlock stages; coins buy outfits.</p></div>
+  <div class="panel"><h3>🎤 Gigs & Competitions</h3><div class="grid">${GIGS.map((g, i) => { const st = gigState(i), song = SONGS.find(s => s.id === g.song), stg = STAGES.find(s => s.id === g.stage);
+    return `<div class="gig ${st === 'done' ? 'done' : ''} ${st === 'locked' ? 'locked' : ''}"><div class="num" style="background:${stg.ui}">${g.e}</div>
+    <div><b>${i + 1}. ${g.name}</b><div class="muted">${stg.e} ${stg.name} · 🎵 ${song.title} · Need rank ${g.need} or better</div><div class="muted">Reward: 💎 ${g.gems} · 💰 ${g.coins} · unlocks ${stg.name}</div></div>
+    ${st === 'done' ? `<button class="btn sm mint" data-act="playGig" data-i="${i}">✅ Replay</button>` : st === 'open' ? `<button class="btn sm pink" data-act="playGig" data-i="${i}">▶ Perform</button>` : st === 'fame' ? `<button class="btn sm" disabled>🎤 Need ${g.fame} fame</button>` : `<button class="btn sm" disabled>🔒 Locked</button>`}</div>`; }).join('')}</div></div>
+  <div class="panel"><h3>🎭 Stages</h3><p class="muted">Pick where you perform in Quick Sing and Challenge. Unlock stages with 💎 gems or by winning gigs.</p>
+  <div class="cards" style="grid-template-columns:repeat(auto-fill,minmax(170px,1fr))">${STAGES.map(st => { const own = S.stagesOwned.includes(st.id), can = ri >= st.rank;
+    return `<div class="card ${S.stage === st.id ? 'sel' : ''}"><div class="stage-thumb" style="background:${st.ui}"></div><span class="t">${st.e} ${st.name}</span>
+    ${own ? (S.stage === st.id ? '<button class="btn sm mint" disabled>✅ Selected</button>' : `<button class="btn sm lav" data-act="pickStage" data-id="${st.id}">Use this stage</button>`) : can ? `<button class="btn sm gold" data-act="buyStage" data-id="${st.id}" ${S.gems < st.gems ? 'disabled' : ''}>💎 ${st.gems} · Unlock</button>` : `<button class="btn sm" disabled>🔒 Reach ${RANKS[st.rank].e} ${RANKS[st.rank].name}</button>`}</div>`; }).join('')}</div></div></div>`;
+  renderSingerInto($('#carSinger'));
+};
+
+/* ---- settings ---- */
+RENDER.settings = () => {
+  const s = S.settings;
+  const tg = (k, label, hint) => `<div class="set-row"><div><b>${label}</b>${hint ? `<div class="muted">${hint}</div>` : ''}</div><button class="toggle" role="switch" aria-checked="${!!s[k]}" aria-label="${label}" data-act="toggleSet" data-k="${k}"></button></div>`;
+  const sl = (k, label, min, max, step, show) => `<div class="set-row"><label for="set_${k}"><b>${label}</b> <span class="muted" id="v_${k}">${show(s[k])}</span></label><input type="range" id="set_${k}" min="${min}" max="${max}" step="${step}" value="${s[k]}" data-set="${k}"></div>`;
+  $('#scr-settings').innerHTML = `<div class="wrap">${topbar('⚙️ Settings')}
+  <div class="panel"><h3>🔊 Sound</h3>
+    ${tg('sound', '🔊 Sound ON / OFF')}
+    ${sl('music', '🎵 Music volume', 0, 1, .05, v => Math.round(v * 100) + '%')}
+    ${sl('sfx', '✨ Effects volume', 0, 1, .05, v => Math.round(v * 100) + '%')}
+    ${sl('voice', '🎤 Singing voice volume', 0, 1, .05, v => Math.round(v * 100) + '%')}
+    ${tg('guide', '🎹 Guide melody', 'Quietly plays the tune so you know what comes next.')}
+    <div class="set-row"><b>Test sounds</b><div class="row"><button class="btn sm" data-act="testSfx" data-s="sparkle">✨ Sparkle</button><button class="btn sm" data-act="testSfx" data-s="applause">👏 Applause</button><button class="btn sm" data-act="testSfx" data-s="cheer">🎉 Cheer</button><button class="btn sm" data-act="testSfx" data-s="fanfare">🏆 Fanfare</button></div></div>
+  </div>
+  <div class="panel"><h3>🎮 Gameplay</h3>
+    ${sl('speed', '🌠 Note travel time', 1, 2.4, .1, v => (+v).toFixed(1) + 's ' + (v < 1.4 ? '(fast)' : v > 1.9 ? '(relaxed)' : '(normal)'))}
+    ${sl('offset', '⏱️ Timing offset', -150, 150, 10, v => (v > 0 ? '+' : '') + v + ' ms')}
+    ${tg('mic', '🎙️ Microphone mode (optional)', 'Turning this on asks for microphone permission. Singing out loud adds a voice bonus. Tap controls still work.')}
+    ${tg('reduced', '🌙 Calm mode', 'Fewer flashy effects and animations.')}
+    <p class="muted">Keyboard: D F J K or ← ↓ ↑ → or 1 2 3 4 for lanes · Space for moves · Esc / P to pause.</p>
+  </div>
+  <div class="panel"><h3>💾 Progress</h3><p class="muted">Progress is saved for this browser session.</p><div id="resetBox"><button class="btn" data-act="resetAsk">🔄 Start over</button></div></div></div>`;
+  $$('#scr-settings [data-set]').forEach(inp => inp.addEventListener('input', e => {
+    const k = e.target.dataset.set; s[k] = +e.target.value; applyVolumes(); save();
+    const shows = {music:v => Math.round(v * 100) + '%', sfx:v => Math.round(v * 100) + '%', voice:v => Math.round(v * 100) + '%', speed:v => (+v).toFixed(1) + 's', offset:v => (v > 0 ? '+' : '') + v + ' ms'};
+    $('#v_' + k).textContent = shows[k](s[k]);
+    if (k === 'music') { menuMusic(false); menuMusic(true); }
+  }));
+};
+
+/* ---- my songs ---- */
+RENDER.mysongs = () => {
+  $('#scr-mysongs').innerHTML = `<div class="wrap">${topbar('💿 My Songs')}
+  <div class="row"><button class="btn pink" data-act="newSong">🎧 Make a new song</button><span class="muted">Your original songs live here for this session.</span></div>
+  ${S.mySongs.length ? `<div class="cards" style="grid-template-columns:repeat(auto-fill,minmax(280px,1fr))">${S.mySongs.map(cs => `<div class="card"><div class="song-row"><div class="cover-box">${coverHTML(cs)}</div><div style="min-width:0"><span class="t">🎵 ${esc(cs.title || 'Untitled')}</span><div class="muted">${beatById(cs.beat).e} ${beatById(cs.beat).name} · ${cs.melody.length} notes${S.scores[cs.id] ? ` · 🏆 ${S.scores[cs.id].rank}` : ''}</div></div></div>
+    <div class="row"><button class="btn sm" data-act="msPlay" data-id="${cs.id}">▶️ Play</button><button class="btn sm lav" data-act="msEdit" data-id="${cs.id}">✏️ Edit</button><button class="btn sm pink" data-act="msPerform" data-id="${cs.id}">🎤 Perform</button><span id="del_${cs.id}"><button class="btn sm" data-act="msDelAsk" data-id="${cs.id}">🗑️ Delete</button></span></div></div>`).join('')}</div>`
+  : `<div class="panel empty"><div style="font-size:3rem">🎧</div><h3>No songs yet</h3><p>Open the studio and make your very first Pink Melody!</p><button class="btn pink" data-act="newSong">🎧 MAKE YOUR OWN SONG</button></div>`}</div>`;
+};
+function coverHTML(cs){
+  const cv = cs.cover || {bg:0, st:{}};
+  let st = ''; STICKERS.forEach(k => { if (cv.st && cv.st[k.id]) k.spots.forEach(([x, y, e, r]) => st += `<span class="st" style="left:${x}%;top:${y}%;--r:${r}deg">${e}</span>`); });
+  return `<div class="cover" style="background:${COVER_BGS[cv.bg] || COVER_BGS[0]}">${st}<div class="ct">🎤 ${esc(cs.title || 'My Song')} 🎤</div><div class="cn">${esc(cs.singer || S.name)}</div></div>`;
+}
+</script>
+<script>
+/* ================= GAMEPLAY ================= */
+let _bf=null; const BODYFONT=()=>_bf||(_bf=getComputedStyle(document.body).fontFamily);
+let G = null;
+const WIN = [[.085, 'perfect', '🌟 PERFECT!', 100, 100], [.15, 'great', '💖 GREAT!', 80, 90], [.22, 'nice', '🎀 NICE!', 60, 78], [.30, 'good', '✨ GOOD!', 40, 66]];
+const MILESTONES = [5, 10, 25, 50, 75, 100, 150, 200];
+
+function startGame(o){
+  initAudio(); menuMusic(false); closeOverlay();
+  const custom = o.custom || null;
+  const track = custom ? buildCustomTrack(custom) : buildStdTrack(o.song);
+  if (!track.melody.length) { toast('🎹', 'No notes yet', 'Add some melody notes in the studio first!'); return; }
+  const speed = o.speed || 1;
+  let startStep = 0, endStep = track.bars * 16;
+  if (o.section) { startStep = o.section.bar * 16; endStep = (o.section.bar + o.section.bars) * 16; }
+  const stepDur = 60 / (track.bpm * speed) / 4;
+  const notes = track.melody.filter(n => n.s >= startStep && n.s < endStep).map(n => ({t:n.s * stepDur, lane:n.lane, m:n.m, len:n.l * stepDur, j:null}));
+  const moves = track.moves.filter(m => m.s >= startStep && m.s < endStep).map(m => ({t:m.s * stepDur, move:m.move, fx:m.fx || null, moment:m.moment || null, done:false}));
+  const mix = custom ? (custom.mix || {beat:.8, mel:.8, fx:.8}) : {beat:.85, mel:1, fx:1};
+  const seq = new Seq(track, {startStep, endStep, lead:3.2, speed, guide:true, playMelody:S.settings.guide, playVocal:!!custom, mix:{beat:mix.beat, mel:custom ? mix.mel : 1, fx:mix.fx}, holdOpen:true,
+    onStep:(s) => onGameStep(s)});
+  G = {o, track, custom, notes, moves, seq, speed, stepDur, startT:startStep * stepDur, endT:endStep * stepDur + .6, score:0, combo:0, maxCombo:0,
+    counts:{perfect:0, great:0, nice:0, good:0, miss:0}, wrong:0, qual:0, star:0, superUntil:0, movesHit:0, movesPerfect:0, laneFlash:[0, 0, 0, 0], rings:[], parts:[], lastCount:null,
+    over:false, stageId:o.stage || S.stage, fxMul:mix.fx, voiceBonus:0, excite:0, lastMove:0, practice:o.mode === 'practice'};
+  go('play');
+  $('#hudSong').textContent = (custom ? '🎧 ' : '🎵 ') + track.title + (o.section ? ' · ' + o.section.name : '') + (speed !== 1 ? ` · ${Math.round(speed * 100)}%` : '');
+  const ps = $('#playSinger'); renderSingerInto(ps); ps.style.setProperty('--beat', (60 / (track.bpm * speed) / 2).toFixed(3) + 's');
+  $('#audience').innerHTML = ['👧','🧒','👦','👩','🧑','👧🏽','🧒🏾','👦🏻','👩🏼','🧑🏿','👧🏻','🧒🏽'].map((e, i) => `<span style="--i:${i}">${e}</span>`).join('');
+  $('#lyricLine').hidden = true;
+  if (custom && custom.lyrics && custom.lyrics.trim()) { G.lyrics = clean(custom.lyrics).split(/\n+/).map(s => s.trim()).filter(Boolean); }
+  $('#meter').classList.remove('super'); $('#micRow').hidden = !A.micStream;
+  if (A.micStream) setupMicAnalyser();
+  G.stageStatic = null; resizeCanvases();
+  $('#hudProg').style.width = '0'; $('#judge').textContent = ''; $('#cueBox').innerHTML = ''; $('#bannerBox').innerHTML = ''; updateHud();
+  seq.start(); G.raf = requestAnimationFrame(gameFrame);
+}
+function onGameStep(s){
+  if (!G) return; const bar = s >> 4;
+  if (s % 4 === 0 && G.combo >= 10 && Math.random() < .35) audienceReact();
+  if (G.lyrics && s % 16 === 0) { const sec = G.track.sectionObj(bar); const el = $('#lyricLine'); if (sec && sec.type !== 'intro' && sec.type !== 'outro') { if ((bar - 2) % 2 === 0) { el.hidden = false; el.textContent = '🎤 ' + G.lyrics[((bar - 2) / 2) % G.lyrics.length]; } } else el.hidden = true; }
+  if (G.custom && s % 16 === 0) { const m = G.track.moments.find(x => x.bar === bar); if (m) stageFx(MOMENTS.find(x => x.id === m.id).fx, true); }
+}
+function endGameCleanup(){ if (!G) return; G.over = true; cancelAnimationFrame(G.raf); G.seq.stop(); stopMicAnalyser(); G = null; closeOverlay(); }
+
+function curPos(){ return G.seq.pos() - S.settings.offset / 1000; }
+function press(lane){
+  if (!G || G.over || G.seq.paused) return;
+  const pos = curPos(); G.laneFlash[lane] = 1;
+  let best = null, bd = 9;
+  for (const n of G.notes) { if (n.j || n.lane !== lane) continue; const d = Math.abs(n.t - pos); if (d < bd) { bd = d; best = n; } if (n.t - pos > .4) break; }
+  if (best && bd <= WIN[3][0]) {
+    const w = WIN.find(x => bd <= x[0]); best.j = w[1];
+    G.counts[w[1]]++; G.qual += w[4]; G.combo++; G.maxCombo = Math.max(G.maxCombo, G.combo);
+    const mult = (1 + Math.min(G.combo, 50) / 50) * (G.superUntil > pos ? 2 : 1);
+    let pts = w[3] * mult;
+    if (G.micLevel > .08) { pts += 20; G.voiceBonus++; }
+    G.score += pts; G.star = clamp(G.star + (w[1] === 'perfect' ? 4 : 3), 0, 100);
+    if (G.star >= 100 && G.superUntil <= pos) { G.superUntil = pos + 8; G.star = 0; banner('🌠 SUPERSTAR MODE! x2'); SFX.cheer(.3); $('#meter').classList.add('super'); if (!G.practice) unlock('super_mode'); }
+    showJudge(w[2]); G.rings.push({lane, life:1, col:LANE_COL[lane]});
+    if (A.ctx) INST.vocal(A.ctx.currentTime, best.m, Math.max(.18, Math.min(best.len, 1.2)), .2, A.voice, 'ah');
+    if (w[1] === 'perfect' && !G.practice) unlock('first_perfect');
+    stageSpawn(w[1] === 'perfect' ? 3 : 2);
+    if (MILESTONES.includes(G.combo)) comboMilestone(G.combo);
+  } else {
+    const other = G.notes.find(n => !n.j && Math.abs(n.t - pos) < .12);
+    if (other) { G.wrong++; showJudge('🎵 Try another note!', true); }
+    if (A.ctx) INST.vocal(A.ctx.currentTime, (G.track.key || 60) + 12 + PENTA[lane * 2], .18, .08, A.voice, 'ah');
+  }
+  updateHud();
+}
+function pressMove(){
+  if (!G || G.over || G.seq.paused) return;
+  const pos = curPos();
+  const mv = G.moves.find(m => !m.done && Math.abs(m.t - pos) <= .6);
+  if (mv) {
+    mv.done = true; const perfect = Math.abs(mv.t - pos) <= .28; G.movesHit++; if (perfect) G.movesPerfect++;
+    const pts = perfect ? 600 : 300; G.score += pts;
+    doMove($('#playSinger'), mv.move); banner(`${MOVES[mv.move].e} ${perfect ? 'PERFECT ' : ''}${MOVES[mv.move].n}! +${pts}`);
+    stageFx(mv.fx || ({spin:'confetti', pose:'sparkle', mic:'notes', jump:'stars', wave:'rainbow', heart:'hearts'})[mv.move]); SFX.sparkle(); audienceReact(4);
+    $('#cueBox').innerHTML = '';
+  } else if (pos - G.lastMove > 1) { G.lastMove = pos; const all = Object.keys(MOVES); doMove($('#playSinger'), all[Math.floor(Math.random() * all.length)]); }
+  updateHud();
+}
+function comboMilestone(c){
+  banner(`🔥 ${c} COMBO!`); SFX.cheer(.25);
+  if (!G.practice) { if (c >= 25) unlock('combo25'); if (c >= 50) unlock('rainbow_performer'); }
+  stageFx(c >= 50 ? 'rainbow' : c >= 25 ? 'stars' : c >= 10 ? 'hearts' : 'sparkle', true); audienceReact(6);
+}
+function banner(txt){ const b = $('#bannerBox'); b.innerHTML = `<div class="combo-banner">${esc(txt)}</div>`; }
+function showJudge(t, soft){ const j = $('#judge'); j.textContent = t; j.style.fontSize = soft ? '1.1rem' : ''; j.classList.remove('pop'); void j.offsetWidth; j.classList.add('pop'); }
+function audienceReact(n = 1){
+  const sv = $('#stageView'); if (!sv || S.settings.reduced) return; const em = ['👏','💖','⭐️','🎉','🙌','💕','✨'];
+  for (let i = 0; i < n; i++) { const r = document.createElement('span'); r.className = 'react'; r.textContent = em[Math.floor(Math.random() * em.length)]; r.style.left = (5 + Math.random() * 90) + '%'; r.style.bottom = (8 + Math.random() * 6) + '%'; r.style.animationDelay = (i * .08) + 's'; sv.appendChild(r); setTimeout(() => r.remove(), 1700); }
+}
+function updateHud(){
+  if (!G) return;
+  $('#hudScore').textContent = fmt(G.score); $('#hudCombo').textContent = G.combo;
+  const hits = G.notes.filter(n => n.j && n.j !== 'miss').length, judged = G.notes.filter(n => n.j).length;
+  const pitch = judged ? Math.round(100 * hits / (judged + G.wrong * .5)) : 100, timing = hits ? Math.round(G.qual / hits) : 100;
+  $('#mPitch').textContent = pitch + '%'; $('#bPitch').style.width = pitch + '%';
+  $('#mTiming').textContent = timing + '%'; $('#bTiming').style.width = timing + '%';
+  $('#mStar').textContent = Math.round(G.star) + '%'; $('#bStar').style.width = G.star + '%';
+  $('#audience').classList.toggle('hype', G.combo >= 10);
+}
+
+function gameFrame(){
+  if (!G || G.over) return;
+  const pos = curPos();
+  // countdown
+  const cd = G.startT - pos; const cdEl = $('#countdown');
+  if (cd > 0) { const n = Math.ceil(cd); const txt = n > 3 ? '' : String(n); if (cdEl.textContent !== txt) { cdEl.textContent = txt; if (txt) SFX.beep(false); } }
+  else if (cdEl.textContent) { cdEl.textContent = cd > -.6 ? 'SING!' : ''; if (cd <= -.6) cdEl.textContent = ''; }
+  if (!G.seq.paused) {
+    for (const n of G.notes) { if (!n.j && pos - n.t > WIN[3][0]) { n.j = 'miss'; G.counts.miss++; if (G.combo >= 5) SFX.miss(); G.combo = 0; G.star = clamp(G.star - 4, 0, 100); showJudge('💫 Miss', true); updateHud(); } }
+    for (const m of G.moves) {
+      if (m.done) continue;
+      const d = m.t - pos;
+      if (d < 2.2 && d > -.45) { const el = $('#cueBox'); const txt = `${MOVES[m.move].e} Get ready: ${MOVES[m.move].n}! ${d > 0 ? '' : '👉 NOW!'}`; if (!el.firstChild || el.firstChild.textContent !== txt) el.innerHTML = `<div class="cue">${txt}</div>`; }
+      if (d < -.45) { m.done = true; $('#cueBox').innerHTML = ''; }
+    }
+    const nextMove = G.moves.find(m => !m.done && m.t - pos < 2.2);
+    const mb = $('#moveBtn'); mb.classList.toggle('ready', !!nextMove && Math.abs(nextMove.t - pos) < .45);
+    $('#moveRing').style.width = nextMove ? clamp(100 - (nextMove.t - pos) / 2.2 * 100, 0, 100) + '%' : '0';
+    if (G.superUntil && pos > G.superUntil) { G.superUntil = 0; $('#meter').classList.remove('super'); }
+    if (G.analyser) readMic();
+    $('#hudProg').style.width = clamp((pos - G.startT) / (G.endT - G.startT) * 100, 0, 100) + '%';
+    if (pos > G.endT) { finishGame(); return; }
+  }
+  G.excite = G.combo >= 50 ? 4 : G.combo >= 25 ? 3 : G.combo >= 10 ? 2 : G.combo >= 5 ? 1 : 0;
+  if (G.superUntil) G.excite = 4;
+  drawLanes(pos); drawStage(pos);
+  G.raf = requestAnimationFrame(gameFrame);
+}
+
+/* ---------- canvases ---------- */
+function sizeCanvas(cv){ const r = cv.getBoundingClientRect(); const dpr = Math.min(2, devicePixelRatio || 1); cv.width = Math.max(1, r.width * dpr); cv.height = Math.max(1, r.height * dpr); const c = cv.getContext('2d'); c.setTransform(dpr, 0, 0, dpr, 0, 0); return {c, w:r.width, h:r.height}; }
+function resizeCanvases(){ if (!G) return; G.lc = sizeCanvas($('#laneCanvas')); G.sc = sizeCanvas($('#stageCanvas')); G.stageStatic = null; }
+addEventListener('resize', () => { resizeCanvases(); if (CUR === 'studio' && $('#miniCanvas')) ST.mini = sizeCanvas($('#miniCanvas')); });
+
+function drawLanes(pos){
+  const {c, w, h} = G.lc; c.clearRect(0, 0, w, h);
+  const lw = w / 4, ty = h - 56, travel = S.settings.speed, top = 10;
+  const g = c.createLinearGradient(0, 0, 0, h); g.addColorStop(0, 'rgba(60,20,90,.2)'); g.addColorStop(1, 'rgba(120,40,140,.5)'); c.fillStyle = g; c.fillRect(0, 0, w, h);
+  for (let l = 0; l < 4; l++) {
+    const x = l * lw;
+    const lg = c.createLinearGradient(0, 0, 0, h); lg.addColorStop(0, 'rgba(255,255,255,0)'); lg.addColorStop(1, LANE_COL[l] + (G.laneFlash[l] > .05 ? '88' : '22'));
+    c.fillStyle = lg; c.fillRect(x + 2, 0, lw - 4, h);
+    G.laneFlash[l] *= .85;
+    c.strokeStyle = 'rgba(255,255,255,.12)'; c.beginPath(); c.moveTo(x, 0); c.lineTo(x, h); c.stroke();
+  }
+  // beat lines
+  const bd = G.stepDur * 4; const firstB = Math.ceil(pos / bd) * bd;
+  for (let t = firstB; t < pos + travel; t += bd) { const y = ty - (t - pos) / travel * (ty - top); const isBar = Math.round(t / bd) % 4 === 0; c.strokeStyle = isBar ? 'rgba(255,255,255,.22)' : 'rgba(255,255,255,.07)'; c.lineWidth = isBar ? 2 : 1; c.beginPath(); c.moveTo(0, y); c.lineTo(w, y); c.stroke(); }
+  // move cues
+  for (const m of G.moves) { if (m.done) continue; const d = m.t - pos; if (d > travel || d < -.5) continue; const y = ty - d / travel * (ty - top);
+    const rg = c.createLinearGradient(0, 0, w, 0); ['#ff7eb6','#ffae6b','#ffe36b','#8ef0b5','#7cc8ff','#b99bff'].forEach((col, i) => rg.addColorStop(i / 5, col));
+    c.fillStyle = rg; c.globalAlpha = .85; c.fillRect(0, y - 5, w, 10); c.globalAlpha = 1; c.font = '24px serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(MOVES[m.move].e, w / 2, y - 16); }
+  // targets
+  const R = Math.min(lw * .32, 26);
+  for (let l = 0; l < 4; l++) { const cx = l * lw + lw / 2; c.beginPath(); c.arc(cx, ty, R + 4, 0, 7); c.strokeStyle = LANE_LIGHT[l]; c.lineWidth = 4; c.stroke(); c.beginPath(); c.arc(cx, ty, R - 3, 0, 7); c.fillStyle = 'rgba(255,255,255,' + (.1 + G.laneFlash[l] * .5) + ')'; c.fill(); }
+  // notes
+  c.textAlign = 'center'; c.textBaseline = 'middle';
+  for (const n of G.notes) {
+    const d = n.t - pos; if (d > travel) break; if (n.j && n.j !== 'miss') continue; if (d < -.35) continue;
+    const cx = n.lane * lw + lw / 2, y = ty - d / travel * (ty - top);
+    if (n.len > G.stepDur * 2.5) { const tl = Math.min(n.len / travel * (ty - top), y); c.fillStyle = LANE_COL[n.lane] + '55'; c.beginPath(); c.roundRect ? c.roundRect(cx - R * .35, y - tl, R * .7, tl, R * .35) : c.rect(cx - R * .35, y - tl, R * .7, tl); c.fill(); }
+    c.globalAlpha = n.j === 'miss' ? .35 : 1;
+    const ng = c.createRadialGradient(cx - R * .3, y - R * .3, 2, cx, y, R); ng.addColorStop(0, '#fff'); ng.addColorStop(.35, LANE_LIGHT[n.lane]); ng.addColorStop(1, LANE_COL[n.lane]);
+    c.shadowColor = LANE_COL[n.lane]; c.shadowBlur = 14; c.fillStyle = ng; c.beginPath(); c.arc(cx, y, R, 0, 7); c.fill(); c.shadowBlur = 0;
+    c.fillStyle = '#fff'; c.font = `bold ${Math.round(R * .95)}px ${BODYFONT()}`; c.fillText('♪', cx, y + 1);
+    c.globalAlpha = 1;
+  }
+  // rings
+  G.rings = G.rings.filter(r => (r.life -= .05) > 0);
+  for (const r of G.rings) { const cx = r.lane * lw + lw / 2; c.beginPath(); c.arc(cx, ty, R + (1 - r.life) * 30, 0, 7); c.strokeStyle = r.col; c.globalAlpha = r.life; c.lineWidth = 5; c.stroke(); c.globalAlpha = 1; }
+  // lane labels
+  c.font = '700 11px ' + BODYFONT(); c.fillStyle = 'rgba(255,255,255,.7)';
+  ['LOW','MID','HIGH','TOP'].forEach((t, l) => c.fillText(t, l * lw + lw / 2, h - 16));
+}
+
+/* ---- stage ---- */
+function stageStatic(w, h, id){
+  const cv = document.createElement('canvas'); const dpr = Math.min(2, devicePixelRatio || 1); cv.width = w * dpr; cv.height = h * dpr; const c = cv.getContext('2d'); c.scale(dpr, dpr);
+  const st = STAGES.find(s => s.id === id) || STAGES[0]; const r = rng(hashStr(id));
+  const g = c.createLinearGradient(0, 0, 0, h); g.addColorStop(0, st.bg[0]); g.addColorStop(1, st.bg[1]); c.fillStyle = g; c.fillRect(0, 0, w, h);
+  const cloud = (x, y, s, a = .9) => { c.fillStyle = `rgba(255,255,255,${a})`; [[0,0,1],[.8,-.3,.8],[1.5,0,.9],[.7,.3,.9]].forEach(([dx, dy, rr]) => { c.beginPath(); c.arc(x + dx * s, y + dy * s, s * rr * .7, 0, 7); c.fill(); }); };
+  const heart = (x, y, s, col) => { c.fillStyle = col; c.beginPath(); c.moveTo(x, y + s * .3); c.bezierCurveTo(x - s, y - s * .5, x - s * .5, y - s * 1.1, x, y - s * .4); c.bezierCurveTo(x + s * .5, y - s * 1.1, x + s, y - s * .5, x, y + s * .3); c.fill(); };
+  if (id === 'bedroom') {
+    for (let x = 0; x < w; x += 40) { c.fillStyle = 'rgba(255,255,255,.18)'; c.fillRect(x, 0, 20, h * .75); }
+    c.fillStyle = '#fff'; c.fillRect(w * .08, h * .12, w * .18, h * .26); c.fillStyle = '#6b5fc7'; c.fillRect(w * .09, h * .13, w * .16, h * .24); c.fillStyle = '#fff6c9'; c.beginPath(); c.arc(w * .2, h * .2, h * .04, 0, 7); c.fill();
+    heart(w * .82, h * .22, h * .07, '#ff7ab8'); heart(w * .7, h * .14, h * .04, '#fff'); heart(w * .9, h * .38, h * .035, '#c9b6ff');
+    c.fillStyle = '#ff9fcf'; c.fillRect(0, h * .75, w, h * .25);
+  } else if (id === 'rainbow') {
+    ['#ff7eb6','#ffae6b','#ffe36b','#8ef0b5','#7cc8ff','#b99bff'].forEach((col, i) => { c.strokeStyle = col; c.lineWidth = h * .045; c.beginPath(); c.arc(w / 2, h * .82, h * (.72 - i * .045), Math.PI, 0); c.stroke(); });
+    cloud(w * .1, h * .7, h * .09); cloud(w * .78, h * .72, h * .1); cloud(w * .3, h * .2, h * .05, .7);
+  } else if (id === 'starry' || id === 'galaxy' || id === 'grand') {
+    if (id === 'galaxy') { [['#ff4fa3', .25, .3], ['#7c5cff', .7, .25], ['#3fb6ff', .5, .6]].forEach(([col, x, y]) => { const rg = c.createRadialGradient(w * x, h * y, 0, w * x, h * y, h * .5); rg.addColorStop(0, col + '88'); rg.addColorStop(1, col + '00'); c.fillStyle = rg; c.fillRect(0, 0, w, h); });
+      c.fillStyle = '#ffb36b'; c.beginPath(); c.arc(w * .82, h * .22, h * .07, 0, 7); c.fill(); c.strokeStyle = '#ffe36b'; c.lineWidth = 3; c.beginPath(); c.ellipse(w * .82, h * .22, h * .12, h * .03, -.3, 0, 7); c.stroke();
+      c.fillStyle = '#8ef0b5'; c.beginPath(); c.arc(w * .14, h * .35, h * .035, 0, 7); c.fill(); }
+    if (id === 'starry') { c.fillStyle = '#fff6c9'; c.beginPath(); c.arc(w * .8, h * .2, h * .08, 0, 7); c.fill(); c.fillStyle = st.bg[0]; c.beginPath(); c.arc(w * .83, h * .18, h * .07, 0, 7); c.fill(); }
+    if (id === 'grand') { c.fillStyle = 'rgba(255,255,255,.08)'; c.fillRect(w * .25, h * .08, w * .5, h * .3); c.strokeStyle = '#ff8fc8'; c.lineWidth = 3; c.strokeRect(w * .25, h * .08, w * .5, h * .3);
+      c.font = `${h * .1}px serif`; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('🎤', w / 2, h * .23);
+      for (let x = 0; x < w; x += 18) { c.fillStyle = 'rgba(20,0,30,.6)'; c.beginPath(); c.arc(x + r() * 8, h * .8 + r() * 10, 10, 0, 7); c.fill(); } }
+    for (let i = 0; i < 70; i++) { c.fillStyle = `rgba(255,255,255,${.3 + r() * .7})`; c.beginPath(); c.arc(r() * w, r() * h * .7, r() * 1.8 + .3, 0, 7); c.fill(); }
+  } else if (id === 'cloud') {
+    const sg = c.createRadialGradient(w * .8, h * .15, 0, w * .8, h * .15, h * .4); sg.addColorStop(0, '#fff6c9'); sg.addColorStop(1, 'rgba(255,246,201,0)'); c.fillStyle = sg; c.fillRect(0, 0, w, h);
+    for (let i = 0; i < 6; i++) cloud(r() * w, h * (.6 + r() * .3), h * (.08 + r() * .06));
+  }
+  // stage floor
+  const fy = h * .86; const fg = c.createRadialGradient(w / 2, fy, 0, w / 2, fy, w * .45); fg.addColorStop(0, 'rgba(255,255,255,.95)'); fg.addColorStop(.5, 'rgba(255,190,230,.55)'); fg.addColorStop(1, 'rgba(255,190,230,0)');
+  c.fillStyle = fg; c.beginPath(); c.ellipse(w / 2, fy, w * .45, h * .1, 0, 0, 7); c.fill();
+  return cv;
+}
+function drawStage(pos){
+  const {c, w, h} = G.sc; if (!G.stageStatic) G.stageStatic = stageStatic(w, h, G.stageId);
+  c.clearRect(0, 0, w, h); c.drawImage(G.stageStatic, 0, 0, w, h);
+  const t = performance.now() / 1000, ex = S.settings.reduced ? 0 : G.excite, id = G.stageId;
+  // ambient animation
+  if (id === 'bedroom') { for (let i = 0; i < 14; i++) { const x = w * (.05 + i * .065), y = h * .06 + Math.sin(i * .9) * 8; c.fillStyle = ['#fff6a8','#ffb3da','#bfe6ff'][i % 3]; c.globalAlpha = .5 + .5 * Math.sin(t * 3 + i); c.beginPath(); c.arc(x, y, 5, 0, 7); c.fill(); } c.globalAlpha = 1; }
+  if (id === 'starry' || id === 'galaxy') { for (let i = 0; i < 12; i++) { const x = (i * 97) % w, y = (i * 53) % (h * .6); const a = .5 + .5 * Math.sin(t * 2 + i); c.fillStyle = `rgba(255,246,200,${a})`; c.font = '12px serif'; c.fillText('✦', x, y); }
+    if (id === 'galaxy') { const sx = ((t * 140) % (w + 300)) - 150; c.strokeStyle = 'rgba(255,255,255,.7)'; c.lineWidth = 2; c.beginPath(); c.moveTo(sx, h * .1 + sx * .1); c.lineTo(sx - 60, h * .1 + (sx - 60) * .1); c.stroke(); } }
+  if (id === 'cloud' || id === 'rainbow') { for (let i = 0; i < 3; i++) { const x = ((t * (12 + i * 6) + i * 300) % (w + 200)) - 100, y = h * (.12 + i * .1); c.fillStyle = 'rgba(255,255,255,.75)'; [[0,0,1],[18,-6,.8],[34,0,.9]].forEach(([dx, dy, rr]) => { c.beginPath(); c.arc(x + dx, y + dy, 16 * rr, 0, 7); c.fill(); }); } }
+  // spotlight beams (more with excitement)
+  const beams = 2 + ex + (id === 'grand' ? 2 : 0);
+  c.globalCompositeOperation = 'lighter';
+  for (let i = 0; i < beams; i++) {
+    const ox = w * (i + .5) / beams, ang = Math.sin(t * (.6 + ex * .25) + i * 1.7) * .45; const len = h * 1.1;
+    const col = ['255,120,200','180,150,255','120,200,255','255,220,120','140,240,190','255,160,120'][i % 6];
+    c.save(); c.translate(ox, -10); c.rotate(ang); const bg = c.createLinearGradient(0, 0, 0, len); bg.addColorStop(0, `rgba(${col},.45)`); bg.addColorStop(1, `rgba(${col},0)`);
+    c.fillStyle = bg; c.beginPath(); c.moveTo(-6, 0); c.lineTo(6, 0); c.lineTo(w * .09, len); c.lineTo(-w * .09, len); c.closePath(); c.fill(); c.restore();
+  }
+  // rainbow wash at high combo
+  if (ex >= 3) { c.globalAlpha = .12 + .06 * Math.sin(t * 4); const rg = c.createLinearGradient(0, 0, w, 0); ['#ff7eb6','#ffe36b','#8ef0b5','#7cc8ff','#b99bff'].forEach((col, i) => rg.addColorStop(i / 4, col)); c.fillStyle = rg; c.fillRect(0, 0, w, h); c.globalAlpha = 1; }
+  c.globalCompositeOperation = 'source-over';
+  // ambient sparkles from excitement
+  if (ex > 0 && Math.random() < ex * .08) stageSpawn(1);
+  // particles
+  G.parts = G.parts.filter(p => (p.life -= 1) > 0);
+  c.textAlign = 'center'; c.textBaseline = 'middle';
+  for (const p of G.parts) { p.x += p.vx; p.y += p.vy; p.vy += p.g; c.globalAlpha = Math.min(1, p.life / 25); c.font = p.s + 'px serif'; c.fillText(p.e, p.x, p.y); }
+  c.globalAlpha = 1;
+}
+function stageEmojis(){
+  const base = ['✨'], fx = (FX.find(f => f.id === S.singer.fx) || FX[0]).p; const ex = G ? G.excite : 0;
+  return base.concat(fx, ex >= 2 ? ['💖','💕'] : [], ex >= 3 ? ['🌈'] : [], ex >= 4 ? ['⭐️','🌟'] : []);
+}
+function stageSpawn(n){
+  if (!G || !G.sc || S.settings.reduced) return; const {w, h} = G.sc; const em = stageEmojis();
+  for (let i = 0; i < n; i++) G.parts.push({x:w / 2 + (Math.random() - .5) * w * .4, y:h * .55 + (Math.random() - .5) * h * .3, vx:(Math.random() - .5) * 2.2, vy:-1 - Math.random() * 2.4, g:.02, s:16 + Math.random() * 14, life:60 + Math.random() * 40, e:em[Math.floor(Math.random() * em.length)]});
+}
+function stageFx(kind, big){
+  if (!G || !G.sc || S.settings.reduced) return; const {w, h} = G.sc; const n = Math.round((big ? 30 : 18) * (G.fxMul ?? 1)) + 4;
+  const E = {sparkle:['✨','💫'], hearts:['💖','💕','💗'], stars:['⭐️','🌟','✦'], rainbow:['🌈','✨','💖','⭐️'], confetti:['🎉','🎊','✨'], notes:['🎵','🎶','🎤']}[kind] || ['✨'];
+  for (let i = 0; i < n; i++) { const a = Math.random() * Math.PI * 2, s = 2 + Math.random() * 4; G.parts.push({x:w / 2, y:h * .5, vx:Math.cos(a) * s, vy:Math.sin(a) * s - 1.5, g:.05, s:18 + Math.random() * 16, life:70 + Math.random() * 30, e:E[i % E.length]}); }
+  if (kind === 'confetti' || kind === 'rainbow') confetti(40);
+}
+
+/* ---------- mic (optional) ---------- */
+async function requestMic(){
+  try {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) throw new Error('unsupported');
+    A.micStream = await navigator.mediaDevices.getUserMedia({audio:true});
+    toast('🎙️', 'Microphone mode on', 'Sing along out loud for a voice bonus!'); return true;
+  } catch(e) {
+    S.settings.mic = false; save(); toast('🎙️', 'Microphone not available', 'No worries! Tap controls work great. Microphone access may be blocked here.'); return false;
+  }
+}
+function setupMicAnalyser(){ try { initAudio(); const src = A.ctx.createMediaStreamSource(A.micStream); const an = A.ctx.createAnalyser(); an.fftSize = 1024; src.connect(an); G.analyser = an; G.micBuf = new Float32Array(an.fftSize); G.micSrc = src; } catch(e) { G.analyser = null; } }
+function readMic(){ G.analyser.getFloatTimeDomainData(G.micBuf); let s = 0; for (const v of G.micBuf) s += v * v; const rms = Math.sqrt(s / G.micBuf.length); G.micLevel = rms * 5; $('#mMic').textContent = G.micLevel > .08 ? '🎶 Singing!' : '…'; }
+function stopMicAnalyser(){ if (G && G.micSrc) try { G.micSrc.disconnect(); } catch(e){} }
+
+/* ---------- pause ---------- */
+function pauseGame(){
+  if (!G || G.over || G.seq.paused) return; G.seq.pause();
+  overlay(`<h3 style="font-size:1.6rem">⏸️ Paused</h3><p class="muted">Take a breath, superstar!</p><button class="btn pink" data-act="resume">▶ Resume</button><button class="btn" data-act="restart">🔄 Restart song</button><button class="btn" data-act="quitGame">🏠 Quit to menu</button>`);
+}
+function resumeGame(){ closeOverlay(); if (G && G.seq.paused) G.seq.resume(); }
+
+/* ---------- results ---------- */
+let LAST = null;
+function finishGame(){
+  const g = G; g.over = true; cancelAnimationFrame(g.raf); g.seq.stop(); stopMicAnalyser();
+  const total = g.notes.length || 1, hits = total - g.counts.miss;
+  const pitch = Math.round(100 * hits / (total + g.wrong * .25));
+  const timing = hits ? Math.round(g.qual / hits) : 0;
+  const mv = g.moves.length, moveRate = mv ? g.movesHit / mv : hits / total;
+  const perf = Math.round(Math.min(100, 45 * hits / total + 30 * moveRate + 25 * Math.min(1, g.maxCombo / total * 1.4) + (g.voiceBonus ? 5 : 0)));
+  const overall = pitch * .4 + timing * .3 + perf * .3;
+  const rank = overall >= 85 ? 'S' : overall >= 72 ? 'A' : overall >= 55 ? 'B' : 'C';
+  const score = Math.round(g.score);
+  const o = g.o, mode = o.mode, id = g.custom ? g.custom.id : o.song.id, diff = g.custom ? 3 : o.song.diff;
+  const rw = {coins:0, xp:0, gems:0, fame:0}; let newBest = false, notes = [];
+  const rankUpFrom = rankIdx();
+  if (mode !== 'practice') {
+    const f = mode === 'free' ? .25 : 1;
+    rw.coins = Math.round((score / 40 + {S:100, A:60, B:30, C:10}[rank]) * f);
+    rw.xp = Math.round(score / 20 * f);
+    rw.gems = mode === 'free' ? 0 : {S:3, A:2, B:1, C:0}[rank];
+    rw.fame = Math.round({S:30, A:20, B:12, C:5}[rank] * diff * f);
+    if (mode !== 'free') { const prev = S.scores[id]; if (!prev || score > prev.best) { newBest = !!prev || true; S.scores[id] = {best:score, rank:(!prev || RANK_ORDER[rank] > RANK_ORDER[prev.rank]) ? rank : prev.rank}; } else if (RANK_ORDER[rank] > RANK_ORDER[prev.rank]) prev.rank = rank; }
+    if (mode === 'challenge') { if (RANK_ORDER[rank] >= 2) { S.challenge++; notes.push('💖 Challenge level cleared! Next level unlocked.'); } else notes.push('💖 Get a B or better to climb the ladder. You can do it!'); }
+    if (mode === 'career') { const gig = GIGS[o.gig]; if (RANK_ORDER[rank] >= RANK_ORDER[gig.need]) { const first = !S.career.cleared.includes(gig.id); if (first) { S.career.cleared.push(gig.id); rw.gems += gig.gems; rw.coins += gig.coins; rw.fame += 40; if (!S.stagesOwned.includes(gig.stage)) { S.stagesOwned.push(gig.stage); notes.push(`🎭 New stage unlocked: ${STAGES.find(s => s.id === gig.stage).name}!`); } } notes.push(`🏆 You won the ${gig.name}!`); } else notes.push(`🌟 You need rank ${gig.need} to win the ${gig.name}. Try again!`); }
+    S.coins += rw.coins; S.xp += rw.xp; S.gems += rw.gems; S.fame += rw.fame; S.stats.songs++;
+  }
+  LAST = {g, total, hits, pitch, timing, perf, rank, score, rw, newBest: newBest && mode !== 'free' && mode !== 'practice', notes, title:g.track.title, mode, custom:g.custom, o};
+  save(); G = null; go('results');
+  // achievements
+  if (mode !== 'practice') {
+    unlock('first_song'); if (rank === 'S') unlock('first_s'); if (g.counts.miss === 0) unlock('perfect_perf');
+    if (S.stats.songs >= 10) unlock('ten_songs');
+    if ((RANK_ORDER[rank] >= 3) && (OUTFITS.find(x => x.id === S.singer.outfit) || {}).pink) unlock('pink_superstar');
+    if (g.custom) { unlock('superstar_composer'); if (rank === 'S') unlock('biggest_hit'); }
+    const ri = rankIdx(); if (ri > rankUpFrom) setTimeout(() => { toast(RANKS[ri].e, 'Rank up! You are now a ' + RANKS[ri].name, 'New songs and stages may be unlocked!'); SFX.fanfare(); confetti(120); }, 1800);
+    if (ri >= 5) unlock('legend');
+  }
+}
+RENDER.results = () => {
+  const L = LAST; if (!L) { go('home'); return; }
+  const pr = L.mode === 'practice';
+  $('#scr-results').innerHTML = `<div class="wrap results">
+    <div class="panel" style="display:flex;flex-direction:column;gap:14px">
+      <div class="big">🎤 ${pr ? 'PRACTICE COMPLETE!' : 'PERFORMANCE COMPLETE!'} 🎤</div>
+      <div class="muted" style="font-size:1.1rem">🎵 Song: <b>${esc(L.title)}</b>${L.o.section ? ' · ' + L.o.section.name : ''}</div>
+      <div class="singer-wrap bop" style="width:110px;margin:0 auto" id="resSinger"></div>
+      <div class="stat-grid">
+        <div><b data-count="${L.pitch}">0</b><small>⭐ Pitch</small></div>
+        <div><b data-count="${L.timing}">0</b><small>💖 Timing</small></div>
+        <div><b data-count="${L.g.maxCombo}">0</b><small>🔥 Combo</small></div>
+        <div><b data-count="${L.perf}">0</b><small>🌟 Performance</small></div>
+      </div>
+      <div class="muted">🌟 ${L.g.counts.perfect} Perfect · 💖 ${L.g.counts.great} Great · 🎀 ${L.g.counts.nice} Nice · ✨ ${L.g.counts.good} Good · 💫 ${L.g.counts.miss} Missed · 💃 ${L.g.movesHit}/${L.g.moves.length} moves</div>
+      <div><div class="eyebrow">Total score</div><div class="total" data-count="${L.score}">0</div>${L.newBest ? '<span class="chip" style="background:#fff0b8">🎉 New best score!</span>' : ''}</div>
+      <div class="bigrank rk-${L.rank}" aria-label="Rank ${L.rank}">${L.rank}</div>
+      <div class="muted" style="font-weight:800">${{S:'🏆 SUPERSTAR PERFORMANCE!', A:'🥇 Amazing show!', B:'🥈 Great singing!', C:'🥉 Nice start! Keep practising!'}[L.rank]}</div>
+      ${pr ? '<p class="muted">Practice mode: no score saved. Try the full song when you feel ready!</p>' : `<div class="row" style="justify-content:center"><span class="chip">💰 +${fmt(L.rw.coins)}</span><span class="chip">⭐ +${fmt(L.rw.xp)} XP</span><span class="chip">💎 +${L.rw.gems}</span><span class="chip">🎤 +${L.rw.fame} fame</span></div>`}
+      ${L.notes.map(n => `<div class="chip" style="justify-content:center">${esc(n)}</div>`).join('')}
+      <div class="row" style="justify-content:center">
+        <button class="btn pink" data-act="again">🔄 Sing again</button>
+        ${L.custom ? '<button class="btn lav" data-act="go" data-to="studio">🎧 Back to studio</button>' : L.mode === 'career' ? '<button class="btn lav" data-act="go" data-to="career">🌟 Career</button>' : '<button class="btn lav" data-act="go" data-to="songs">🎵 Songs</button>'}
+        <button class="btn" data-act="go" data-to="home">🏠 Home</button>
+      </div>
+    </div></div>`;
+  renderSingerInto($('#resSinger'));
+  $$('#scr-results [data-count]').forEach(el => { const to = +el.dataset.count, t0 = performance.now(); const step = () => { const k = Math.min(1, (performance.now() - t0) / 1100); el.textContent = fmt(to * (1 - Math.pow(1 - k, 3))); if (k < 1) requestAnimationFrame(step); }; requestAnimationFrame(step); });
+  if (!pr) { SFX.applause(2.2, .5); if (RANK_ORDER[L.rank] >= 3) { setTimeout(() => { confetti(160); SFX.cheer(.35); }, 900); } }
+};
+</script>
+<script>
+/* ================= SONG STUDIO ================= */
+const ST = {seq:null, what:null, tool:'add', sel:null, moment:'dance', mini:null, parts:[], raf:0, drag:null, prevBeat:null, prevChorus:null};
+function newDraft(){
+  return {id:'cs' + Date.now().toString(36), title:'', singer:S.name, beat:'bubble',
+    melody:[{s:0,p:2,l:2},{s:2,p:3,l:2},{s:4,p:4,l:2},{s:6,p:3,l:2},{s:8,p:2,l:4},{s:16,p:4,l:2},{s:18,p:5,l:2},{s:20,p:4,l:2},{s:22,p:3,l:2},{s:24,p:2,l:4}],
+    vocal:[1,-1,2,-1,1,-1,0,-1,1,-1,2,-1,2,1,0,-1], chorus:'sparkle', moments:{6:'sparkle', 14:'heart', 22:'finale'},
+    mix:{beat:.8, mel:.8, fx:.8}, cover:{bg:0, st:{hearts:true, sparkles:true, mic:true}}, lyrics:''};
+}
+const D = () => S.draft || (S.draft = newDraft());
+function studioStop(){
+  if (ST.seq) { ST.seq.stop(); ST.seq = null; } ST.what = null;
+  const sc = $('#scr-studio'); if (!sc) return;
+  $$('.record', sc).forEach(r => r.classList.remove('spin')); $$('.eq i', sc).forEach(i => i.style.height = '12%');
+  const ph = $('#playhead'); if (ph) ph.style.display = 'none';
+  $$('.pnote.lit,.vc.lit,.tb.lit', sc).forEach(e => e.classList.remove('lit'));
+  $$('[data-playing]', sc).forEach(b => { b.textContent = b.dataset.label; b.removeAttribute('data-playing'); });
+}
+function studioPlay(what, seq, btn){
+  studioStop(); menuMusic(false); ST.what = what; ST.seq = seq;
+  if (btn) { btn.dataset.label = btn.textContent; btn.dataset.playing = '1'; btn.textContent = '⏹ Stop'; }
+  seq.start(); $$('#scr-studio .record').forEach(r => r.classList.add('spin'));
+}
+function eqPulse(){ $$('#scr-studio .eq i').forEach(i => i.style.height = (15 + Math.random() * 85) + '%'); }
+
+RENDER.studio = () => {
+  studioStop(); const d = D(); ST.sel = null;
+  const b = beatById(d.beat);
+  $('#scr-studio').innerHTML = `<div class="wrap">${topbar('🎧 Make Your Own Song')}
+  <p class="muted" style="margin:0">Welcome to your tiny magical recording booth! Everything you make here is your very own original song. 💖</p>
+  <div class="studio"><div class="grid" style="gap:16px">
+
+  <div class="panel"><div class="step-h"><span class="n">1</span><h3>🎵 Name your song</h3></div>
+    <label class="sr" for="songTitle">Song title</label><input class="name-input" id="songTitle" maxlength="32" placeholder="Type your song title…" value="${esc(d.title)}">
+    <div class="row" style="margin-top:8px">${TITLE_IDEAS.map(t => `<button class="btn sm" data-act="titleIdea" data-t="${esc(t.slice(t.indexOf(' ') + 1))}">${t}</button>`).join('')}</div></div>
+
+  <div class="panel"><div class="step-h"><span class="n">2</span><h3>🥁 Choose your beat</h3></div>
+    <div class="beat-grid">${BEATS.map(x => `<div class="beat-card ${d.beat === x.id ? 'sel' : ''}" role="button" tabindex="0" data-act="pickBeat" data-id="${x.id}" aria-pressed="${d.beat === x.id}"><span class="em">${x.e}</span>${x.name}<small class="muted">${x.bpm} BPM</small><button class="btn sm" data-act="previewBeat" data-id="${x.id}">▶ Preview</button></div>`).join('')}</div></div>
+
+  <div class="panel"><div class="step-h"><span class="n">3</span><h3>🎹 Build your melody</h3></div>
+    <p class="muted" style="margin-top:0">These notes become the notes you sing on stage! Tap an empty square to add a note. Pick a tool to move, erase, stretch or change pitch.</p>
+    <div class="tools" role="toolbar" aria-label="Melody tools">${[['add','➕ Add'],['move','↔️ Move'],['erase','➖ Remove'],['length','🎵 Length'],['pitch','⬆️ Pitch']].map(([t, n]) => `<button class="btn sm ${ST.tool === t ? 'pink' : ''}" data-act="tool" data-t="${t}" aria-pressed="${ST.tool === t}">${n}</button>`).join('')}</div>
+    <div class="piano-scroll" style="margin-top:10px"><div class="piano" id="piano"></div></div>
+    <div class="row" style="margin-top:10px" id="selTools"></div>
+    <div class="row" style="margin-top:10px">
+      <button class="btn pink sm" data-act="playMelody">▶️ Play melody</button><button class="btn sm" data-act="pausePlay">⏸️ Pause</button><button class="btn sm" data-act="restartMelody">🔄 Restart</button>
+      <button class="btn sm lav" data-act="surpriseMelody">🎲 Surprise me</button><button class="btn sm" data-act="clearMelody">🧹 Clear</button></div></div>
+
+  <div class="panel"><div class="step-h"><span class="n">4</span><h3>🎤 Create your vocal melody</h3></div>
+    <p class="muted" style="margin-top:0">Choose high, medium or low "ooh" notes for your backing vocals. Tap a dot again to clear it.</p>
+    <div class="piano-scroll" style="padding:4px 8px"><div class="vgrid" id="vgrid"></div></div>
+    <div class="row" style="margin-top:10px"><button class="btn pink" data-act="playVocal">🎤 PLAY VOCAL LINE</button><button class="btn sm" data-act="clearVocal">🧹 Clear</button></div>
+    <div style="margin-top:12px"><label for="lyrics"><b>✍️ Your own lyrics (optional)</b></label>
+    <div class="row" style="margin:6px 0">${LYRIC_PROMPTS.map(p => `<button class="btn sm" data-act="lyricPrompt" data-p="${esc(p)}">${p}</button>`).join('')}</div>
+    <textarea id="lyrics" maxlength="400" placeholder="${esc(LYRIC_PROMPTS[0])}">${esc(d.lyrics)}</textarea>
+    <p class="muted">Write your own words, one line per row. They'll glow on stage while you perform.</p></div></div>
+
+  <div class="panel"><div class="step-h"><span class="n">5</span><h3>✨ Add a chorus ✨</h3></div>
+    <p class="muted" style="margin-top:0">Your chorus repeats automatically three times during the song.</p>
+    <div class="beat-grid">${CHORUSES.map(c => `<div class="beat-card ${d.chorus === c.id ? 'sel' : ''}" role="button" tabindex="0" data-act="pickChorus" data-id="${c.id}" aria-pressed="${d.chorus === c.id}"><span class="em">${c.e}</span>${c.name}<button class="btn sm" data-act="previewChorus" data-id="${c.id}">▶ Preview</button></div>`).join('')}</div></div>
+
+  <div class="panel"><div class="step-h"><span class="n">6</span><h3>💃 Add performance moments</h3></div>
+    <p class="muted" style="margin-top:0">Pick a moment, then tap a bar on the timeline to place it. They trigger stage animations and bonus moves when you perform.</p>
+    <div class="row">${MOMENTS.map(m => `<button class="btn sm ${ST.moment === m.id ? 'pink' : ''}" data-act="pickMoment" data-id="${m.id}" aria-pressed="${ST.moment === m.id}">${m.e} ${m.name}</button>`).join('')}</div>
+    <div class="piano-scroll" style="margin-top:10px;padding:8px;background:#fff8fc"><div id="timeline"></div></div></div>
+
+  <div class="panel"><div class="step-h"><span class="n">7</span><h3>🎚️ Mix your song</h3></div>
+    ${[['beat','🎵 Beat volume'],['mel','🎤 Melody volume'],['fx','✨ Effects volume']].map(([k, n]) => `<div class="set-row"><label for="mix_${k}"><b>${n}</b></label><input type="range" id="mix_${k}" min="0" max="1" step=".05" value="${d.mix[k]}" data-mix="${k}"></div>`).join('')}
+    <div class="row" style="margin-top:8px"><button class="btn pink" data-act="playFull">▶️ PLAY FULL SONG</button><button class="btn" data-act="pausePlay">⏸️ PAUSE</button><button class="btn" data-act="restartFull">🔄 START OVER</button></div></div>
+
+  <div class="panel"><div class="step-h"><span class="n">8</span><h3>💿 Album cover</h3></div>
+    <div class="eyebrow" style="margin-bottom:6px">🎨 Background</div>
+    <div class="row">${COVER_BGS.map((bg, i) => `<button class="swatch ${d.cover.bg === i ? 'sel' : ''}" style="background:${bg}" data-act="coverBg" data-i="${i}" aria-label="Background ${i + 1}"></button>`).join('')}</div>
+    <div class="eyebrow" style="margin:12px 0 6px">Decorations</div>
+    <div class="row">${STICKERS.map(k => `<button class="btn sm ${d.cover.st[k.id] ? 'pink' : ''}" data-act="coverSt" data-id="${k.id}" aria-pressed="${!!d.cover.st[k.id]}">${k.e} ${k.name}</button>`).join('')}</div></div>
+
+  <div class="panel"><div class="step-h"><span class="n">9</span><h3>🌟 Save your song</h3></div>
+    <div class="row"><button class="btn gold" data-act="saveSong">💾 SAVE SONG</button><button class="btn mint" data-act="finishSong">🎉 I'm finished!</button><button class="btn" data-act="go" data-to="mysongs">💿 My Songs (${S.mySongs.length})</button><button class="btn" data-act="newSong">🔄 Start a new song</button></div></div>
+
+  </div>
+  <aside class="booth">
+    <div class="panel cover-box" id="coverPrev">${coverHTML(d)}</div>
+    <div class="panel" style="display:flex;flex-direction:column;gap:10px">
+      <div class="row" style="flex-wrap:nowrap"><div class="record" aria-hidden="true"></div><div class="eq" aria-hidden="true">${'<i></i>'.repeat(9)}</div></div>
+      <div class="mini-stage" id="miniStage"><canvas id="miniCanvas"></canvas><div class="sec" id="miniSec">🎧 Ready</div><div class="singer-wrap bop" id="miniSinger"></div>
+        <span class="floatnote" style="left:12%;top:30%">🎵</span><span class="floatnote" style="right:12%;top:22%">🎶</span><span class="floatnote" style="left:22%;top:60%">💖</span><span class="floatnote" style="right:20%;top:56%">⭐️</span></div>
+      <div class="rbprog" aria-label="Song progress"><i id="rbProg"></i></div>
+      <div class="row" style="justify-content:center"><button class="btn pink sm" data-act="playFull">▶️ Play</button><button class="btn sm" data-act="pausePlay">⏸️ Pause</button><button class="btn sm" data-act="restartFull">🔄 Restart</button></div>
+      <button class="btn rainbow xl perform-huge" data-act="performDraft">🌈 🎤 PERFORM MY SONG 🎤 🌈</button>
+      <p class="muted" style="margin:0;text-align:center">${b.e} ${b.name} · ${d.melody.length} melody notes · ${Object.keys(d.moments).length} moments</p>
+    </div>
+  </aside></div></div>`;
+  renderPiano(); renderVgrid(); renderTimeline();
+  renderSingerInto($('#miniSinger'));
+  ST.mini = sizeCanvas($('#miniCanvas')); cancelAnimationFrame(ST.raf); ST.raf = requestAnimationFrame(miniLoop);
+  $('#songTitle').addEventListener('input', e => { d.title = clean(e.target.value).slice(0, 32); save(); $('#coverPrev').innerHTML = coverHTML(d); });
+  $('#lyrics').addEventListener('input', e => { d.lyrics = e.target.value.slice(0, 400); save(); });
+  $('#lyrics').addEventListener('blur', e => { const c = clean(e.target.value); if (c !== e.target.value) { e.target.value = c; d.lyrics = c; save(); toast('✨', 'Kept it kind!', 'A few words were swapped for sparkles.'); } });
+  $$('#scr-studio [data-mix]').forEach(i => i.addEventListener('input', e => { d.mix[e.target.dataset.mix] = +e.target.value; if (ST.seq) ST.seq.o.mix = d.mix; save(); }));
+  setupPianoPointer();
+};
+function miniLoop(){
+  if (CUR !== 'studio' || !ST.mini) return;
+  const {c, w, h} = ST.mini; c.clearRect(0, 0, w, h);
+  const t = performance.now() / 1000;
+  for (let i = 0; i < 5; i++) { const x = w * (i + .5) / 5, a = Math.sin(t * (ST.what ? 1.5 : .5) + i) * .4; c.save(); c.translate(x, 0); c.rotate(a); const g = c.createLinearGradient(0, 0, 0, h); g.addColorStop(0, ['rgba(255,120,200,.35)','rgba(180,150,255,.35)','rgba(120,200,255,.35)'][i % 3]); g.addColorStop(1, 'rgba(255,255,255,0)'); c.fillStyle = g; c.beginPath(); c.moveTo(-4, 0); c.lineTo(4, 0); c.lineTo(26, h); c.lineTo(-26, h); c.fill(); c.restore(); }
+  ST.parts = ST.parts.filter(p => (p.life -= 1) > 0); c.textAlign = 'center'; c.textBaseline = 'middle';
+  for (const p of ST.parts) { p.x += p.vx; p.y += p.vy; p.vy += .05; c.globalAlpha = Math.min(1, p.life / 20); c.font = p.s + 'px serif'; c.fillText(p.e, p.x, p.y); }
+  c.globalAlpha = 1; ST.raf = requestAnimationFrame(miniLoop);
+}
+function miniFx(kind){
+  if (!ST.mini || S.settings.reduced) return; const {w, h} = ST.mini; const fxv = D().mix.fx; const n = Math.round(22 * fxv) + 3;
+  const E = {sparkle:['✨','💫'], hearts:['💖','💕'], stars:['⭐️','🌟'], rainbow:['🌈','✨','💖'], confetti:['🎉','🎊'], notes:['🎵','🎶']}[kind] || ['✨'];
+  for (let i = 0; i < n; i++) { const a = Math.random() * Math.PI * 2, s = 1.5 + Math.random() * 3; ST.parts.push({x:w / 2, y:h * .5, vx:Math.cos(a) * s, vy:Math.sin(a) * s - 1.5, s:14 + Math.random() * 10, life:50 + Math.random() * 30, e:E[i % E.length]}); }
+  if (fxv > .05) SFX.sparkle();
+}
+
+/* piano roll */
+function renderPiano(){
+  const d = D(), el = $('#piano'); if (!el) return;
+  let h = '';
+  for (let p = 7; p >= 0; p--) {
+    h += `<div class="lbl" style="background:${LANE_COL[p >> 1]}">${NOTE_NAMES[p]}</div>`;
+    for (let s = 0; s < 32; s++) h += `<div class="cell ${s % 8 === 0 ? 'bar' : s % 2 === 0 ? 'beat' : ''}" data-s="${s}" data-p="${p}" style="${(s >> 3) % 2 ? 'background:#fdf6ff' : ''}"></div>`;
+  }
+  h += d.melody.map((n, i) => `<div class="pnote ${ST.sel === i ? 'sel' : ''}" data-i="${i}" style="left:calc(44px + (100% - 44px) * ${n.s} / 32 + 1px);width:calc((100% - 44px) * ${n.l} / 32 - 3px);top:${(7 - n.p) * 30 + 2}px;background:linear-gradient(180deg,${LANE_LIGHT[n.p >> 1]},${LANE_COL[n.p >> 1]})" aria-label="${NOTE_NAMES[n.p]} note">♪</div>`).join('');
+  h += `<div class="playhead" id="playhead"></div>`;
+  el.innerHTML = h;
+  const st = $('#selTools');
+  if (st) st.innerHTML = ST.sel != null && d.melody[ST.sel] ? `<span class="chip">🎵 Selected: ${NOTE_NAMES[d.melody[ST.sel].p]}</span>${[['noteUp','⬆️ Higher'],['noteDown','⬇️ Lower'],['noteLeft','⬅️ Earlier'],['noteRight','➡️ Later'],['noteLonger','➕ Longer'],['noteShorter','➖ Shorter'],['noteDel','🗑️ Remove']].map(([a, n]) => `<button class="btn sm" data-act="${a}">${n}</button>`).join('')}` : '<span class="muted">Tip: select a note to nudge it with the arrow keys.</span>';
+}
+function previewNote(p){ if (initAudio()) INST.keys(A.ctx.currentTime, 72 + PENTA[p], .25, .2, A.sfx); }
+function setupPianoPointer(){
+  const el = $('#piano'); if (!el) return;
+  el.addEventListener('pointerdown', e => {
+    const d = D(); const noteEl = e.target.closest('.pnote'); const cell = e.target.closest('.cell');
+    if (noteEl) {
+      const i = +noteEl.dataset.i, n = d.melody[i];
+      if (ST.tool === 'erase') { d.melody.splice(i, 1); ST.sel = null; save(); renderPiano(); return; }
+      if (ST.tool === 'length') { n.l = n.l >= 4 || n.s + n.l >= 32 ? 1 : n.l + 1; ST.sel = i; save(); renderPiano(); previewNote(n.p); return; }
+      if (ST.tool === 'pitch') { n.p = (n.p + 1) % 8; ST.sel = i; save(); renderPiano(); previewNote(n.p); return; }
+      ST.sel = i; const r = el.getBoundingClientRect(); ST.drag = {i, x:e.clientX, y:e.clientY, s:n.s, p:n.p, colW:(r.width - 44) / 32};
+      el.setPointerCapture(e.pointerId); renderPiano(); previewNote(n.p); e.preventDefault(); return;
+    }
+    if (cell) {
+      const s = +cell.dataset.s, p = +cell.dataset.p;
+      if (ST.tool === 'add') { if (d.melody.length >= 64) { toast('🎹', 'Melody is full', 'Remove a note to add a new one.'); return; } if (!d.melody.some(n => n.s === s && n.p === p)) { d.melody.push({s, p, l:1}); d.melody.sort((a, b) => a.s - b.s); ST.sel = d.melody.findIndex(n => n.s === s && n.p === p); save(); renderPiano(); previewNote(p); } }
+      else { ST.sel = null; renderPiano(); }
+    }
+  });
+  el.addEventListener('pointermove', e => {
+    const g = ST.drag; if (!g) return; const d = D(); const n = d.melody[g.i]; if (!n) return;
+    const ns = clamp(g.s + Math.round((e.clientX - g.x) / g.colW), 0, 32 - n.l), np = clamp(g.p - Math.round((e.clientY - g.y) / 30), 0, 7);
+    if (ns !== n.s || np !== n.p) { const pc = np !== n.p; n.s = ns; n.p = np; const ne = $(`#piano .pnote[data-i="${g.i}"]`); if (ne) { ne.style.left = `calc(44px + (100% - 44px) * ${ns} / 32 + 1px)`; ne.style.top = (7 - np) * 30 + 2 + 'px'; ne.style.background = `linear-gradient(180deg,${LANE_LIGHT[np >> 1]},${LANE_COL[np >> 1]})`; } if (pc) previewNote(np); }
+  });
+  const end = () => { if (!ST.drag) return; const d = D(); const cur = d.melody[ST.drag.i]; d.melody.sort((a, b) => a.s - b.s); ST.sel = d.melody.indexOf(cur); ST.drag = null; save(); renderPiano(); };
+  el.addEventListener('pointerup', end); el.addEventListener('pointercancel', end);
+}
+function nudge(ds, dp, dl){
+  const d = D(), n = d.melody[ST.sel]; if (!n) return;
+  n.p = clamp(n.p + dp, 0, 7); n.l = clamp(n.l + dl, 1, 4); n.s = clamp(n.s + ds, 0, 32 - n.l);
+  d.melody.sort((a, b) => a.s - b.s); ST.sel = d.melody.indexOf(n); save(); renderPiano(); previewNote(n.p);
+}
+function renderVgrid(){
+  const d = D(), el = $('#vgrid'); if (!el) return;
+  let h = ''; const names = ['🎵 High', '🎵 Med', '🎵 Low'], lv = [2, 1, 0];
+  lv.forEach((v, r) => { h += `<div class="vl">${names[r]}</div>`; for (let i = 0; i < 16; i++) h += `<div class="vc ${d.vocal[i] === v ? 'on' : ''}" data-act="vcell" data-i="${i}" data-v="${v}" role="button" tabindex="0" aria-label="${names[r]} note at beat ${i + 1}" aria-pressed="${d.vocal[i] === v}"><i></i></div>`; });
+  const pts = d.vocal.map((v, i) => v >= 0 ? [(i + .5) * 10, [100, 60, 20][v]] : null).filter(Boolean);
+  const path = pts.map((p, i) => (i ? 'L' : 'M') + p[0] + ' ' + p[1]).join(' ');
+  h += `<svg viewBox="0 0 160 120" preserveAspectRatio="none" aria-hidden="true"><path d="${path}" fill="none" stroke="#ff4fa3" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke" style="filter:drop-shadow(0 0 4px #ff8fc8) drop-shadow(0 0 8px #c9b6ff)"/></svg>`;
+  el.innerHTML = h;
+}
+function renderTimeline(){
+  const d = D(), el = $('#timeline'); if (!el) return;
+  const secs = layout(SECTIONS_CUSTOM);
+  let head = ''; secs.forEach(s => head += `<span style="grid-column:span ${s.bars}">${s.name}</span>`);
+  let bars = ''; for (let b = 0; b < 24; b++) { const m = MOMENTS.find(x => x.id === d.moments[b]); const sec = secs.find(s => b >= s.bar && b < s.bar + s.bars); bars += `<button class="tb ${sec.type === 'chorus' ? 'ch' : ''}" data-act="placeMoment" data-b="${b}" aria-label="Bar ${b + 1}${m ? ', ' + m.name : ''}">${m ? m.e : ''}<small>${b + 1}</small></button>`; }
+  el.innerHTML = `<div class="sec-row">${head}</div><div class="timeline">${bars}</div>`;
+}
+
+/* studio playback */
+function studioFullSeq(){
+  const d = D(); const tr = buildCustomTrack(d); const total = tr.bars * 16;
+  return new Seq(tr, {mix:d.mix, onEnd:() => { studioStop(); $('#rbProg').style.width = '100%'; $('#miniSec').textContent = '🎉 Done!'; songComplete(); },
+    onStep:(s) => {
+      const bar = s >> 4; $('#rbProg') && ($('#rbProg').style.width = (s / total * 100) + '%');
+      if (s % 2 === 0) eqPulse();
+      if (s % 4 === 0) { $$('#scr-studio .floatnote').forEach(f => { f.classList.add('bounce'); setTimeout(() => f.classList.remove('bounce'), 140); }); }
+      if (s % 16 === 0) {
+        const sec = tr.sectionObj(bar); $('#miniSec').textContent = '🎶 ' + sec.name;
+        $$('#timeline .tb').forEach((t, i) => t.classList.toggle('lit', i === bar));
+        const m = MOMENTS.find(x => x.id === d.moments[bar]); if (m) { doMove($('#miniSinger'), m.move); miniFx(m.fx); if (m.fx === 'rainbow' || m.fx === 'confetti') confetti(50); }
+      }
+      if (s % 8 === 0 && Math.random() < .3) miniFx('notes');
+    }});
+}
+function songComplete(){
+  overlay(`<div style="font-size:3rem">🎉</div><h3 style="font-size:1.8rem">SONG COMPLETE!</h3><p><b>You just created your very own Pink Melody!</b> 💖🎤✨</p><div class="cover-box" style="max-width:220px;margin:0 auto">${coverHTML(D())}</div>
+    <div class="row" style="justify-content:center"><button class="btn pink" data-act="ovPlay">🌸 PLAY</button><button class="btn rainbow" data-act="performDraft">🎤 PERFORM</button><button class="btn gold" data-act="saveSong">💾 SAVE</button><button class="btn lav" data-act="newSong">🔄 CREATE ANOTHER</button></div><button class="btn sm" data-act="closeOv">Keep editing</button>`);
+  confetti(140); SFX.cheer(.3);
+}
+function saveDraft(silent){
+  const d = D();
+  if (d.melody.length < 4) { toast('🎹', 'Add a few more notes', 'Your melody needs at least 4 notes before saving.'); return false; }
+  if (!d.title.trim()) d.title = 'My Pink Melody';
+  d.singer = S.name; d.lyrics = clean(d.lyrics);
+  const copy = JSON.parse(JSON.stringify(d)); const i = S.mySongs.findIndex(x => x.id === d.id);
+  if (i >= 0) S.mySongs[i] = copy; else S.mySongs.unshift(copy);
+  Object.values(d.moments).forEach(m => { if (!S.stats.momentsUsed.includes(m)) S.stats.momentsUsed.push(m); });
+  save(); if (!silent) { toast('💾', 'Song saved!', `"${d.title}" is in My Songs.`); SFX.coin(); }
+  unlock('first_created'); if (S.mySongs.length >= 3) unlock('song_maker'); if (S.mySongs.length >= 5) unlock('hit_maker');
+  if (MOMENTS.every(m => S.stats.momentsUsed.includes(m.id))) unlock('rainbow_composer');
+  return true;
+}
+
+/* library player */
+const LIB = {seq:null, id:null};
+function libStop(){ if (LIB.seq) LIB.seq.stop(); LIB.seq = null; LIB.id = null; }
+
+/* ================= ACTIONS ================= */
+const ACT = {
+  go:b => { SFX.click(); if (b.dataset.mode) songMode = b.dataset.mode; libStop(); go(b.dataset.to); },
+  toggleSound:() => { S.settings.sound = !S.settings.sound; initAudio(); applyVolumes(); save(); RENDER.home(); menuMusic(S.settings.sound); },
+  singerTab:b => { singerTab = b.dataset.t; SFX.click(); RENDER.singer(); },
+  setSinger:b => {
+    const k = b.dataset.k, v = k === 'skin' ? +b.dataset.v : b.dataset.v, cat = b.dataset.cat;
+    if (cat && !owns(cat, v)) { const it = SHOP_CATS.find(c => c.id === cat).list.find(x => x.id === v); toast('🔒', it.name + ' is locked', `Buy it in the Shop for 💰 ${it.cost}.`); return; }
+    S.singer[k] = v; save(); SFX.sparkle(); RENDER.singer(); doMove($('#crSinger'), 'pose');
+  },
+  previewMove:b => doMove($('#crSinger'), b.dataset.m),
+  randomSinger:() => { const pick = (cat, list) => { const o = list.filter(i => owns(cat, i.id)); return o[Math.floor(Math.random() * o.length)].id; };
+    Object.assign(S.singer, {hair:pick('hairs', HAIRS), outfit:pick('outfits', OUTFITS), shoes:pick('shoes', SHOES), mic:pick('mics', MICS), acc:pick('accs', ACCS), fx:pick('fx', FX), hairColor:HAIR_COLORS[Math.floor(Math.random() * HAIR_COLORS.length)].id});
+    save(); SFX.sparkle(); RENDER.singer(); doMove($('#crSinger'), 'spin'); },
+  songMode:b => { if (b.dataset.m === 'career') { SFX.click(); go('career'); return; } songMode = b.dataset.m; SFX.click(); RENDER.songs(); },
+  songCat:b => { songCat = b.dataset.c; SFX.click(); RENDER.songs(); },
+  pickFreeStage:b => { if (!S.stagesOwned.includes(b.dataset.id)) { toast('🔒', 'Stage locked', 'Win Career gigs or use gems to unlock it.'); return; } freeStage = b.dataset.id; SFX.click(); RENDER.songs(); },
+  playSong:b => {
+    const song = SONGS.find(s => s.id === b.dataset.id);
+    if (b.dataset.challenge) { const lvl = S.challenge; const speed = 1 + Math.floor(lvl / SONGS.length) * .1 + (lvl % SONGS.length) * .01; startGame({song, mode:'challenge', speed, stage:S.stage}); return; }
+    if (songMode === 'free') startGame({song, mode:'free', stage:freeStage || S.stage}); else startGame({song, mode:'quick', stage:S.stage});
+  },
+  practicePick:b => {
+    const song = SONGS.find(s => s.id === b.dataset.id); const tr = buildStdTrack(song);
+    const secs = tr.sections.filter(s => s.type !== 'intro' && s.type !== 'outro');
+    overlay(`<h3>🌸 Practice: ${esc(song.title)}</h3><p class="muted">Pick a section to practise. No score pressure!</p>
+      <div class="row" style="justify-content:center"><span class="muted">Speed:</span><button class="btn sm pink" data-act="pSpeed" data-v=".75" id="spd75">🐢 75%</button><button class="btn sm" data-act="pSpeed" data-v="1" id="spd100">🎵 100%</button></div>
+      <div class="grid">${secs.map(s => `<button class="btn" data-act="practiceGo" data-id="${song.id}" data-bar="${s.bar}">${s.type === 'chorus' ? '✨' : s.type === 'bridge' ? '🌉' : '🎵'} ${s.name} <small>(bars ${s.bar + 1}–${s.bar + s.bars})</small></button>`).join('')}
+      <button class="btn lav" data-act="practiceGo" data-id="${song.id}" data-bar="all">🎶 Whole song</button></div><button class="btn sm" data-act="closeOv">Cancel</button>`);
+    ACT._pspeed = .75;
+  },
+  pSpeed:b => { ACT._pspeed = +b.dataset.v; $('#spd75').classList.toggle('pink', ACT._pspeed < 1); $('#spd100').classList.toggle('pink', ACT._pspeed === 1); },
+  practiceGo:b => { const song = SONGS.find(s => s.id === b.dataset.id); const tr = buildStdTrack(song); const sec = b.dataset.bar === 'all' ? null : tr.sections.find(s => s.bar === +b.dataset.bar); startGame({song, mode:'practice', speed:ACT._pspeed || .75, section:sec, stage:S.stage}); },
+  playGig:b => { const gig = GIGS[+b.dataset.i]; startGame({song:SONGS.find(s => s.id === gig.song), mode:'career', gig:+b.dataset.i, stage:gig.stage}); },
+  pickStage:b => { S.stage = b.dataset.id; save(); SFX.sparkle(); RENDER.career(); },
+  buyStage:b => { const st = STAGES.find(s => s.id === b.dataset.id); if (S.gems < st.gems) return; S.gems -= st.gems; S.stagesOwned.push(st.id); S.stage = st.id; save(); SFX.fanfare(); toast(st.e, st.name + ' unlocked!', 'It is now your performance stage.'); RENDER.career(); },
+  shopCat:b => { shopCat = b.dataset.c; SFX.click(); RENDER.shop(); },
+  buy:b => { const cat = SHOP_CATS.find(c => c.id === b.dataset.cat), it = cat.list.find(x => x.id === b.dataset.id); if (S.coins < it.cost || owns(cat.id, it.id)) return;
+    S.coins -= it.cost; S.own[cat.id].push(it.id); S.singer[cat.key] = it.id; save(); SFX.coin(); SFX.sparkle(); toast(it.e, 'You got ' + it.name + '!', 'Now wearing it on stage.');
+    if (S.own.outfits.length >= 8) unlock('outfit_collector'); RENDER.shop(); },
+  equip:b => { const cat = SHOP_CATS.find(c => c.id === b.dataset.cat); S.singer[cat.key] = b.dataset.id; save(); SFX.sparkle(); RENDER.shop(); },
+  toggleSet:async b => { const k = b.dataset.k; S.settings[k] = !S.settings[k]; initAudio(); applyVolumes(); save();
+    if (k === 'mic') { if (S.settings.mic) await requestMic(); else if (A.micStream) { A.micStream.getTracks().forEach(t => t.stop()); A.micStream = null; } }
+    if (k === 'reduced') document.body.classList.toggle('reduced', S.settings.reduced);
+    if (k === 'sound' || k === 'music') { menuMusic(false); menuMusic(true); }
+    RENDER.settings(); },
+  testSfx:b => { initAudio(); const s = b.dataset.s; s === 'applause' ? SFX.applause(1.5) : SFX[s](); },
+  resetAsk:() => { $('#resetBox').innerHTML = `<p><b>Start over from the beginning?</b> This clears singer, coins, scores and songs for this session.</p><div class="row"><button class="btn pink" data-act="resetYes">Yes, start over</button><button class="btn" data-act="resetNo">Keep my progress</button></div>`; },
+  resetNo:() => RENDER.settings(),
+  resetYes:() => { S = freshState(); save(); document.body.classList.remove('reduced'); toast('🌸', 'Fresh start!', 'Your singing journey begins again.'); go('home'); },
+  pause:() => pauseGame(), resume:() => resumeGame(),
+  restart:() => { const o = G.o, cs = G.custom; endGameCleanup(); cs ? startGame({custom:cs, mode:'custom'}) : startGame(o); },
+  quitGame:() => { const to = G && G.custom ? 'mysongs' : G && G.o.mode === 'career' ? 'career' : 'songs'; endGameCleanup(); go(to); },
+  again:() => { const L = LAST; L.custom ? startGame({custom:L.custom, mode:'custom'}) : startGame(L.o); },
+  closeOv:() => closeOverlay(),
+  // studio
+  titleIdea:b => { D().title = b.dataset.t; save(); $('#songTitle').value = b.dataset.t; $('#coverPrev').innerHTML = coverHTML(D()); SFX.sparkle(); },
+  pickBeat:(b, e) => { if (e.target.closest('[data-act="previewBeat"]')) return; D().beat = b.dataset.id; save(); SFX.click(); const y = $('#scr-studio').scrollTop; RENDER.studio(); $('#scr-studio').scrollTop = y; },
+  previewBeat:b => { const id = b.dataset.id; if (ST.what === 'beat:' + id) { studioStop(); return; } const bt = beatById(id);
+    studioPlay('beat:' + id, new Seq({bpm:bt.bpm, beat:id, bars:4, key:60, melody:[], sectionAt:() => 'verse'}, {loop:true, onStep:s => { if (s % 2 === 0) eqPulse(); }}), b); },
+  tool:b => { ST.tool = b.dataset.t; SFX.click(); $$('#scr-studio [data-act="tool"]').forEach(x => { x.classList.toggle('pink', x.dataset.t === ST.tool); x.setAttribute('aria-pressed', x.dataset.t === ST.tool); }); },
+  noteUp:() => nudge(0, 1, 0), noteDown:() => nudge(0, -1, 0), noteLeft:() => nudge(-1, 0, 0), noteRight:() => nudge(1, 0, 0), noteLonger:() => nudge(0, 0, 1), noteShorter:() => nudge(0, 0, -1),
+  noteDel:() => { D().melody.splice(ST.sel, 1); ST.sel = null; save(); renderPiano(); },
+  playMelody:b => { if (ST.what === 'melody') { studioStop(); return; } const d = D();
+    const tr = {bpm:beatById(d.beat).bpm, beat:d.beat, bars:4, key:60, melody:d.melody.map(n => ({s:n.s * 2, m:72 + PENTA[n.p], l:n.l * 2})), sectionAt:() => 'verse'};
+    studioPlay('melody', new Seq(tr, {mix:{beat:d.mix.beat * .6, mel:Math.max(.3, d.mix.mel), fx:1}, onEnd:() => studioStop(), onStep:s => { const ph = $('#playhead'); if (ph) { ph.style.display = 'block'; ph.style.left = `calc(44px + (100% - 44px) * ${s / 2} / 32)`; } if (s % 2 === 0) { eqPulse(); $$('#piano .pnote').forEach(p => { const n = d.melody[+p.dataset.i]; p.classList.toggle('lit', !!n && s / 2 >= n.s && s / 2 < n.s + n.l); }); } }}), b); },
+  restartMelody:() => { const b = $('#scr-studio [data-act="playMelody"]'); studioStop(); ACT.playMelody(b); },
+  pausePlay:() => { if (!ST.seq) return; if (ST.seq.paused) { ST.seq.resume(); $$('#scr-studio .record').forEach(r => r.classList.add('spin')); } else { ST.seq.pause(); $$('#scr-studio .record').forEach(r => r.classList.remove('spin')); } },
+  surpriseMelody:() => { const r = rng(Date.now()); D().melody = genPhrase(r, 2).map(n => ({s:n.s, p:n.p, l:n.l})).filter((n, i, a) => a.findIndex(x => x.s === n.s) === i); ST.sel = null; save(); renderPiano(); SFX.sparkle(); },
+  clearMelody:() => { D().melody = []; ST.sel = null; save(); renderPiano(); },
+  vcell:b => { const d = D(), i = +b.dataset.i, v = +b.dataset.v; d.vocal[i] = d.vocal[i] === v ? -1 : v; save(); renderVgrid(); if (d.vocal[i] >= 0 && initAudio()) INST.vocal(A.ctx.currentTime, [64, 67, 72][v], .3, .15, A.voice, 'oo'); },
+  clearVocal:() => { D().vocal = Array(16).fill(-1); save(); renderVgrid(); },
+  playVocal:b => { if (ST.what === 'vocal') { studioStop(); return; } const d = D();
+    const tr = {bpm:beatById(d.beat).bpm, beat:d.beat, bars:4, key:60, melody:[], vocal:d.vocal.map((v, i) => v >= 0 ? {s:i * 4, m:[64, 67, 72][v], l:4} : null).filter(Boolean), sectionAt:() => 'verse'};
+    studioPlay('vocal', new Seq(tr, {mix:{beat:d.mix.beat * .4, mel:1.4, fx:1}, onEnd:() => studioStop(), onStep:s => { if (s % 4 === 0) { const col = s / 4; $$('#vgrid .vc').forEach(c => c.classList.toggle('lit', +c.dataset.i === col && c.classList.contains('on'))); eqPulse(); } }}), b); },
+  lyricPrompt:b => { const t = $('#lyrics'); t.placeholder = b.dataset.p; t.focus(); },
+  pickChorus:(b, e) => { if (e.target.closest('[data-act="previewChorus"]')) return; D().chorus = b.dataset.id; save(); SFX.click(); $$('#scr-studio [data-act="pickChorus"]').forEach(x => { x.classList.toggle('sel', x.dataset.id === b.dataset.id); x.setAttribute('aria-pressed', x.dataset.id === b.dataset.id); }); },
+  previewChorus:b => { if (ST.what === 'chorus:' + b.dataset.id) { studioStop(); return; } const d = D(), ch = CHORUSES.find(c => c.id === b.dataset.id);
+    const tr = {bpm:beatById(d.beat).bpm, beat:d.beat, bars:4, key:60, melody:ch.notes.map(([s, p, l]) => ({s:s * 2, m:72 + PENTA[p], l:l * 2})), sectionAt:() => 'chorus'};
+    studioPlay('chorus:' + b.dataset.id, new Seq(tr, {mix:d.mix, onEnd:() => studioStop(), onStep:s => { if (s % 2 === 0) eqPulse(); if (s % 8 === 0) miniFx('sparkle'); }}), b); },
+  pickMoment:b => { ST.moment = b.dataset.id; SFX.click(); $$('#scr-studio [data-act="pickMoment"]').forEach(x => { x.classList.toggle('pink', x.dataset.id === ST.moment); x.setAttribute('aria-pressed', x.dataset.id === ST.moment); }); },
+  placeMoment:b => { const d = D(), bar = +b.dataset.b; if (d.moments[bar] === ST.moment) delete d.moments[bar]; else { d.moments[bar] = ST.moment; const m = MOMENTS.find(x => x.id === ST.moment); doMove($('#miniSinger'), m.move); miniFx(m.fx); } save(); renderTimeline(); },
+  playFull:b => { if (ST.what === 'full') { if (ST.seq.paused) ACT.pausePlay(); return; } studioPlay('full', studioFullSeq(), null); },
+  restartFull:() => { studioStop(); studioPlay('full', studioFullSeq(), null); },
+  coverBg:b => { D().cover.bg = +b.dataset.i; save(); $$('#scr-studio .swatch').forEach(s => s.classList.toggle('sel', s === b)); $('#coverPrev').innerHTML = coverHTML(D()); SFX.click(); },
+  coverSt:b => { const st = D().cover.st; st[b.dataset.id] = !st[b.dataset.id]; save(); b.classList.toggle('pink', st[b.dataset.id]); b.setAttribute('aria-pressed', st[b.dataset.id]); $('#coverPrev').innerHTML = coverHTML(D()); SFX.sparkle(); },
+  saveSong:() => { if (saveDraft()) { const btn = $('#scr-studio [data-to="mysongs"]'); if (btn) btn.textContent = `💿 My Songs (${S.mySongs.length})`; } },
+  finishSong:() => { if (D().melody.length < 4) { toast('🎹', 'Add a few more notes', 'Your melody needs at least 4 notes.'); return; } studioStop(); songComplete(); },
+  ovPlay:() => { closeOverlay(); studioPlay('full', studioFullSeq(), null); },
+  performDraft:() => { closeOverlay(); if (!saveDraft(true)) return; toast('💾', 'Saved to My Songs', 'Time to perform your creation!'); startGame({custom:JSON.parse(JSON.stringify(D())), mode:'custom'}); },
+  newSong:() => { closeOverlay(); studioStop(); S.draft = newDraft(); save(); if (CUR === 'studio') RENDER.studio(); else go('studio'); toast('🎧', 'New song started', 'A fresh page for your next hit!'); },
+  msPlay:b => { const id = b.dataset.id; if (LIB.id === id) { libStop(); b.textContent = '▶️ Play'; return; } libStop(); menuMusic(false); const cs = S.mySongs.find(x => x.id === id);
+    $$('#scr-mysongs [data-act="msPlay"]').forEach(x => x.textContent = '▶️ Play'); b.textContent = '⏹ Stop';
+    LIB.id = id; LIB.seq = new Seq(buildCustomTrack(cs), {mix:cs.mix, onEnd:() => { libStop(); b.textContent = '▶️ Play'; }}); LIB.seq.start(); },
+  msEdit:b => { libStop(); S.draft = JSON.parse(JSON.stringify(S.mySongs.find(x => x.id === b.dataset.id))); save(); go('studio'); },
+  msPerform:b => { libStop(); startGame({custom:JSON.parse(JSON.stringify(S.mySongs.find(x => x.id === b.dataset.id))), mode:'custom'}); },
+  msDelAsk:b => { const id = b.dataset.id; $('#del_' + id).innerHTML = `<b>Delete?</b> <button class="btn sm pink" data-act="msDel" data-id="${id}">Yes</button> <button class="btn sm" data-act="msDelNo">No</button>`; },
+  msDel:b => { if (LIB.id === b.dataset.id) libStop(); S.mySongs = S.mySongs.filter(x => x.id !== b.dataset.id); save(); RENDER.mysongs(); },
+  msDelNo:() => RENDER.mysongs(),
+};
+
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-act]'); if (!b || b.disabled) return;
+  const f = ACT[b.dataset.act]; if (f) { initAudio(); f(b, e); }
+});
+document.addEventListener('keydown', e => {
+  const tag = (e.target.tagName || '').toLowerCase(); const typing = tag === 'input' || tag === 'textarea';
+  if (CUR === 'play' && G) {
+    const map = {d:0, f:1, j:2, k:3, arrowleft:0, arrowdown:1, arrowup:2, arrowright:3, 1:0, 2:1, 3:2, 4:3, a:0, s:1, l:3};
+    const k = e.key.toLowerCase();
+    if (k === 'escape' || k === 'p') { e.preventDefault(); G.seq.paused ? resumeGame() : pauseGame(); return; }
+    if (e.repeat) { if (k in map || k === ' ') e.preventDefault(); return; }
+    if (k in map) { e.preventDefault(); press(map[k]); const bt = $(`.lane-btn[data-lane="${map[k]}"]`); bt && bt.classList.add('down'); return; }
+    if (k === ' ') { e.preventDefault(); pressMove(); return; }
+  }
+  if (CUR === 'studio' && !typing && ST.sel != null) {
+    const k = e.key; const m = {ArrowUp:[0, 1, 0], ArrowDown:[0, -1, 0], ArrowLeft:[-1, 0, 0], ArrowRight:[1, 0, 0], '+':[0, 0, 1], '=':[0, 0, 1], '-':[0, 0, -1]}[k];
+    if (m) { e.preventDefault(); nudge(...m); } else if (k === 'Delete' || k === 'Backspace') { e.preventDefault(); ACT.noteDel(); }
+  }
+  if ((e.key === 'Enter' || e.key === ' ') && !typing && e.target.matches('[role="button"][data-act]')) { e.preventDefault(); e.target.click(); }
+});
+document.addEventListener('keyup', e => { const map = {d:0, f:1, j:2, k:3, arrowleft:0, arrowdown:1, arrowup:2, arrowright:3, 1:0, 2:1, 3:2, 4:3, a:0, s:1, l:3}; const k = e.key.toLowerCase(); if (k in map) { const bt = $(`.lane-btn[data-lane="${map[k]}"]`); bt && bt.classList.remove('down'); } });
+
+/* lane buttons & canvas touch */
+$$('.lane-btn[data-lane]').forEach(bt => {
+  bt.addEventListener('pointerdown', e => { e.preventDefault(); initAudio(); press(+bt.dataset.lane); bt.classList.add('down'); });
+  ['pointerup','pointerleave','pointercancel'].forEach(ev => bt.addEventListener(ev, () => bt.classList.remove('down')));
+});
+$('#moveBtn').addEventListener('pointerdown', e => { e.preventDefault(); pressMove(); });
+$('#laneCanvas').addEventListener('pointerdown', e => { const r = e.currentTarget.getBoundingClientRect(); press(clamp(Math.floor((e.clientX - r.left) / r.width * 4), 0, 3)); });
+document.addEventListener('visibilitychange', () => { if (document.hidden && G && !G.over) pauseGame(); });
+document.addEventListener('pointerdown', () => { if (!A.ctx) { initAudio(); if (!['play','studio'].includes(CUR)) menuMusic(true); } }, {once:false});
+
+/* ================= BOOT ================= */
+function boot(data){
+  if (data && data.S) S = data.S; else load();
+  document.body.classList.toggle('reduced', !!S.settings.reduced);
+  S.settings.mic = false; // mic needs a fresh opt-in each session
+  go('home');
+}
+try { window.claude?.hot?.snapshot?.(() => ({S})); } catch(e){}
+window.claude?.hot?.ready ? window.claude.hot.ready(boot) : boot(window.claude?.hot?.data ?? {});
+</script>
+</body></html>

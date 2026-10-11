@@ -1,0 +1,757 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pink Melody Idol</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Mochiy+Pop+One&family=Nunito:wght@500;700;800&display=swap">
+<style>
+:root{
+  color-scheme: light;
+  --ground:#FFE3EF; --ground2:#F6DCFF; --card:#FFF8FC; --ink:#4A1540; --ink-soft:#7D4A72;
+  --pink:#FF5FA8; --pink-soft:#FFB8D6; --lilac:#B592FF; --gold:#FFC53D; --mint:#7FE3C8;
+  --line:#F7C3DC;
+  --display:"Mochiy Pop One","Arial Rounded MT Bold","Trebuchet MS",system-ui,sans-serif;
+  --body:"Nunito","Avenir Next","Segoe UI",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{min-height:100%}
+body{margin:0;background:linear-gradient(180deg,var(--ground) 0%,var(--ground2) 100%) fixed;background-color:var(--ground);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.6}
+#sky{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
+.wrap{position:relative;z-index:1;max-width:1160px;margin:0 auto;padding-inline:16px;padding-block:20px 80px}
+.layout{display:grid;gap:22px;grid-template-columns:minmax(0,1fr)}
+@media (min-width:980px){.layout{grid-template-columns:minmax(0,1fr) 360px}.lyrics{order:2}}
+
+/* lyrics side panel */
+.lyrics{align-self:start;background:var(--card);border:2px solid var(--line);border-radius:28px;box-shadow:0 10px 30px rgba(181,146,255,.18);overflow:hidden}
+@media (min-width:980px){.lyrics{position:sticky;top:calc(env(safe-area-inset-top,0px) + 16px);max-height:calc(100vh - 32px);display:flex;flex-direction:column}}
+.lyrics summary{list-style:none;cursor:pointer;padding:16px 18px 12px;display:flex;align-items:center;justify-content:space-between;gap:10px;background:linear-gradient(135deg,#FFE3F0,#EEE2FF)}
+.lyrics summary::-webkit-details-marker{display:none}
+.lyrics summary h2{font-size:20px;margin:0;color:var(--pink)}
+.lyrics summary .hint{font:800 12px/1 var(--body);color:var(--ink-soft);letter-spacing:.08em;text-transform:uppercase}
+.lyrics[open] summary .hint{display:none}
+.lyr-body{padding:12px 18px 20px;overflow:auto;min-height:0}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.tab{font:800 12.5px/1.1 var(--body);border:2px solid var(--line);background:#fff;color:var(--ink);border-radius:999px;padding:7px 10px;cursor:pointer}
+.tab[aria-selected="true"]{background:var(--pink);border-color:var(--pink);color:#fff}
+.tab.live::after{content:" 🎤"}
+.tab:focus-visible,.play:focus-visible{outline:3px solid var(--lilac);outline-offset:2px}
+.song-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:6px}
+.song-title{font-family:var(--display);font-size:20px;line-height:1.2;margin:0;color:var(--ink);text-wrap:balance}
+.song-meta{font:700 13px/1.4 var(--body);color:var(--ink-soft);margin:2px 0 0}
+.play{flex:none;font:800 13px/1 var(--body);border:0;background:var(--lilac);color:#fff;border-radius:999px;padding:9px 12px;cursor:pointer}
+.play.on{background:var(--pink)}
+.now{display:inline-block;font:800 11px/1 var(--body);letter-spacing:.12em;text-transform:uppercase;background:#FFF1C9;color:#8A5A00;border-radius:999px;padding:6px 9px;margin:8px 0 4px}
+.sec{margin-top:14px;padding:10px 12px;border-radius:16px;transition:background .3s}
+.sec h4{margin:0 0 4px;font:800 11.5px/1 var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--lilac)}
+.sec p{margin:0;font-size:15.5px;line-height:1.65}
+.sec.hl{background:linear-gradient(135deg,#FFE3F0,#F1E6FF);box-shadow:inset 0 0 0 2px var(--pink-soft)}
+.sec.hl h4::after{content:"  ← singing now ✨";color:var(--pink)}
+.credit{margin-top:16px;font-size:12.5px;color:var(--ink-soft)}
+
+header.top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.brand{font-family:var(--display);font-size:clamp(20px,5vw,28px);line-height:1.15;color:var(--pink);text-shadow:0 2px 0 #fff,0 0 18px rgba(255,95,168,.35);text-wrap:balance;margin:0}
+.brand small{display:block;font-family:var(--body);font-weight:800;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);text-shadow:none}
+.tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.pill{font:800 13px/1 var(--body);border:2px solid var(--pink-soft);background:var(--card);color:var(--ink);border-radius:999px;padding:8px 12px;cursor:pointer}
+.pill:hover{border-color:var(--pink)}
+.pill:focus-visible,.choice:focus-visible{outline:3px solid var(--lilac);outline-offset:3px}
+.trophies{font-weight:800;font-size:13px;color:var(--ink-soft)}
+
+.turn{background:var(--card);border:2px solid var(--line);border-radius:28px;padding:22px clamp(16px,4vw,30px);margin-bottom:22px;box-shadow:0 10px 30px rgba(255,95,168,.14);animation:pop .5s cubic-bezier(.2,1.4,.4,1) both}
+.turn.past{opacity:.72;box-shadow:none}
+@keyframes pop{from{transform:translateY(14px) scale(.98)}to{transform:none}}
+.eyebrow{font:800 12px/1 var(--body);letter-spacing:.16em;text-transform:uppercase;color:var(--pink);margin:0 0 8px}
+h2{font-family:var(--display);font-weight:400;font-size:clamp(22px,5.4vw,30px);line-height:1.2;margin:0 0 14px;text-wrap:balance;color:var(--ink)}
+.turn p{margin:0 0 12px;max-width:62ch}
+.chant{font-family:var(--display);color:var(--pink);font-size:1.08em;letter-spacing:.02em}
+.count{font-family:var(--display);font-size:1.25em;color:var(--lilac)}
+.divider{text-align:center;letter-spacing:.3em;margin:16px 0;font-size:18px}
+
+.reaction{background:linear-gradient(135deg,#FFF0F7,#F3EAFF);border-radius:20px;padding:16px 18px;margin-bottom:18px;border:2px dashed var(--pink-soft)}
+.reaction .eyebrow{color:var(--lilac)}
+.deltas{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.delta{font:800 14px/1 var(--body);padding:8px 12px;border-radius:999px;background:#fff;border:2px solid var(--mint);color:#1F6B57}
+.delta.down{border-color:#FFB3B3;color:#9B2C2C}
+
+.status{margin:18px 0;border-radius:22px;padding:16px 18px;background:#fff;border:3px solid var(--pink-soft);position:relative}
+.status h3{font-family:var(--display);font-weight:400;font-size:18px;margin:0 0 10px;text-align:center;color:var(--pink)}
+.stat{display:grid;grid-template-columns:minmax(128px,auto) 1fr auto;align-items:center;gap:6px 12px;padding:6px 0;border-top:1px dashed var(--line)}
+.stat:first-of-type{border-top:0}
+.stat .name{font-weight:800}
+.stat .bar{font-size:20px;letter-spacing:2px;white-space:nowrap}
+.stat .lvl{font-weight:800;font-variant-numeric:tabular-nums;color:var(--ink-soft);font-size:14px;white-space:nowrap}
+.stat .lvl.max{color:#B8860B}
+@media (max-width:480px){.stat{grid-template-columns:1fr auto}.stat .bar{grid-column:1 / -1;grid-row:2}}
+
+.ask{font-family:var(--display);text-align:center;font-size:20px;color:var(--pink);margin:22px 0 12px}
+.choices{display:grid;gap:12px}
+.choice{display:flex;gap:14px;align-items:flex-start;text-align:left;width:100%;border:3px solid var(--pink-soft);background:linear-gradient(135deg,#fff,#FFF2F8);color:var(--ink);border-radius:22px;padding:14px 16px;cursor:pointer;font:600 16px/1.45 var(--body);transition:transform .15s,border-color .15s,box-shadow .15s}
+.choice:hover:not([disabled]){transform:translateY(-2px) rotate(-.3deg);border-color:var(--pink);box-shadow:0 8px 20px rgba(255,95,168,.25)}
+.choice .n{flex:none;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:var(--pink);color:#fff;font:400 16px/1 var(--display)}
+.choice b{display:block;font:400 16px/1.3 var(--display);color:var(--pink);margin-bottom:3px}
+.choice[disabled]{cursor:default;opacity:.5}
+.choice.picked{opacity:1;border-color:var(--pink);background:linear-gradient(135deg,#FFE0EE,#EFE3FF)}
+.choice.picked .n{background:var(--lilac)}
+
+.curtain{position:fixed;top:0;bottom:0;width:51%;z-index:5;pointer-events:none;background:repeating-linear-gradient(90deg,#E23E88 0 26px,#FF5FA8 26px 52px);box-shadow:inset 0 -40px 60px rgba(74,21,64,.35)}
+.curtain.l{left:0;animation:openL 1.6s 1.1s cubic-bezier(.7,0,.3,1) forwards}
+.curtain.r{right:0;animation:openR 1.6s 1.1s cubic-bezier(.7,0,.3,1) forwards}
+@keyframes openL{to{transform:translateX(-102%)}}
+@keyframes openR{to{transform:translateX(102%)}}
+@media (prefers-reduced-motion:reduce){.curtain{display:none}.turn{animation:none}.choice{transition:none}}
+</style>
+</head>
+<body>
+
+<div class="curtain l" aria-hidden="true"></div>
+<div class="curtain r" aria-hidden="true"></div>
+<canvas id="sky" aria-hidden="true"></canvas>
+
+<div class="wrap">
+  <header class="top">
+    <h1 class="brand"><small>🎤 An idol stage adventure 🎀</small>Pink Melody ✨</h1>
+    <div class="tools">
+      <span class="trophies" id="trophies"></span>
+      <button class="pill" id="sound" type="button">🔊 Sound on</button>
+      <button class="pill" id="restart" type="button">🌸 Restart</button>
+    </div>
+  </header>
+  <div class="layout">
+    <details class="lyrics" id="lyrics">
+      <summary><h2>🎵 Setlist &amp; Lyrics 🎵</h2><span class="hint">Tap to open 💖</span></summary>
+      <div class="lyr-body">
+        <div class="tabs" id="tabs" role="tablist" aria-label="Songs"></div>
+        <div id="song"></div>
+        <p class="credit">🌸 All songs written for Pink Melody. Sing along when a section lights up! 🎤</p>
+      </div>
+    </details>
+    <main id="story" aria-live="polite"></main>
+  </div>
+</div>
+
+<script>
+(function(){
+const START = {v:2, sp:3, h:2};
+const VENUES = [
+  "🍓🎵 STRAWBERRY SYMPHONY STADIUM 🎵🍓",
+  "🍭💫 COTTON CANDY DOME 💫🍭",
+  "🌸🌙 STARLIGHT SAKURA ARENA 🌙🌸",
+  "🌈💎 RAINBOW PEARL COLISEUM 💎🌈"
+];
+const NAMES = {v:"🎤 Vocal Power", sp:"💖 Idol Sparkle", h:"🎀 Fan Hype"};
+const ICON = {v:["💗","🤍"], sp:["💖","🤍"], h:["🎀","🤍"]};
+const SUFFIX = {v:"💗", sp:"✨", h:"🌸"};
+const MAX = 5;
+
+let S, history, trophies = [];
+
+function fresh(tour){
+  return {...START, tour: tour||0, flags:{}};
+}
+
+/* ---------- SCENES ---------- */
+const SC = {
+open:{
+  eyebrow:"Backstage · Tour stop", title:"✨ 30 Seconds to Showtime ✨",
+  text:s=>[
+    `You're standing backstage at the enormous <b>${VENUES[s.tour%VENUES.length]}</b>! 🎤💖`,
+    `The bass vibrates up through the floor and into your sparkling shoes. 🎵 Pink and purple lights glow underneath the stage like a sleepy sunrise. 💜🩷`,
+    `Your custom idol outfit catches every beam 🎀 — matching pink ribbons, shimmering gems 💎, tiny flowers 🌸, and glitter that twinkles each time you breathe. ✨`,
+    `The air smells of fresh flowers and stage fog. 🌷💨 Outside the curtains, thousands of fans are chanting your name:`,
+    `<span class="chant">"WE LOVE YOU! 💖🎤 WE LOVE YOU! 💖🎤"</span>`,
+    `A sea of pink lightsticks sparkles like glowing stars. ✨🩷✨🩷✨ Your heart beats faster… 💕`,
+    `The stage manager leans in and whispers: <i>"You're on in 30 seconds…"</i> 🎤✨`,
+    `The crowd gets louder. <span class="count">"10… 9… 8…"</span>`,
+    `You take a deep breath. The magical microphone in your hand pulses in time with the music and glows brighter… 💫`,
+    `The curtains begin to open…`,
+    `<div class="divider">✨🎀🌸💖🎤🎵🌸🎀✨</div>`
+  ],
+  choices:[
+    {icon:"🎤", name:"POWER NOTE", desc:"Step onto the stage and open the concert with an enormous, powerful high note.",
+     fx:{v:2}, set:{entrance:"power"}, next:"song1",
+     result:s=>[`You stride into the spotlight and let loose a HUGE high note! 🎤💥`,
+       `It soars all the way to the stadium roof. The screens shake. The fans scream so loud the confetti launches itself! 🎊`,
+       `<span class="chant">"SHE HIT THE WHISTLE NOTE!!" 😱💗</span>`]},
+    {icon:"🎀", name:"SPARKLE ENTRANCE", desc:"Walk onto the stage slowly while performing a dazzling choreography entrance.",
+     fx:{sp:2}, set:{entrance:"sparkle"}, next:"song1",
+     result:s=>[`You glide out step by step, ribbons twirling, arms tracing hearts in the air. 🎀💃`,
+       `Every spotlight follows you. Your outfit bursts into rainbow glimmers! 🌈✨`,
+       `The crowd gasps in one giant <span class="chant">"WAAAAH~! 😍"</span> and ten thousand phones light up to film you. 📱💖`]},
+    {icon:"💖", name:"HEARTFELT START", desc:"Hold the microphone close and begin with a soft, emotional melody that makes the entire stadium go silent.",
+     fx:{h:2, v:1}, set:{entrance:"heart"}, next:"song1",
+     result:s=>[`You hold the mic close and sing, soft and warm. 🎶💖`,
+       `The whole stadium goes silent. Lightsticks sway slowly like fireflies. ✨🩷`,
+       `In the front row, someone whispers <i>"I'm crying already…" 🥹</i> Then the cheers crash in like a wave! 🌊💕`]}
+  ]
+},
+song1:{
+  eyebrow:"Song 1 · Opening number", title:"🍓 Strawberry Starlight 🍓",
+  text:s=>[
+    s.flags.entrance==="power" ? `The band roars in right after your high note! 🥁🎸 The drummer gives you a thumbs-up. 👍✨`
+    : s.flags.entrance==="sparkle" ? `The band kicks in, perfectly timed to your final entrance pose. 🥁🎸 Glitter is still drifting down! ✨`
+    : `The band gently joins your melody, then BOOM, the beat drops! 🥁🎸 The crowd leaps to its feet! 🎉`,
+    `It's your hit single, <b>"Strawberry Starlight"</b>! 🍓⭐️ The chorus is coming up fast.`,
+    `The giant screens show your face 50 feet tall. You've got one chorus to make this opening legendary. 🎤👑`
+  ],
+  choices:[
+    {icon:"🎤", name:"KEY CHANGE CHALLENGE", desc:"Push the final chorus up a whole key and belt it with everything you've got.",
+     fx:{v:2}, next:"surprise",
+     result:s=>[`The music lifts… and so do you! 🎶⬆️ Your voice rings out clear and sparkly-strong. 🎤💎`,
+       `The band members look at each other like <i>"did that just happen?!"</i> 😲 The fans go WILD! 💖`]},
+    {icon:"🎀", name:"LIGHTSTICK WAVE", desc:"Teach the whole stadium a lightstick wave, section by section.",
+     fx:{h:2, sp:1}, next:"surprise",
+     result:s=>[`"Left side! 💖 Right side! 💜 Everybody!!" 🎀`,
+       `A giant wave of pink light rolls around the stadium like the ocean at sunset. 🌊🩷 It's so pretty the camera crew forgets to zoom! 📸✨`]},
+    {icon:"✨", name:"GLITTER CANNON SPIN", desc:"Time a spinning jump perfectly with the glitter cannons.",
+     fx:{sp:2}, next:"surprise",
+     result:s=>[`You spin, jump, and 💥 FWOOSH! The glitter cannons explode right on beat! ✨🎊`,
+       `You land in a perfect pose inside a pink sparkle storm. The screens show it in slow motion. 🌸💫`]}
+  ]
+},
+surprise:{
+  eyebrow:"Stage surprise!", title:"⚡️ The Microphone Flickers! ⚡️",
+  text:s=>[
+    `The drums kick off your second song, the fierce dance track <b>"Wild Glitter"</b>! 💎🥁`,
+    `Right as you lift the mic for the first line, your magical microphone flickers… and goes quiet. 🎤💤`,
+    `The sound crew waves from the side of the stage: <i>"30 seconds to fix it!"</i> ⏱️`,
+    `Thousands of fans are watching. This is the moment a true idol shines. 🌟💕`
+  ],
+  choices:[
+    {icon:"🎤", name:"SING WITHOUT A MIC", desc:"Step to the very front and sing out with your natural voice, no mic at all.",
+     fx:{v:2, h:1}, set:{mic:"acapella"}, next:"fan",
+     result:s=>[`You take a breath and sing with nothing but your own voice. 🎶`,
+       `The stadium goes hush-quiet to hear you. Your voice carries all the way to the top seats! 🏟️💗`,
+       `When the mic blinks back on, it glows <b>gold</b> for a second, like it's proud of you. 🎤✨`]},
+    {icon:"🎀", name:"FAN CHOIR", desc:"Hop to the edge of the stage and let the fans sing the chorus for you.",
+     fx:{h:2}, set:{mic:"choir"}, next:"fan",
+     result:s=>[`You cup your hand to your ear and point the dead mic at the crowd. 🎀👂`,
+       `Tens of thousands of fans sing your chorus back to you, every single word! 🎶💕`,
+       `It's so loud and sweet that your eyes sparkle with happy tears. 🥹💖`]},
+    {icon:"✨", name:"DANCE BREAK", desc:"Signal the band for an instrumental and fill the time with a surprise dance break.",
+     fx:{sp:2}, set:{mic:"dance"}, next:"fan",
+     result:s=>[`You flash the band a secret signal. 🤫🎸 The beat switches to a funky instrumental!`,
+       `You spin, pop, and slide across the stage in a freestyle dance break. 💃✨`,
+       `Nobody even realises something went wrong. They think it's a planned surprise! 😆🌟`]}
+  ]
+},
+fan:{
+  eyebrow:"Fan moment", title:"🌷 A Sign in the Front Row 🌷",
+  text:s=>[
+    `The mic is back and glowing! 🎤💫 As the song ends, you spot a little fan in the front row. 👀`,
+    `She's holding a hand-painted sign covered in stickers: <b>"YOUR SONGS GAVE ME COURAGE 💖"</b> 🌸`,
+    `She's waving so hard her pigtails are bouncing. 🥰 Her whole family is cheering beside her.`
+  ],
+  choices:[
+    {icon:"🎤", name:"DEDICATE A SONG", desc:"Dedicate your next song to her and sing it looking right at her sign.",
+     fx:{h:2, v:1}, set:{fan:"song"}, next:"costume",
+     result:s=>[`"This next song is for the girl with the beautiful sign! 💖"`,
+       `She covers her face with both hands, then jumps up and down. 🥹🎀 The whole stadium cheers for her!`]},
+    {icon:"🎀", name:"GIFT YOUR RIBBON", desc:"Untie one of your pink ribbons and toss it to her with a heart hand.",
+     fx:{h:2, sp:1}, set:{fan:"ribbon"}, next:"costume",
+     result:s=>[`You untie a ribbon and send it floating down like a pink butterfly. 🎀🦋`,
+       `She catches it! 😆 She holds it up high and the camera zooms in. The big screen fills with hearts. 💕💕💕`]},
+    {icon:"✨", name:"SIGN SPOTLIGHT", desc:"Ask the lighting crew to shine a sparkly spotlight on her sign for everyone to read.",
+     fx:{h:1, sp:2}, set:{fan:"spot"}, next:"costume",
+     result:s=>[`"Lights, please! 🔦✨" A pink spotlight finds her sign.`,
+       `The whole stadium reads it together and cheers! 🌟 She's glowing like a star herself. 💫`]}
+  ]
+},
+costume:{
+  eyebrow:"Quick change · 90 seconds", title:"👗 Backstage Costume Rush 👗",
+  text:s=>[
+    `You dash backstage for your costume change! 🏃‍♀️💨 Stylists swarm around you with pins, brushes, and sparkles. ✨`,
+    `Three outfits wait on the rack, each one glittering under the mirror lights. 💡🪞`,
+    `The next part of the show is yours to shape. Which look will you wear? 🎀`
+  ],
+  choices:[
+    {icon:"🎤", name:"STARLIGHT GOWN", desc:"A flowing lavender gown with star-dusted sleeves, made for big ballads.",
+     fx:{v:1, sp:1}, set:{outfit:"gown"}, next:"rival",
+     result:s=>[`You step out in the <b>Starlight Gown</b>. 🌌💜 Every step leaves a trail of tiny glowing stars.`,
+       `The crowd whispers <i>"a princess!!" 👑</i>`]},
+    {icon:"🎀", name:"CANDY POP SKIRT", desc:"A bouncy pink-and-mint skirt with bows and light-up sneakers, made for dancing.",
+     fx:{sp:2}, set:{outfit:"candy"}, next:"rival",
+     result:s=>[`You bounce back on stage in the <b>Candy Pop Skirt</b>! 🍬👟`,
+       `Your sneakers flash pink with every step. The fans chant <span class="chant">"CUTE! CUTE! CUTE!" 🥰</span>`]},
+    {icon:"✨", name:"FAN-LETTER JACKET", desc:"A rainbow jacket covered in patches made from real fan letters.",
+     fx:{h:2}, set:{outfit:"jacket"}, next:"rival",
+     result:s=>[`You return wearing the <b>Fan-Letter Jacket</b>! 🌈💌`,
+       `When the screen zooms in, fans spot their own words stitched onto it. People are hugging each other in the stands. 🫶💕`]}
+  ]
+},
+rival:{
+  eyebrow:"A surprise guest!", title:"🌙 Luna Violet Appears! 🌙",
+  text:s=>{
+    const o = {gown:"Starlight Gown 🌌", candy:"Candy Pop Skirt 🍬", jacket:"Fan-Letter Jacket 🌈"}[s.flags.outfit];
+    return [
+    `Just as you strike a pose in your ${o}, the lights turn deep purple. 💜🌫️`,
+    `A second stage rises from the fog, and on it stands <b>Luna Violet</b>, the famous "Midnight Moon Idol"! 🌙🎤`,
+    `She smiles and points her silver microphone at you. <i>"Let's see who shines brightest tonight, star!"</i> ⭐️`,
+    `The crowd splits into pink and purple lightsticks. 🩷💜 This could get exciting!`
+  ];},
+  choices:[
+    {icon:"🎤", name:"HARMONY BATTLE", desc:"Answer her vocal run with a higher, sparklier one of your own.",
+     fx:{v:2}, set:{rival:"battle"}, next:"newsong",
+     result:s=>[`Luna sings a silky run. 🌙 You answer with a higher one! 🎤 She goes higher. You go HIGHER! ⬆️⬆️`,
+       `You finish on a note so bright the lights flicker pink. 💗 Luna laughs and bows: <i>"Okay, okay, you win this round!"</i> 😄`]},
+    {icon:"🎀", name:"MAKE IT A DUET", desc:"Offer her your hand and turn the challenge into a surprise duet.",
+     fx:{h:1, sp:1, v:1}, set:{rival:"friend"}, next:"newsong",
+     result:s=>[`You reach across the stage and offer your hand. 🤝💕 Luna blinks, then smiles and takes it.`,
+       `You sing together, pink and purple harmonies swirling. 🩷💜 The lightsticks mix into one glowing lavender sea! 🌊✨`,
+       `Backstage later, Luna whispers: <i>"Friends?"</i> 🥰`]},
+    {icon:"✨", name:"DANCE-OFF", desc:"Challenge her to a friendly dance-off in the middle of the runway.",
+     fx:{sp:2, h:1, v:-1}, set:{rival:"dance"}, next:"newsong",
+     result:s=>[`You point to the runway. 💃 Luna grins and accepts!`,
+       `Spins, slides, a perfect heart-shaped pose… 💖 The crowd votes with lightsticks, and PINK takes it! 🩷🏆`,
+       `You're a little out of breath for the next song though. 😮‍💨🎤`]}
+  ]
+},
+newsong:{
+  eyebrow:"World premiere", title:"🎶 Your Brand-New Song 🎶",
+  text:s=>[
+    s.flags.rival==="friend" ? `Luna waves goodbye and blows you a kiss from the moon stage. 🌙💋` : `Luna's stage sinks back into the fog with a sparkle of purple. 🌙✨`,
+    `Now it's time for something no one has ever heard: your <b>unreleased song</b>! 🤫🎵`,
+    `Your producer gives you a nod from the booth. There are three versions ready. Which melody will you premiere tonight? 🎹💖`
+  ],
+  choices:[
+    {icon:"🎤", name:"\"HEART LIKE A COMET\"", desc:"A soaring power ballad with a sky-high final chorus.",
+     fx:{v:2}, set:{song:"comet"}, next:"encore",
+     result:s=>[`You sing <b>"Heart Like a Comet"</b> ☄️💖 and your voice climbs higher with every verse.`,
+       `On the final chorus, real shooting stars flash across the stadium screens! 🌠 People are singing along by the second chorus.`]},
+    {icon:"🎀", name:"\"SUGAR SUGAR SPARKLE\"", desc:"A bouncy bubblegum pop song with a super catchy chant.",
+     fx:{h:2}, set:{song:"sugar"}, next:"encore",
+     result:s=>[`<b>"Sugar Sugar Sparkle"</b> 🍬✨ is SO catchy the whole stadium learns the chant in one try!`,
+       `<span class="chant">"SU-GAR! SU-GAR! SPAR-KLE!" 🎀🎀🎀</span> Security guards are dancing too. 😆`]},
+    {icon:"✨", name:"\"MOONBEAM RIBBON\"", desc:"A dreamy synth-pop song where the stage lights follow your moves.",
+     fx:{sp:2}, set:{song:"moon"}, next:"encore",
+     result:s=>[`<b>"Moonbeam Ribbon"</b> 🌙🎀 begins, and the stage lights turn into glowing ribbons that follow your hands!`,
+       `You dance and the light-ribbons swirl across the whole stadium. It's pure magic. 💫🌈`]}
+  ]
+},
+encore:{
+  eyebrow:"Finale", title:"👑 ENCORE! ENCORE! 👑",
+  text:s=>[
+    `The last note fades… and the stadium goes dark. 🌑`,
+    `Then, one by one, every lightstick switches back on. 🩷✨🩷✨🩷`,
+    `<span class="chant">"EN-CORE! 💖 EN-CORE! 💖 EN-CORE! 💖"</span>`,
+    `Your microphone glows the brightest it has all night. 🎤🌟 This is your final moment on stage tonight. Make it unforgettable!`
+  ],
+  choices:[
+    {icon:"🎤", name:"THE ULTIMATE NOTE", desc:"Sing the longest, highest, most sparkling note of your whole career.",
+     fx:{v:2}, next:"ending",
+     result:s=>[`You close your eyes and sing. 🎤 One note. Longer. Higher. Brighter. 💎`,
+       `The microphone bursts into a beam of pink light that shoots straight into the night sky! 🌟💖`]},
+    {icon:"🎀", name:"RUNWAY OF HEARTS", desc:"Walk the runway right into the crowd, high-fiving fans as you sing.",
+     fx:{h:2}, next:"ending",
+     result:s=>[`You jog down the runway, reaching out to every fan you can. 🙌💕`,
+       `High-fives, heart-hands, happy tears. 🥹 Everyone who touched your hand is screaming <i>"BEST NIGHT EVER!"</i> 🎀`]},
+    {icon:"✨", name:"RAINBOW STAGE MAGIC", desc:"Raise your microphone to the sky and release all its magic at once.",
+     fx:{sp:2}, next:"ending",
+     result:s=>[`You lift the microphone high. ✨ It hums… then EXPLODES into rainbow light! 🌈💥`,
+       `Rainbow confetti, pink fireworks, and a giant glowing heart hang in the sky above the stadium. 💖🎆`]}
+  ]
+},
+ending:{
+  eyebrow:"The Pink Diamond Awards", title:s=>endingOf(s).title,
+  text:s=>{
+    const e = endingOf(s);
+    const recap = [];
+    if(s.flags.fan==="ribbon") recap.push(`the little fan waving your pink ribbon 🎀`);
+    else if(s.flags.fan==="song") recap.push(`the song you dedicated to the girl with the sign 💖`);
+    else recap.push(`the spotlight you shone on a brave little fan's sign 🔦`);
+    if(s.flags.rival==="friend") recap.push(`your surprise duet with your new friend Luna 🌙🤝`);
+    else if(s.flags.rival==="battle") recap.push(`your legendary harmony battle with Luna Violet 🎤⚡️`);
+    else recap.push(`your dance-off win on the runway 💃🏆`);
+    const song = {comet:"\"Heart Like a Comet\" ☄️", sugar:"\"Sugar Sugar Sparkle\" 🍬", moon:"\"Moonbeam Ribbon\" 🌙"}[s.flags.song];
+    return [
+      `A week later, you're standing on another stage in a sparkly gown. 👗✨ It's the <b>Pink Diamond Awards</b>! 💎🏆`,
+      `The host opens the golden envelope… 📜`,
+      `<span class="chant">"And the award goes to… YOU!! 💖"</span>`,
+      `You win <b>${e.award}</b>. ${e.line}`,
+      `Everyone is still talking about ${recap.join(" and ")}. Your premiere song ${song} is #1 on every chart! 📈🎶`,
+      `Holding your trophy, you whisper <i>"Thank you, everyone. I love you too!"</i> 🥹💕 Your magical microphone glows softly, as if it's already dreaming of the next stage… 🎤✨`,
+      `<div class="divider">🌟 ${e.badge} 🌟</div>`
+    ];
+  },
+  choices:[
+    {icon:"🎤", name:"WORLD TOUR!", desc:"Pack your sparkly suitcase and take the show to the next stadium. 🌍✈️", special:"tour"},
+    {icon:"🎀", name:"FAN LETTER TIME", desc:"Sit backstage with a cup of strawberry milk and read tonight's fan letters. 💌", special:"letters"},
+    {icon:"✨", name:"REDO THIS CONCERT", desc:"Rewind to backstage and try a completely different show. 🔁", special:"restart"}
+  ]
+},
+letters:{
+  eyebrow:"Backstage · After the show", title:"💌 Fan Letters 💌",
+  text:s=>{
+    const L = [];
+    L.push(`You curl up on the dressing-room sofa with a mountain of glittery envelopes. 📬✨`);
+    if(s.flags.mic==="acapella") L.push(`<i>"When your mic broke and you sang anyway, I decided I'd try out for the school choir. 🎤"</i> — Mina, 12`);
+    if(s.flags.mic==="choir") L.push(`<i>"I SANG YOUR CHORUS WITH 40,000 PEOPLE. My throat hurts and I'm so happy. 🎶"</i> — Theo`);
+    if(s.flags.mic==="dance") L.push(`<i>"That dance break!! I've practised it 20 times in my bedroom already. 💃"</i> — Priya`);
+    L.push(`A small envelope with a pink ribbon sticker: <i>"Thank you for noticing my sign. I'll be brave at my new school. 🌸"</i> 🥹`);
+    if(s.flags.rival==="friend") L.push(`A purple one, signed with a moon: <i>"Duet again at my next show? — Luna 🌙"</i> 💜`);
+    L.push(`Your heart feels warm and full. 💕 Tomorrow, the next adventure begins. ✨`);
+    return L;
+  },
+  choices:[
+    {icon:"🎤", name:"WORLD TOUR!", desc:"Answer the fans the best way you know: on the next stage. 🌍✈️", special:"tour"},
+    {icon:"🎀", name:"WRITE BACK", desc:"Write a thank-you card to every fan, decorated with ribbon stickers. 🖍️", special:"writeback"},
+    {icon:"✨", name:"REDO THIS CONCERT", desc:"Rewind to backstage and try a completely different show. 🔁", special:"restart"}
+  ]
+}
+};
+
+function endingOf(s){
+  if(s.v>=MAX && s.sp>=MAX && s.h>=MAX) return {title:"👑 TRIPLE CROWN SUPERSTAR 👑", award:"the <b>Triple Crown Superstar</b> award 👑", line:"The first idol ever to max out voice, sparkle, AND fan love in one night! 🌟🌟🌟", badge:"👑 Triple Crown Superstar 👑"};
+  const top = ["v","sp","h"].sort((a,b)=>s[b]-s[a] || "vsph".indexOf(a)-"vsph".indexOf(b))[0];
+  if(top==="v") return {title:"🎤 LEGENDARY DIVA 🎤", award:"<b>Voice of the Year</b> 🎤💎", line:"Music critics say your high notes \"could make the moon sing along.\" 🌙🎶", badge:"🎤 Legendary Diva"};
+  if(top==="sp") return {title:"✨ SPARKLE QUEEN ✨", award:"<b>Most Dazzling Performance</b> ✨💖", line:"Clips of your stage magic have been replayed over 50 million times! 📱🌈", badge:"✨ Sparkle Queen"};
+  return {title:"🎀 THE PEOPLE'S IDOL 🎀", award:"<b>Fan Favourite Idol</b> 🎀💕", line:"Your fan club doubled overnight, and they call themselves the <b>Pink Petals</b> 🌸!", badge:"🎀 The People's Idol"};
+}
+
+/* ---------- SONGS & LYRICS (all original) ---------- */
+const SONGS = {
+ strawberry:{tab:"🍓 Strawberry Starlight", title:"🍓 Strawberry Starlight", meta:"Setlist #1 · Sparkly pop · 128 BPM",
+  tune:"C5:2 E5:1 G5:1 A5:2 G5:2 E5:1 G5:1 C6:2 B5:2 A5:1 G5:1 E5:2 D5:2 C5:4",
+  secs:[
+   ["Verse 1",["Pink skies over the city tonight","Ribbons in my hair and my heart feels light","Every step I take is a tiny drumbeat","Glitter on the sidewalk under my feet"]],
+   ["Pre-Chorus",["Turn the lights up, turn the world around","Can you hear it? That's our favourite sound 💖"]],
+   ["Chorus",["Strawberry starlight, shine on me","Sweeter than a dream, brighter than the sea","Hold your lightstick high, let it glow","Strawberry starlight, steal the show 🍓"]],
+   ["Verse 2",["Butterflies waiting in the wings with me","Thirty seconds left until we're free","Every voice out there is calling my name","After tonight we'll never be the same"]],
+   ["Bridge",["Oh-oh, one more time","Oh-oh, pink and bright","Everybody sing it with me: one, two, three!"]],
+   ["Final Chorus",["Strawberry starlight, you and me","Sweeter than a dream, brighter than the sea","Hold your lightstick high, let it glow","Strawberry starlight, steal the show ✨"]]
+  ]},
+ glitter:{tab:"💎 Wild Glitter", title:"💎 Wild Glitter", meta:"Setlist #2 · Fierce dance-pop · 118 BPM",
+  tune:"A4:1 A4:1 C5:1 A4:1 D5:2 C5:2 A4:1 A4:1 C5:1 E5:1 D5:2 C5:2 E5:1 E5:1 G5:2 E5:2 D5:1 C5:1 A4:4",
+  secs:[
+   ["Intro",["Ha! Lights down… let's go 💎"]],
+   ["Verse 1",["Heels click, bright lights, count me in","Messy bun and a fearless grin","I don't need a map, I don't need a plan","Just a bassline beating like a drum in my hand"]],
+   ["Pre-Chorus",["Five, six, seven, eight","Nobody's gonna make me wait","Glitter on my cheek like war paint","Hands up, here we go!"]],
+   ["Chorus",["Wild glitter, shake it off and shine","Every spotlight's saying it's our time","Stomp, clap, turn it up louder","Wild glitter, feel the power 💥"]],
+   ["Verse 2",["Pink boots stepping on a silver line","Sparkle in the dark like a neon sign","If you wanna keep up, better stay close","We're the brightest thing that the whole world knows"]],
+   ["Bridge",["Freeze… (freeze!)","Now strike a pose (pose!)","Everybody glowing from your head to your toes"]],
+   ["Final Chorus",["Wild glitter, shake it off and shine","Every spotlight's saying it's our time","Stomp, clap, turn it up louder","Wild glitter, feel the power! 👑"]]
+  ]},
+ comet:{tab:"☄️ Heart Like a Comet", title:"☄️ Heart Like a Comet", meta:"World premiere · Power ballad · 72 BPM",
+  tune:"G4:2 C5:2 D5:2 E5:4 D5:2 C5:2 E5:2 G5:4 A5:2 G5:2 E5:2 D5:2 C5:6",
+  secs:[
+   ["Verse 1",["I used to whisper when I wanted to shout","Kept every dream folded up and never let them out","But there's a fire in the middle of the night","Telling me to follow the light"]],
+   ["Pre-Chorus",["And if I fall, I'll fall toward the sky 🌠"]],
+   ["Chorus",["I've got a heart like a comet","Burning through the dark, can you see it?","Every scar's a spark, I believe it","I've got a heart like a comet","And I'm never coming down"]],
+   ["Verse 2",["To every voice that told me to stay small","Thank you, you taught me how to stand tall","Now I'm painting every star I pass","With the colours of the future and the past"]],
+   ["Bridge",["Higher, higher, past the moon","I'll leave a trail of light for you 💖"]],
+   ["Final Chorus",["I've got a heart like a comet","Burning through the dark, can you see it?","Every scar's a spark, I believe it","Heart like a comet… still shining ☄️"]]
+  ]},
+ sugar:{tab:"🍬 Sugar Sugar Sparkle", title:"🍬 Sugar Sugar Sparkle", meta:"World premiere · Bubblegum pop · 140 BPM",
+  tune:"E5:1 E5:1 G5:2 E5:1 E5:1 G5:2 A5:1 G5:1 E5:1 C5:1 D5:4 E5:1 E5:1 G5:2 C6:2 B5:1 A5:1 G5:4",
+  secs:[
+   ["Chant",["Su-gar! Su-gar! Spar-kle! 🎀"]],
+   ["Verse 1",["Candy-coloured sneakers, bounce bounce bounce","Pink lemonade and a cotton-candy cloud","Clap your hands if you're feeling sweet","Stomp your feet to the bubblegum beat"]],
+   ["Chorus",["Sugar sugar sparkle, sprinkle it around","Sugar sugar sparkle, hear that happy sound","Spin it like a lollipop, pop pop pop","Sugar sugar sparkle, never gonna stop 🍭"]],
+   ["Verse 2",["Heart-shaped glasses on my nose","Glitter on the tips of my rainbow bows","Best friends dancing in a line","Everybody's shining all the time"]],
+   ["Bridge",["Left side say \"SUGAR!\"","Right side say \"SPARKLE!\"","Everybody all together now!"]],
+   ["Final Chorus",["Sugar sugar sparkle, sprinkle it around","Sugar sugar sparkle, hear that happy sound","Spin it like a lollipop, pop pop pop","Sugar sugar sparkle, never gonna stop! 💖"]]
+  ]},
+ moon:{tab:"🌙 Moonbeam Ribbon", title:"🌙 Moonbeam Ribbon", meta:"World premiere · Dreamy synth-pop · 100 BPM",
+  tune:"D5:2 F5:2 A5:3 G5:1 F5:2 E5:2 D5:4 C5:2 E5:2 G5:3 F5:1 E5:2 D5:6",
+  secs:[
+   ["Verse 1",["Draw a ribbon through the midnight air","Silver moonlight tangled in my hair","Close your eyes and follow where it goes","Only the stars and the dreamers know"]],
+   ["Pre-Chorus",["Float, float, slow and light","Hold my hand across the night 🌌"]],
+   ["Chorus",["Moonbeam ribbon, wrap around the sky","Tie our wishes up and let them fly","Every light that falls is a melody","Moonbeam ribbon, dance with me"]],
+   ["Verse 2",["Lavender glow on a sleepy sea","Every heartbeat keeping time with me","Twirl the light and let it swirl","Brightest little ribbon in the world"]],
+   ["Bridge",["Spin me softly, spin me slow","Don't you ever let the magic go 💫"]],
+   ["Final Chorus",["Moonbeam ribbon, wrap around the sky","Tie our wishes up and let them fly","Every light that falls is a melody","Moonbeam ribbon… dance with me 🌙"]]
+  ]}
+};
+Object.assign(SONGS, {
+ butterfly:{tab:"🦋 Butterfly Backstage", title:"🦋 Butterfly Backstage", meta:"Backstage warm-up · Soft pop · 92 BPM",
+  tune:"E5:2 D5:1 C5:1 D5:2 E5:2 G5:2 E5:2 D5:4 C5:2 D5:1 E5:1 G5:2 A5:2 G5:6",
+  secs:[
+   ["Verse 1",["Fingers shaking on the microphone","Thirty thousand voices, but I'm not alone","Deep breath in, let the nerves fly free","Every butterfly is cheering for me"]],
+   ["Pre-Chorus",["Flutter, flutter, fly up high","Turn my worries into light 🦋"]],
+   ["Chorus",["Butterfly backstage, I'm ready to go","Wings full of glitter from my head to my toes","If I feel small, I'll remember the sound","Of everyone who loves me all around"]],
+   ["Bridge",["Ten, nine, eight… my heart's in time","Seven, six, five… I feel alive!"]],
+   ["Final Chorus",["Butterfly backstage, the curtains are wide","Wings full of glitter and a spark inside","Here comes the light, here comes the sound","Butterfly, it's time to take the crown 👑"]]
+  ]},
+ midnight:{tab:"🌙 Midnight Moon (Luna)", title:"🌙 Midnight Moon", meta:"Luna Violet's signature song · Cool electro-pop · 110 BPM",
+  tune:"A4:2 C5:2 E5:2 F5:1 E5:1 D5:2 C5:2 B4:4 A4:2 C5:2 E5:2 A5:2 G5:1 F5:1 E5:6",
+  secs:[
+   ["Verse 1",["Violet shadows on a silver stage","Starlight writing my name on the page","You can shine bright, darling, I'll shine too","Midnight's the time when the moon comes through"]],
+   ["Chorus",["Midnight moon, midnight moon","Glowing softer than a lullaby tune","Pink may sparkle, purple glows","Only the midnight moon really knows 💜"]],
+   ["Verse 2",["Silver ribbon in a velvet sky","Every dreamer's gonna wonder why","The brightest light isn't always loud","Sometimes it's hiding behind a cloud"]],
+   ["Bridge",["Ooh-ooh, tell me what you see","Ooh-ooh, can you keep up with me?"]],
+   ["Final Chorus",["Midnight moon, midnight moon","See you on the stage again real soon","Pink may sparkle, purple glows","Only the midnight moon really knows 🌙"]]
+  ]},
+ duet:{tab:"🩷💜 Pink & Purple (Duet)", title:"🩷💜 Pink & Purple", meta:"Duet with Luna Violet · Friendship pop · 116 BPM",
+  tune:"C5:1 E5:1 G5:2 A5:2 G5:2 F5:1 E5:1 D5:2 C5:2 E5:1 G5:1 C6:2 B5:2 A5:1 G5:1 C6:4",
+  secs:[
+   ["Verse 1 (You)",["I thought you'd be my rival in the spotlight","Two different colours fighting for the same night"]],
+   ["Verse 1 (Luna)",["But when you took my hand, the whole sky changed","Now pink and purple are painting the stage"]],
+   ["Chorus (Together)",["Pink and purple, side by side","Two lights shining, double bright","Sunset meets the midnight sky","Pink and purple, you and I 💕"]],
+   ["Verse 2 (Both)",["You sing high and I sing low","Lavender's the colour when we let it glow","Every stage is bigger with a friend","This is how the best stories begin and never end"]],
+   ["Bridge",["Is it pink? (Is it purple?)","It's both! (It's both!)","Friends forever, that's the most!"]],
+   ["Final Chorus",["Pink and purple, side by side","Two lights shining, double bright","Sunset meets the midnight sky","Pink and purple… you and I 🌈"]]
+  ]},
+ petals:{tab:"🌸 Pink Petals (Fan Anthem)", title:"🌸 Pink Petals", meta:"Fan club anthem · Singalong pop · 104 BPM",
+  tune:"G4:2 C5:2 C5:1 D5:1 E5:2 E5:2 D5:1 C5:1 D5:4 E5:2 G5:2 G5:1 A5:1 G5:2 E5:2 D5:1 E5:1 C5:6",
+  secs:[
+   ["Verse 1",["You were there when I was brand new","Singing in a room with an audience of two","Now there's a sea of light as far as I can see","Every single petal means the world to me"]],
+   ["Pre-Chorus",["Hold them up, one, two, three","This one's for you from me 💌"]],
+   ["Chorus",["Pink petals, falling down like rain","Every time you call, I'll call your name","Through every storm and every sunny day","Pink petals, we'll bloom the same way 🌸"]],
+   ["Verse 2",["Handmade signs and ribbons in your hair","Every single letter shows how much you care","When I'm scared, I close my eyes and see","A garden full of petals growing next to me"]],
+   ["Bridge (Crowd)",["We are the petals! (WE ARE THE PETALS!)","We bloom together! (WE BLOOM TOGETHER!)"]],
+   ["Final Chorus",["Pink petals, falling down like rain","Every time you call, I'll call your name","Through every storm and every sunny day","Pink petals, forever we'll stay 💖"]]
+  ]},
+ rocket:{tab:"🚀 Cotton Candy Rocket", title:"🚀 Cotton Candy Rocket", meta:"World Tour special · Hyper-pop · 150 BPM",
+  tune:"C5:1 C5:1 E5:1 G5:1 C6:2 G5:1 E5:1 D5:1 D5:1 F5:1 A5:1 D6:2 A5:2 C6:1 B5:1 A5:1 G5:1 E5:2 C5:4",
+  secs:[
+   ["Countdown",["3… 2… 1… BLAST OFF! 🚀"]],
+   ["Verse 1",["Pack my suitcase full of bows and stars","Flying past the moon, say hi to Mars","Every city's got a brand new sky","Cotton candy clouds are floating by"]],
+   ["Chorus",["Cotton candy rocket, zoom zoom zoom","Pink smoke trail across the afternoon","Hold on tight, we're going round the world","Cotton candy rocket, spin and swirl ☁️"]],
+   ["Verse 2",["Tokyo, Paris, and Rio too","Every single stop, I'm singing for you","Passport stamped with a sparkly heart","Every ending is a brand new start"]],
+   ["Bridge",["Zoom! (zoom!) Boom! (boom!)","Sugar in the air and we're over the moon!"]],
+   ["Final Chorus",["Cotton candy rocket, zoom zoom zoom","Pink smoke trail across the afternoon","Hold on tight, we're going round the world","Cotton candy rocket, the brightest girl! 🌍"]]
+  ]},
+ sakura:{tab:"🌷 Sakura Promise", title:"🌷 Sakura Promise", meta:"Acoustic ballad · Piano & strings · 66 BPM",
+  tune:"E5:3 D5:1 C5:2 D5:2 E5:2 G5:2 E5:4 D5:3 C5:1 A4:2 C5:2 D5:2 C5:6",
+  secs:[
+   ["Verse 1",["Underneath the cherry trees in spring","You told me someday I would sing","Petals falling soft as snow","That's the day I promised, you should know"]],
+   ["Chorus",["Sakura promise, I kept it true","Every song I sing, I sing for you","When the blossoms come back every year","I'll be singing, I'll be here 🌸"]],
+   ["Verse 2",["Now the stage is big and the lights are bright","But I still hear you whisper, \"You'll be alright\"","Every note I hold, I hold it long","So you can hear me in this song"]],
+   ["Bridge",["Even when the petals fly away","The promise always stays"]],
+   ["Final Chorus",["Sakura promise, I kept it true","Every song I sing, I sing for you","When the blossoms come back every year","I'll be singing… I'll be here 🌷"]]
+  ]}
+});
+const NOW = {
+  open:s=> s.tour%4===1 ? ["rocket","Countdown"] : s.tour%4===2 ? ["sakura","Chorus"] : ["butterfly","Bridge"],
+  song1:["strawberry","Chorus"], surprise:["glitter","Intro"], fan:["glitter","Final Chorus"],
+  costume:null, rival:["midnight","Chorus"],
+  newsong:s=> s.flags.rival==="friend" ? ["duet","Chorus (Together)"] : null,
+  encore:s=>[s.flags.song,"Chorus"], ending:s=>[s.flags.song,"Final Chorus"],
+  letters:["petals","Chorus"]
+};
+let shownSong = "strawberry", liveSong = null, liveSec = null;
+const tabsEl = document.getElementById("tabs"), songEl = document.getElementById("song");
+function drawTabs(){
+  tabsEl.innerHTML = Object.keys(SONGS).map(k=>
+    `<button class="tab ${k===liveSong?"live":""}" role="tab" type="button" id="tab-${k}" aria-selected="${k===shownSong}" data-k="${k}">${SONGS[k].tab}</button>`).join("");
+  tabsEl.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{ shownSong=b.dataset.k; drawTabs(); drawSong(); });
+}
+function drawSong(){
+  const so = SONGS[shownSong];
+  const isLive = shownSong===liveSong;
+  songEl.innerHTML = `<div class="song-head"><div><h3 class="song-title">${so.title}</h3><p class="song-meta">${so.meta}</p></div>
+    <button class="play ${playing===shownSong?"on":""}" id="play" type="button">${playing===shownSong?"⏹ Stop":"▶ Melody"}</button></div>
+    ${isLive?`<span class="now">🎤 On stage now</span>`:""}
+    ${so.secs.map(([h,lines])=>`<div class="sec ${isLive&&h===liveSec?"hl":""}"><h4>${h}</h4><p>${lines.join("<br>")}</p></div>`).join("")}`;
+  document.getElementById("play").onclick = ()=>{ playing===shownSong ? stopTune() : playTune(shownSong); drawSong(); };
+}
+function setNowPlaying(sceneId){
+  let m = NOW[sceneId]; if(typeof m==="function") m = m(S);
+  if(m && m[0]){ liveSong=m[0]; liveSec=m[1]; shownSong=m[0]; }
+  else { liveSong=null; liveSec=null; }
+  drawTabs(); drawSong();
+}
+
+/* ---------- RENDER ---------- */
+const story = document.getElementById("story");
+const clamp = n => Math.max(1, Math.min(MAX, n));
+function bar(k){
+  const n = S[k];
+  return ICON[k][0].repeat(n) + ICON[k][1].repeat(MAX-n);
+}
+function statusHTML(){
+  return `<div class="status"><h3>🌟 IDOL STATUS 🌟</h3>` + ["v","sp","h"].map(k=>
+    `<div class="stat"><span class="name">${NAMES[k]}:</span><span class="bar" aria-label="Level ${S[k]} of ${MAX}">${bar(k)}</span><span class="lvl ${S[k]>=MAX?"max":""}">— Level ${S[k]} ${S[k]>=MAX?"👑 MAX":SUFFIX[k]}</span></div>`
+  ).join("") + `</div>`;
+}
+function renderTrophies(){
+  document.getElementById("trophies").textContent = trophies.length ? "🏆 " + trophies.join(" · ") : "";
+}
+
+function renderTurn(sceneId, reaction){
+  const sc = SC[sceneId];
+  const el = document.createElement("section");
+  el.className = "turn";
+  let html = "";
+  if(reaction){
+    html += `<div class="reaction"><p class="eyebrow">💫 The crowd reacts 💫</p>${reaction.paras.map(p=>`<p>${p}</p>`).join("")}`;
+    if(reaction.deltas.length) html += `<div class="deltas">${reaction.deltas.map(d=>`<span class="delta ${d.n<0?"down":""}">${NAMES[d.k]} ${d.n>0?"+":""}${d.n}</span>`).join("")}</div>`;
+    html += `</div>`;
+  }
+  const title = typeof sc.title==="function" ? sc.title(S) : sc.title;
+  const eyebrow = sceneId==="open" ? `Backstage · Tour stop ${S.tour+1}` : sc.eyebrow;
+  html += `<p class="eyebrow">${eyebrow}</p><h2>${title}</h2>`;
+  html += sc.text(S).map(p=>p.startsWith("<div")?p:`<p>${p}</p>`).join("");
+  html += statusHTML();
+  html += `<p class="ask">💕 WHAT WILL YOU DO? 💕</p><div class="choices">`;
+  sc.choices.forEach((c,i)=>{
+    html += `<button class="choice" type="button" id="c-${history.length}-${i}" data-i="${i}"><span class="n">${i+1}</span><span><b>${c.icon} ${c.name}</b>${c.desc}</span></button>`;
+  });
+  html += `</div>`;
+  el.innerHTML = html;
+  el.querySelectorAll(".choice").forEach(btn=>btn.addEventListener("click",()=>{
+    choose(sceneId, +btn.dataset.i, el, btn, true);
+  }));
+  story.appendChild(el);
+  setNowPlaying(sceneId);
+  return el;
+}
+
+function choose(sceneId, i, el, btn, live){
+  const c = SC[sceneId].choices[i];
+  el.querySelectorAll(".choice").forEach(b=>b.disabled=true);
+  btn.classList.add("picked");
+  el.classList.add("past");
+  history.push([sceneId,i]);
+  if(live) jingle(c.icon);
+
+  if(c.special==="restart"){ startNew(S.tour, true); return; }
+  if(c.special==="tour"){
+    const e = endingOf(S); if(live){ trophies.push(e.badge); renderTrophies(); }
+    const t = S.tour+1; S = fresh(t);
+    const r = {paras:[`You wave goodbye from the airport with your trophy tucked in your suitcase. ✈️🏆`,`Next stop: <b>${VENUES[t%VENUES.length]}</b>! Every new stage is a fresh start, so your stats reset for tonight's show. 🌸💫`], deltas:[]};
+    afterTurn(renderTurn("open", r), live); return;
+  }
+  if(c.special==="writeback"){
+    const r = {paras:[`You write until midnight, decorating every card with ribbon stickers and tiny hand-drawn stars. 🎀⭐️✍️`,`When the cards arrive, fans post them everywhere. <span class="chant">#PinkMelodyWroteBack</span> trends worldwide! 🌍💖`], deltas:[]};
+    afterTurn(renderTurn("letters", r), live); return;
+  }
+  if(sceneId==="ending" && c.special==="letters"){ afterTurn(renderTurn("letters", null), live); return; }
+
+  const deltas = [];
+  for(const k in (c.fx||{})){
+    const before = S[k]; S[k] = clamp(S[k] + c.fx[k]);
+    if(S[k]!==before) deltas.push({k, n:S[k]-before});
+    else if(c.fx[k]>0) deltas.push({k, n:0});
+  }
+  Object.assign(S.flags, c.set||{});
+  const r = {paras:c.result(S), deltas:deltas.filter(d=>d.n!==0)};
+  if(deltas.some(d=>d.n===0)) r.paras.push(`Your ${deltas.filter(d=>d.n===0).map(d=>NAMES[d.k]).join(" and ")} is already at MAX! 👑✨`);
+  afterTurn(renderTurn(c.next, r), live);
+}
+
+function afterTurn(el, live){
+  if(live) setTimeout(()=>el.scrollIntoView({behavior: matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth", block:"start"}), 60);
+}
+
+function startNew(tour, live){
+  S = fresh(tour);
+  const el = renderTurn("open", live ? {paras:[`✨ Rewind! ✨ You're back backstage, heart pounding, microphone glowing. Let's make tonight completely different! 🌸🎤`], deltas:[]} : null);
+  afterTurn(el, live);
+}
+
+function boot(data){
+  story.innerHTML = "";
+  trophies = (data && data.trophies) || [];
+  renderTrophies();
+  history = [];
+  S = fresh((data && data.tour0) || 0);
+  const tour0 = S.tour;
+  let el = renderTurn("open", null);
+  const past = (data && data.history) || [];
+  for(const [sid,i] of past){
+    const btn = el.querySelector(`.choice[data-i="${i}"]`);
+    if(!btn) break;
+    choose(sid, i, el, btn, false);
+    el = story.lastElementChild;
+  }
+  window.__tour0 = tour0;
+}
+
+document.getElementById("restart").addEventListener("click",()=>{ boot({trophies}); window.scrollTo({top:0}); });
+
+/* ---------- SOUND ---------- */
+let soundOn = true, ctx;
+const sBtn = document.getElementById("sound");
+sBtn.addEventListener("click",()=>{ soundOn=!soundOn; sBtn.textContent = soundOn?"🔊 Sound on":"🔇 Sound off"; });
+let playing = null, tuneTimer = null, tuneNodes = [];
+function noteHz(n){
+  const m = n.match(/^([A-G])(#?)(\d)$/); const idx = {C:0,D:2,E:4,F:5,G:7,A:9,B:11}[m[1]] + (m[2]?1:0);
+  return 440*Math.pow(2,(idx + (+m[3]+1)*12 - 69)/12);
+}
+function stopTune(){ clearTimeout(tuneTimer); tuneNodes.forEach(o=>{try{o.stop()}catch(e){}}); tuneNodes=[]; playing=null; }
+function playTune(k){
+  stopTune();
+  try{
+    ctx = ctx || new (window.AudioContext||window.webkitAudioContext)();
+    const u = .16; let t = ctx.currentTime + .05;
+    SONGS[k].tune.split(" ").forEach(tok=>{
+      const [n,d] = tok.split(":"); const dur = (+d)*u;
+      const o = ctx.createOscillator(), g = ctx.createGain(), o2 = ctx.createOscillator();
+      o.type="triangle"; o2.type="sine"; o.frequency.value = noteHz(n); o2.frequency.value = noteHz(n)*2;
+      g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(.11,t+.02); g.gain.exponentialRampToValueAtTime(.001,t+dur*.95);
+      o.connect(g); o2.connect(g); g.connect(ctx.destination);
+      o.start(t); o2.start(t); o.stop(t+dur); o2.stop(t+dur); tuneNodes.push(o,o2);
+      t += dur;
+    });
+    playing = k;
+    tuneTimer = setTimeout(()=>{ playing=null; tuneNodes=[]; drawSong(); }, (t-ctx.currentTime)*1000);
+  }catch(e){ playing=null; }
+}
+function jingle(icon){
+  if(!soundOn) return;
+  try{
+    ctx = ctx || new (window.AudioContext||window.webkitAudioContext)();
+    const base = icon==="🎤"?523.25: icon==="🎀"?587.33:659.25;
+    [1,1.25,1.5,2].forEach((m,idx)=>{
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = "triangle"; o.frequency.value = base*m;
+      const t = ctx.currentTime + idx*0.09;
+      g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(.12,t+.02); g.gain.exponentialRampToValueAtTime(.001,t+.35);
+      o.connect(g).connect(ctx.destination); o.start(t); o.stop(t+.4);
+    });
+  }catch(e){}
+}
+
+/* ---------- SPARKLE SKY ---------- */
+const cv = document.getElementById("sky"), g2 = cv.getContext("2d");
+const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
+let W,H,parts=[];
+const GLYPHS = ["💖","✨","🩷","⭐️","🌸","💫","🎵"];
+function size(){
+  const d = Math.min(devicePixelRatio||1,2);
+  W = innerWidth; H = innerHeight; cv.width = W*d; cv.height = H*d; g2.setTransform(d,0,0,d,0,0);
+  const n = Math.round(Math.min(34, W/28));
+  parts = Array.from({length:n},()=>({x:Math.random()*W,y:Math.random()*H,s:12+Math.random()*14,v:.2+Math.random()*.5,w:Math.random()*6.28,gl:GLYPHS[(Math.random()*GLYPHS.length)|0],a:.25+Math.random()*.35}));
+}
+function draw(t){
+  g2.clearRect(0,0,W,H);
+  // lightstick sea
+  for(let i=0;i<W;i+=22){
+    const y = H - 18 - Math.sin(i*.05 + (still?0:t*.002))*6 - (i%44?0:6);
+    const grd = g2.createRadialGradient(i,y,0,i,y,12);
+    grd.addColorStop(0,"rgba(255,95,168,.55)"); grd.addColorStop(1,"rgba(255,95,168,0)");
+    g2.fillStyle = grd; g2.beginPath(); g2.arc(i,y,12,0,6.28); g2.fill();
+  }
+  // spotlights
+  if(!still){
+    [[.2,"255,184,214"],[.8,"181,146,255"]].forEach(([px,c],k)=>{
+      const ang = Math.sin(t*.0006 + k*2)*.35;
+      g2.save(); g2.translate(W*px,0); g2.rotate(ang);
+      const lg = g2.createLinearGradient(0,0,0,H);
+      lg.addColorStop(0,`rgba(${c},.28)`); lg.addColorStop(1,`rgba(${c},0)`);
+      g2.fillStyle = lg; g2.beginPath(); g2.moveTo(-10,0); g2.lineTo(10,0); g2.lineTo(H*.25,H); g2.lineTo(-H*.25,H); g2.closePath(); g2.fill(); g2.restore();
+    });
+  }
+  g2.textAlign="center";
+  for(const p of parts){
+    if(!still){ p.y -= p.v; p.w += .02; if(p.y < -30){ p.y = H+20; p.x = Math.random()*W; } }
+    g2.globalAlpha = p.a; g2.font = `${p.s}px serif`; g2.fillText(p.gl, p.x + Math.sin(p.w)*10, p.y);
+  }
+  g2.globalAlpha = 1;
+  if(!still) requestAnimationFrame(draw);
+}
+addEventListener("resize", size); size(); requestAnimationFrame(draw);
+
+/* ---------- START (with live-update state carry-over) ---------- */
+try{ if(matchMedia("(min-width: 980px)").matches) document.getElementById("lyrics").open = true; }catch(e){}
+const hot = window.claude && window.claude.hot;
+if(hot && hot.snapshot) hot.snapshot(()=>({history, trophies, tour0: window.__tour0||0}));
+const start = d => boot(d||{});
+if(hot && hot.ready) hot.ready(start); else start((hot && hot.data) || {});
+})();
+</script>
+</body>
+</html>

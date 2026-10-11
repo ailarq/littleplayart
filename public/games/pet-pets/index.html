@@ -1,0 +1,1488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>🐾 Pet Pets</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --pink:#FF6FA6;
+    --pink-dark:#E14F86;
+    --yellow:#FFD23F;
+    --yellow-dark:#EDB800;
+    --sky:#4DCCFF;
+    --sky-dark:#22ABDE;
+    --green:#6BCB77;
+    --green-dark:#3FAE4E;
+    --purple:#9B7BE0;
+    --purple-dark:#7B58C4;
+    --cream:#FFF9F0;
+    --ink:#3D2B56;
+    --shadow-color:#3D2B5633;
+    --bg-top:#CFF3FF;
+    --bg-bottom:#FFE7B8;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;height:100%;}
+  body{
+    font-family:'Nunito',sans-serif;
+    background: linear-gradient(180deg, var(--bg-top) 0%, #FDEFD0 55%, var(--bg-bottom) 100%);
+    color:var(--ink);
+    min-height:100vh;
+    overflow-x:hidden;
+    user-select:none;
+  }
+  h1,h2,h3,.display{font-family:'Baloo 2',cursive;}
+  button{font-family:'Nunito',sans-serif; cursor:pointer;}
+  .screen{display:none; min-height:100vh; padding:16px; position:relative;}
+  .screen.active{display:block;}
+
+  /* ---------- sticker component ---------- */
+  .sticker{
+    background:#fff;
+    border:4px solid var(--ink);
+    border-radius:26px;
+    box-shadow:6px 6px 0 var(--shadow-color);
+  }
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    border:4px solid var(--ink);
+    border-radius:999px;
+    padding:14px 26px;
+    font-weight:800;
+    font-size:1.05rem;
+    color:var(--ink);
+    box-shadow:5px 5px 0 var(--shadow-color);
+    transition:transform .12s ease, box-shadow .12s ease;
+    background:var(--yellow);
+  }
+  .btn:active{transform:translate(3px,3px); box-shadow:2px 2px 0 var(--shadow-color);}
+  .btn:hover{transform:translateY(-2px);}
+  .btn.pink{background:var(--pink); color:#fff;}
+  .btn.sky{background:var(--sky); color:#fff;}
+  .btn.green{background:var(--green); color:#fff;}
+  .btn.purple{background:var(--purple); color:#fff;}
+  .btn.small{padding:10px 18px; font-size:.9rem; border-width:3px; box-shadow:3px 3px 0 var(--shadow-color);}
+  .btn:disabled{opacity:.45; cursor:not-allowed; transform:none;}
+  .btn.ghost{background:#fff;}
+
+  .topbar{
+    display:flex; align-items:center; justify-content:space-between;
+    flex-wrap:wrap; gap:10px; margin-bottom:18px;
+  }
+  .coin-badge{
+    display:flex; align-items:center; gap:6px;
+    background:#fff; border:3px solid var(--ink); border-radius:999px;
+    padding:8px 16px; font-weight:900; box-shadow:3px 3px 0 var(--shadow-color);
+  }
+  .back-btn{background:#fff;}
+
+  /* floaty bounce */
+  @keyframes floaty{0%,100%{transform:translateY(0) rotate(0deg);}50%{transform:translateY(-14px) rotate(-4deg);}}
+  @keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
+  @keyframes wiggle{0%,100%{transform:rotate(-3deg);}50%{transform:rotate(3deg);}}
+  @keyframes popIn{0%{transform:scale(0);opacity:0;}80%{transform:scale(1.15);opacity:1;}100%{transform:scale(1);}}
+  @keyframes sparkle{0%,100%{opacity:.2; transform:scale(.8);}50%{opacity:1; transform:scale(1.2);}}
+
+  /* ---------- HOME ---------- */
+  #screen-home{text-align:center;}
+  .home-deco{position:absolute; font-size:2.4rem; animation:floaty 4s ease-in-out infinite; opacity:.9; pointer-events:none;}
+  .logo-wrap{margin-top:26px; margin-bottom:10px;}
+  .logo-title{
+    font-size:clamp(2.4rem,8vw,4rem); font-weight:800; margin:0;
+    color:var(--pink-dark);
+    -webkit-text-stroke:3px var(--ink);
+    text-shadow:4px 4px 0 var(--yellow);
+    letter-spacing:1px;
+  }
+  .logo-sub{font-weight:800; color:var(--ink); margin-top:4px; font-size:1.1rem;}
+  .start-btn{
+    font-size:1.5rem; padding:20px 46px; margin:26px 0 30px;
+    background:var(--pink); color:#fff; animation:bounce 2s ease-in-out infinite;
+  }
+  .home-grid{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+    gap:16px; max-width:640px; margin:0 auto;
+  }
+  .home-nav-btn{
+    padding:22px 10px; font-size:1.5rem; flex-direction:column; border-radius:22px; width:100%;
+  }
+  .home-nav-btn span.label{font-size:.85rem; margin-top:4px;}
+
+  /* ---------- generic layout ---------- */
+  .panel-title{text-align:center; font-size:1.8rem; margin:6px 0 18px; color:var(--purple-dark);}
+  .card-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(110px,1fr)); gap:14px; max-width:720px; margin:0 auto;}
+  .pick-card{
+    padding:16px 8px; text-align:center; cursor:pointer; transition:transform .15s;
+  }
+  .pick-card:hover{transform:translateY(-4px) scale(1.03);}
+  .pick-card.selected{background:var(--yellow); border-color:var(--ink);}
+  .pick-emoji{font-size:2.6rem; display:block;}
+  .pick-label{font-weight:800; margin-top:6px; font-size:.95rem;}
+
+  /* ---------- pet stage ---------- */
+  .pet-stage{
+    max-width:520px; margin:0 auto; padding:26px 16px 10px; text-align:center; position:relative;
+    min-height:230px;
+  }
+  .pet-spot{
+    width:190px; height:190px; border-radius:50%; margin:0 auto; position:relative;
+    display:flex; align-items:center; justify-content:center;
+    border:5px solid var(--ink);
+  }
+  .pet-emoji-wrap{font-size:6.5rem; position:relative; animation:bounce 2.4s ease-in-out infinite;}
+  .pet-accessory{position:absolute; font-size:2.2rem; top:-14px; right:-6px;}
+  .pet-name-tag{
+    display:inline-block; margin-top:12px; font-size:1.3rem; font-weight:800;
+    background:#fff; border:3px solid var(--ink); border-radius:999px; padding:6px 20px;
+  }
+  .zzz{position:absolute; top:-6px; right:6px; font-size:1.4rem; animation:floaty 1.6s ease-in-out infinite;}
+
+  .stat-bars{max-width:420px; margin:20px auto; display:grid; gap:10px;}
+  .stat-row{display:flex; align-items:center; gap:10px;}
+  .stat-icon{font-size:1.3rem; width:26px; text-align:center;}
+  .stat-track{flex:1; height:16px; border-radius:999px; background:#eee; border:2px solid var(--ink); overflow:hidden;}
+  .stat-fill{height:100%; border-radius:999px; transition:width .4s ease;}
+  .fill-happy{background:var(--pink);}
+  .fill-hunger{background:var(--yellow-dark);}
+  .fill-energy{background:var(--sky);}
+  .fill-clean{background:var(--green);}
+
+  .action-grid{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(90px,1fr));
+    gap:12px; max-width:640px; margin:22px auto 0;
+  }
+  .action-btn{
+    flex-direction:column; padding:14px 6px; font-size:1.6rem; border-radius:20px;
+  }
+  .action-btn span.label{font-size:.72rem; margin-top:4px;}
+
+  /* floating text popups */
+  .float-pop{
+    position:absolute; font-weight:900; font-size:1.2rem; pointer-events:none;
+    animation:floatUp 1s ease-out forwards; z-index:50;
+  }
+  @keyframes floatUp{0%{opacity:1; transform:translateY(0);}100%{opacity:0; transform:translateY(-60px);}}
+
+  /* ---------- walk ---------- */
+  .walk-scene{
+    max-width:640px; margin:14px auto; min-height:280px; border-radius:26px; border:5px solid var(--ink);
+    position:relative; overflow:hidden; display:flex; align-items:flex-end; justify-content:center; padding-bottom:20px;
+  }
+  .walk-item{position:absolute; font-size:2rem; cursor:pointer; animation:sparkle 1.6s ease-in-out infinite;}
+  .walk-pet{font-size:4.4rem; animation:bounce 1.6s ease-in-out infinite;}
+
+  /* ---------- games ---------- */
+  .ttt-board{display:grid; grid-template-columns:repeat(3,84px); grid-template-rows:repeat(3,84px); gap:8px; margin:20px auto; width:fit-content;}
+  .ttt-cell{
+    background:#fff; border:4px solid var(--ink); border-radius:16px; font-size:2.4rem;
+    display:flex; align-items:center; justify-content:center; cursor:pointer;
+  }
+  .mem-board{display:grid; grid-template-columns:repeat(4,76px); gap:10px; margin:20px auto; width:fit-content;}
+  .mem-card{
+    width:76px; height:76px; border-radius:14px; border:4px solid var(--ink);
+    display:flex; align-items:center; justify-content:center; font-size:1.9rem;
+    background:var(--sky); cursor:pointer; transition:transform .25s;
+  }
+  .mem-card.flipped, .mem-card.matched{background:#fff;}
+  .mem-card.matched{opacity:.55;}
+
+  .snl-track{display:flex; flex-wrap:wrap; gap:6px; max-width:640px; margin:18px auto; justify-content:center;}
+  .snl-cell{
+    width:52px; height:52px; border-radius:10px; border:3px solid var(--ink); background:#fff;
+    display:flex; align-items:center; justify-content:center; font-size:.8rem; font-weight:800; position:relative;
+  }
+  .snl-cell.ladder{background:var(--green);}
+  .snl-cell.snake{background:var(--pink);}
+  .snl-token{position:absolute; font-size:1.3rem; top:-8px;}
+  .snl-token.you{left:-4px;}
+  .snl-token.pet{right:-4px;}
+
+  .catch-zone{
+    max-width:500px; height:340px; margin:16px auto; border-radius:24px; border:5px solid var(--ink);
+    position:relative; overflow:hidden;
+  }
+  .fall-item{position:absolute; font-size:2.2rem; cursor:pointer;}
+
+  .bubble{position:absolute; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:1.4rem; animation:floaty 3s ease-in-out infinite;}
+
+  .game-hud{display:flex; justify-content:center; gap:24px; font-weight:900; margin-top:6px; font-size:1.1rem;}
+
+  /* achievements */
+  .ach-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px; max-width:800px; margin:0 auto;}
+  .ach-card{display:flex; align-items:center; gap:12px; padding:14px; opacity:.4;}
+  .ach-card.unlocked{opacity:1; background:var(--yellow);}
+  .ach-emoji{font-size:2.2rem;}
+  .streak-badge{
+    text-align:center; max-width:300px; margin:0 auto 24px; padding:16px; font-size:1.3rem; font-weight:800;
+    background:var(--pink); color:#fff;
+  }
+
+  /* shop */
+  .shop-item{padding:16px 10px; text-align:center;}
+  .shop-price{margin-top:6px; font-weight:900; color:var(--yellow-dark);}
+
+  footer.credit{text-align:center; margin:30px 0 10px; font-size:.75rem; opacity:.55;}
+  .side-credit{
+    position:fixed; right:10px; bottom:10px; z-index:100;
+    background:#fff; border:3px solid var(--ink); border-radius:999px;
+    padding:6px 14px; font-size:.72rem; font-weight:800; opacity:.85;
+    box-shadow:3px 3px 0 var(--shadow-color);
+    writing-mode:horizontal-tb;
+  }
+  @media (max-width:480px){
+    .side-credit{font-size:.65rem; padding:5px 10px; right:6px; bottom:6px;}
+  }
+
+  @media (max-width:480px){
+    .pet-spot{width:150px; height:150px;}
+    .pet-emoji-wrap{font-size:5rem;}
+    .ttt-board{grid-template-columns:repeat(3,72px); grid-template-rows:repeat(3,72px);}
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= HOME ================= -->
+<section id="screen-home" class="screen active">
+  <div class="home-deco" style="top:6%;left:4%;">🐶</div>
+  <div class="home-deco" style="top:10%;right:6%; animation-delay:.6s;">🐱</div>
+  <div class="home-deco" style="top:36%;left:2%; animation-delay:1.2s;">🦋</div>
+  <div class="home-deco" style="top:30%;right:3%; animation-delay:.3s;">🐰</div>
+  <div class="home-deco" style="bottom:6%;left:8%; animation-delay:.9s;">🐢</div>
+  <div class="home-deco" style="bottom:8%;right:9%; animation-delay:1.5s;">🦜</div>
+
+  <div class="logo-wrap">
+    <h1 class="logo-title">🐾 PET PETS 🐾</h1>
+    <div class="logo-sub">your very own virtual best friend!</div>
+  </div>
+
+  <div style="text-align:center;">
+    <button class="btn start-btn" onclick="playClick(); goToStart()">▶ START PLAYING!</button>
+  </div>
+
+  <div class="home-grid">
+    <button class="btn sky home-nav-btn" onclick="playClick(); go('petHomeOrSelect')"><span>🐾</span><span class="label">My Pet</span></button>
+    <button class="btn green home-nav-btn" onclick="playClick(); go('games')"><span>🎮</span><span class="label">Games</span></button>
+    <button class="btn purple home-nav-btn" onclick="playClick(); go('achievements')"><span>🏆</span><span class="label">Achievements</span></button>
+    <button class="btn pink home-nav-btn" onclick="playClick(); go('shop')"><span>🏡</span><span class="label">My Home</span></button>
+    <button class="btn ghost home-nav-btn" onclick="playClick(); go('settings')"><span>⚙️</span><span class="label">Settings</span></button>
+  </div>
+
+  <footer class="credit">Made with 💛 for kids who love pets</footer>
+</section>
+
+<!-- ================= PET SELECT ================= -->
+<section id="screen-select" class="screen">
+  <div class="topbar">
+    <button class="btn back-btn small" onclick="playClick(); go('home')">⬅ Back</button>
+    <div class="coin-badge">🪙 <span id="coinCount1">0</span></div>
+  </div>
+  <h2 class="panel-title">Choose Your Pet! 🐾</h2>
+  <div class="card-grid" id="animalGrid"></div>
+  <div style="text-align:center; margin-top:22px;">
+    <button class="btn pink" id="selectNextBtn" disabled onclick="playClick(); goCustomize()">Next: Customize! ➡</button>
+  </div>
+</section>
+
+<!-- ================= CUSTOMIZE ================= -->
+<section id="screen-customize" class="screen">
+  <div class="topbar">
+    <button class="btn back-btn small" onclick="playClick(); go('select')">⬅ Back</button>
+    <div class="coin-badge">🪙 <span id="coinCount2">0</span></div>
+  </div>
+  <h2 class="panel-title">Make It Yours! ✨</h2>
+
+  <div class="pet-stage">
+    <div class="pet-spot" id="customSpot">
+      <div class="pet-emoji-wrap" id="customEmoji">
+        <span class="pet-accessory" id="customAccessory"></span>
+      </div>
+    </div>
+  </div>
+
+  <h3 style="text-align:center;">🎨 Color</h3>
+  <div class="card-grid" id="colorGrid" style="max-width:520px;"></div>
+
+  <h3 style="text-align:center; margin-top:20px;">🌀 Pattern</h3>
+  <div class="card-grid" id="patternGrid" style="max-width:520px;"></div>
+
+  <h3 style="text-align:center; margin-top:20px;">🎀 Accessory</h3>
+  <div class="card-grid" id="accessoryGrid" style="max-width:520px;"></div>
+
+  <h3 style="text-align:center; margin-top:20px;">📛 Name</h3>
+  <div style="text-align:center;">
+    <input id="petNameInput" maxlength="14" placeholder="Type a name..."
+      style="font-family:'Nunito'; font-size:1.1rem; font-weight:800; padding:12px 20px; border-radius:999px; border:4px solid var(--ink); text-align:center; width:220px;">
+  </div>
+
+  <div style="text-align:center; margin-top:26px;">
+    <button class="btn pink" style="font-size:1.2rem;" onclick="confirmPet()">Meet Your New Pet Pet! ❤️</button>
+  </div>
+</section>
+
+<!-- ================= MEET ================= -->
+<section id="screen-meet" class="screen" style="text-align:center;">
+  <div style="margin-top:14%;">
+    <h1 style="font-size:2.2rem; color:var(--pink-dark);">Meet your new Pet Pet! ❤️</h1>
+    <div class="pet-stage">
+      <div class="pet-spot" id="meetSpot" style="margin:0 auto;">
+        <div class="pet-emoji-wrap" id="meetEmoji" style="animation:popIn .6s ease;"></div>
+      </div>
+    </div>
+    <div class="pet-name-tag" id="meetName"></div>
+    <div style="margin-top:30px;">
+      <button class="btn green" onclick="playCelebrate(); go('petHome')">Let's Go Home! 🏡</button>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PET HOME ================= -->
+<section id="screen-pethome" class="screen">
+  <div class="topbar">
+    <button class="btn back-btn small" onclick="playClick(); go('home')">⬅ Home Menu</button>
+    <div class="coin-badge">🪙 <span id="coinCount3">0</span></div>
+  </div>
+
+  <div class="pet-stage" id="petHomeStage">
+    <div class="pet-spot" id="homeSpot">
+      <div class="pet-emoji-wrap" id="homeEmoji">
+        <span class="pet-accessory" id="homeAccessory"></span>
+      </div>
+    </div>
+    <div class="pet-name-tag" id="homeName"></div>
+  </div>
+
+  <div class="stat-bars">
+    <div class="stat-row"><span class="stat-icon">❤️</span><div class="stat-track"><div class="stat-fill fill-happy" id="barHappy" style="width:80%"></div></div></div>
+    <div class="stat-row"><span class="stat-icon">🍎</span><div class="stat-track"><div class="stat-fill fill-hunger" id="barHunger" style="width:80%"></div></div></div>
+    <div class="stat-row"><span class="stat-icon">⚡</span><div class="stat-track"><div class="stat-fill fill-energy" id="barEnergy" style="width:80%"></div></div></div>
+    <div class="stat-row"><span class="stat-icon">✨</span><div class="stat-track"><div class="stat-fill fill-clean" id="barClean" style="width:80%"></div></div></div>
+  </div>
+
+  <div class="action-grid">
+    <button class="btn pink action-btn" onclick="doAction('pet')"><span>🥰</span><span class="label">Pet</span></button>
+    <button class="btn yellow action-btn" onclick="doAction('feed')"><span>🍎</span><span class="label">Feed</span></button>
+    <button class="btn sky action-btn" onclick="doAction('water')"><span>💧</span><span class="label">Water</span></button>
+    <button class="btn sky action-btn" onclick="doAction('bath')"><span>🛁</span><span class="label">Bath</span></button>
+    <button class="btn purple action-btn" onclick="doAction('sleep')"><span>💤</span><span class="label">Sleep</span></button>
+    <button class="btn green action-btn" onclick="doAction('toy')"><span>🧸</span><span class="label">Toy</span></button>
+    <button class="btn pink action-btn" onclick="doAction('cuddle')"><span>❤️</span><span class="label">Cuddle</span></button>
+    <button class="btn ghost action-btn" onclick="go('customizeAccessory')"><span>🎀</span><span class="label">Style</span></button>
+  </div>
+
+  <div style="text-align:center; margin-top:24px;">
+    <button class="btn green" style="font-size:1.15rem;" onclick="playClick(); go('walk')">🚶 Go Outside</button>
+  </div>
+</section>
+
+<!-- ================= WALK LOCATIONS ================= -->
+<section id="screen-walk" class="screen">
+  <div class="topbar">
+    <button class="btn back-btn small" onclick="playClick(); go('petHome')">⬅ Back</button>
+    <div class="coin-badge">🪙 <span id="coinCount4">0</span></div>
+  </div>
+  <h2 class="panel-title">Where to today? 🚶</h2>
+  <div class="card-grid" id="locationGrid"></div>
+</section>
+
+<!-- ================= WALK SCENE ================= -->
+<section id="screen-walkscene" class="screen">
+  <div class="topbar">
+    <button class="btn back-btn small" onclick="playClick(); go('walk')">⬅ Locations</button>
+    <div class="coin-badge">🪙 <span id="coinCount5">0</span></div>
+  </div>
+  <h2 class="panel-title" id="walkSceneTitle"></h2>
+  <div class="walk-scene" id="walkSceneBox">
+    <div class="walk-pet" id="walkScenePet"></div>
+  </div>
+  <p style="text-align:center; font-weight:800;">Tap the sparkly things to collect them! ✨</p>
+</section>
+
+<!-- ================= GAMES HUB ================= -->
+<section id="screen-games" class="screen">
+  <div class="topbar">
+    <button class="btn back-btn small" onclick="playClick(); go('home')">⬅ Home Menu</button>
+    <div class="coin-badge">🪙 <span id="coinCount6">0</span></div>
+  </div>
+  <h2 class="panel-title">Pet Games 🎮</h2>
+  <div class="card-grid">
+    <div class="sticker pick-card" onclick="playClick(); startTTT()"><span class="pick-emoji">❌⭕</span><span class="pick-label">Tic-Tac-Toe</span></div>
+    <div class="sticker pick-card" onclick="playClick(); startSnakes()"><span class="pick-emoji">🎲</span><span class="pick-label">Snakes &amp; Ladders</span></div>
+    <div class="sticker pick-card" onclick="playClick(); startMemory()"><span class="pick-emoji">🧠</span><span class="pick-label">Memory Match</span></div>
+    <div class="sticker pick-card" onclick="playClick(); startCatch()"><span class="pick-emoji">🎯</span><span class="pick-label">Ball Catch</span></div>
+    <div class="sticker pick-card" onclick="playClick(); startBubble()"><span class="pick-emoji">🫧</span><span class="pick-label">Bubble Pop</span></div>
+    <div class="sticker pick-card" onclick="playClick(); startSimon()"><span class="pick-emoji">🎵</span><span class="pick-label">Simon Says</span></div>
+    <div class="sticker pick-card" onclick="playClick(); startPeek()"><span class="pick-emoji">🙈</span><span class="pick-label">Peek-a-Boo</span></div>
+  </div>
+</section>
+
+<!-- ================= TIC TAC TOE ================= -->
+<section id="screen-ttt" class="screen">
+  <div class="topbar">
+    <button class="btn back-btn small" onclick="playClick(); go('games')">⬅ Games</button>
+    <div class="coin-badge">🪙 <span id="coinCount7">0</span></div>
+  </div>
+  <h2 class="panel-title" id="tttPetLine">🐾 Tic-Tac-Toe</h2>
+  <div id="tttMsg" style="text-align:center; font-weight:800; font-size:1.1rem;">Your turn! You're ❌</div>
+  <div class="ttt-board" id="tttBoard"></div>
+  <div style="text-align:center; margin-top:14px;">
+    <button class="btn small" onclick="startTTT()">🔄 Play Again</button>
+  </div>
+</section>
+
+<!-- ================= MEMORY MATCH ================= -->
+<section id="screen-memory" class="screen">
+  <div class="topbar">
+    <button class="btn back-btn small" onclick="playClick(); go('games')">⬅ Games</button>
+    <div class="coin-badge">🪙 <span id="coinCount8">0</span></div>
+  </div>
+  <h2 class="panel-title">🧠 Memory Match</h2>
+  <div class="game-hud"><span id="memMoves">Moves: 0</span><span id="memPairs">Pairs: 0/6</span></div>
+  <div class="mem-board" id="memBoard"></div>
+  <div style="text-align:center; margin-top:14px;">
+    <button class="btn small" onclick="startMemory()">🔄 New Game</button>
+  </div>
+</section>
+
+<!-- ================= SNAKES & LADDERS ================= -->
+<section id="screen-snakes" class="screen">
+  <div class="topbar">
+    <button class="btn back-btn small" onclick="playClick(); go('games')">⬅ Games</button>
+    <div class="coin-badge">🪙 <span id="coinCount9">0</span></div>
+  </div>
+  <h2 class="panel-title">🎲 Snakes &amp; Ladders</h2>
+  <div id="snlMsg" style="text-align:center; font-weight:800;">You vs your Pet Pet — race to 30!</div>
+  <div class="snl-track" id="snlTrack"></div>
+  <div style="text-align:center; margin-top:14px;">
+    <button class="btn pink" id="snlRollBtn" onclick="snlRoll()">🎲 Roll Dice</button>
+    <div id="snlDiceFace" style="font-size:2rem; margin-top:10px;"></div>
+  </div>
+</section>
+
+<!-- ================= BALL CATCH ================= -->
+<section id="screen-catch" class="screen">
+  <div class="topbar">
+    <button class="btn back-btn small" onclick="playClick(); stopCatch(); go('games')">⬅ Games</button>
+    <div class="coin-badge">🪙 <span id="coinCount10">0</span></div>
+  </div>
+  <h2 class="panel-title">🎯 Ball Catch</h2>
+  <div class="game-hud"><span id="catchScore">Caught: 0</span><span id="catchTime">Time: 15</span></div>
+  <div class="catch-zone" id="catchZone"></div>
+  <div style="text-align:center; margin-top:10px;">
+    <button class="btn small" onclick="startCatch()">🔄 Restart</button>
+  </div>
+</section>
+
+<!-- ================= BUBBLE POP ================= -->
+<section id="screen-bubble" class="screen">
+  <div class="topbar">
+    <button class="btn back-btn small" onclick="playClick(); stopBubble(); go('games')">⬅ Games</button>
+    <div class="coin-badge">🪙 <span id="coinCount11">0</span></div>
+  </div>
+  <h2 class="panel-title">🫧 Bubble Pop</h2>
+  <div class="game-hud"><span id="bubbleScore">Popped: 0</span><span id="bubbleTime">Time: 15</span></div>
+  <div class="catch-zone" id="bubbleZone" style="background:linear-gradient(180deg,#BFEFFF,#E9FBFF);"></div>
+  <div style="text-align:center; margin-top:10px;">
+    <button class="btn small" onclick="startBubble()">🔄 Restart</button>
+  </div>
+</section>
+
+<!-- ================= SIMON SAYS ================= -->
+<section id="screen-simon" class="screen">
+  <div class="topbar">
+    <button class="btn back-btn small" onclick="playClick(); stopSimon(); go('games')">⬅ Games</button>
+    <div class="coin-badge">🪙 <span id="coinCount15">0</span></div>
+  </div>
+  <h2 class="panel-title">🎵 Simon Says</h2>
+  <div id="simonMsg" style="text-align:center; font-weight:800; font-size:1.1rem;">Watch your Pet Pet's pattern, then repeat it!</div>
+  <div class="game-hud"><span id="simonLevel">Level: 1</span></div>
+  <div id="simonPads" style="display:grid; grid-template-columns:repeat(2,120px); grid-template-rows:repeat(2,120px); gap:10px; margin:20px auto; width:fit-content;"></div>
+  <div style="text-align:center; margin-top:10px;">
+    <button class="btn pink" id="simonStartBtn" onclick="simonBeginRound()">▶ Watch Pattern</button>
+    <button class="btn small" onclick="startSimon()" style="margin-left:8px;">🔄 Restart</button>
+  </div>
+</section>
+
+<!-- ================= PEEK-A-BOO ================= -->
+<section id="screen-peek" class="screen">
+  <div class="topbar">
+    <button class="btn back-btn small" onclick="playClick(); stopPeek(); go('games')">⬅ Games</button>
+    <div class="coin-badge">🪙 <span id="coinCount16">0</span></div>
+  </div>
+  <h2 class="panel-title">🙈 Peek-a-Boo</h2>
+  <div class="game-hud"><span id="peekScore">Caught: 0</span><span id="peekTime">Time: 20</span></div>
+  <p style="text-align:center; font-weight:700;">Tap your Pet Pet before it hides again!</p>
+  <div id="peekGrid" style="display:grid; grid-template-columns:repeat(3,90px); grid-template-rows:repeat(3,90px); gap:10px; margin:16px auto; width:fit-content;"></div>
+  <div style="text-align:center; margin-top:10px;">
+    <button class="btn small" onclick="startPeek()">🔄 Restart</button>
+  </div>
+</section>
+
+<!-- ================= ACHIEVEMENTS ================= -->
+<section id="screen-achievements" class="screen">
+  <div class="topbar">
+    <button class="btn back-btn small" onclick="playClick(); go('home')">⬅ Home Menu</button>
+    <div class="coin-badge">🪙 <span id="coinCount12">0</span></div>
+  </div>
+  <h2 class="panel-title">🏆 Achievements</h2>
+  <div class="sticker streak-badge">🔥 <span id="streakCount">1</span> Day Pet Streak!</div>
+  <div class="ach-grid" id="achGrid"></div>
+</section>
+
+<!-- ================= SHOP / HOME ================= -->
+<section id="screen-shop" class="screen">
+  <div class="topbar">
+    <button class="btn back-btn small" onclick="playClick(); go('home')">⬅ Home Menu</button>
+    <div class="coin-badge">🪙 <span id="coinCount13">0</span></div>
+  </div>
+  <h2 class="panel-title">🏡 My Home &amp; Shop</h2>
+  <p style="text-align:center; font-weight:800;">Spend Pet Coins on fun stuff — no real money, ever! 🚫💳</p>
+  <div class="card-grid" id="shopGrid"></div>
+</section>
+
+<!-- ================= SETTINGS ================= -->
+<section id="screen-settings" class="screen">
+  <div class="topbar">
+    <button class="btn back-btn small" onclick="playClick(); go('home')">⬅ Home Menu</button>
+    <div class="coin-badge">🪙 <span id="coinCount14">0</span></div>
+  </div>
+  <h2 class="panel-title">⚙️ Settings</h2>
+  <div style="text-align:center;">
+    <button class="btn pink" id="soundToggleBtn" onclick="toggleSound()">🔊 Sound: On</button>
+  </div>
+  <p style="text-align:center; margin-top:26px; max-width:420px; margin-left:auto; margin-right:auto; font-weight:700; opacity:.8;">
+    Pet Pets is made just for kids: no chatting with strangers, no personal info, and no real-money purchases. Just you and your Pet Pet! 🐾
+  </p>
+</section>
+
+<script>
+/* ============================================================
+   STATE
+============================================================ */
+const ANIMALS = [
+  {id:'dog', emoji:'🐶', label:'Dog'},
+  {id:'cat', emoji:'🐱', label:'Cat'},
+  {id:'hamster', emoji:'🐹', label:'Hamster'},
+  {id:'rabbit', emoji:'🐰', label:'Rabbit'},
+  {id:'mouse', emoji:'🐭', label:'Mouse'},
+  {id:'turtle', emoji:'🐢', label:'Turtle'},
+  {id:'parrot', emoji:'🦜', label:'Parrot'},
+  {id:'fish', emoji:'🐠', label:'Fish'},
+  {id:'gecko', emoji:'🦎', label:'Gecko'},
+  {id:'frog', emoji:'🐸', label:'Frog'},
+];
+const COLORS = [
+  {id:'pink', label:'Blossom', hex:'#FFC2DA'},
+  {id:'sky', label:'Sky', hex:'#BDEBFF'},
+  {id:'sun', label:'Sunshine', hex:'#FFE9A8'},
+  {id:'mint', label:'Mint', hex:'#C6F2CE'},
+  {id:'lilac', label:'Lilac', hex:'#DCCCF7'},
+  {id:'peach', label:'Peach', hex:'#FFD3B8'},
+];
+const PATTERNS = [
+  {id:'solid', label:'Solid', style:''},
+  {id:'dots', label:'Dots', style:'radial-gradient(circle,#fff5 20%,transparent 21%)', size:'14px 14px'},
+  {id:'stripes', label:'Stripes', style:'repeating-linear-gradient(45deg,#fff5 0 6px,transparent 6px 12px)'},
+  {id:'hearts', label:'Hearts', emojiOverlay:'💗'},
+];
+const ACCESSORIES = [
+  {id:'none', label:'None', emoji:''},
+  {id:'bow', label:'Bow', emoji:'🎀'},
+  {id:'hat', label:'Hat', emoji:'🎩'},
+  {id:'collar', label:'Collar', emoji:'📿'},
+  {id:'glasses', label:'Glasses', emoji:'🕶️'},
+  {id:'crown', label:'Crown', emoji:'👑'},
+];
+const LOCATIONS = [
+  {id:'park', label:'Park', emoji:'🌳', bg:'linear-gradient(180deg,#BFEFFF 0%, #DFF6C8 60%, #8FD17A 100%)'},
+  {id:'beach', label:'Beach', emoji:'🏖️', bg:'linear-gradient(180deg,#BFEFFF 0%, #FFF3C4 55%, #F6DFA6 100%)'},
+  {id:'forest', label:'Forest', emoji:'🌲', bg:'linear-gradient(180deg,#CDEBD6 0%, #9FD8A8 60%, #5FAE6E 100%)'},
+  {id:'city', label:'City', emoji:'🏙️', bg:'linear-gradient(180deg,#CFE3FF 0%, #E3E3F0 60%, #B9B9CE 100%)'},
+  {id:'garden', label:'Flower Garden', emoji:'🌸', bg:'linear-gradient(180deg,#FFE1F0 0%, #FFF0DA 60%, #E8C8E8 100%)'},
+  {id:'snow', label:'Snowy Park', emoji:'❄️', bg:'linear-gradient(180deg,#E8F6FF 0%, #FFFFFF 60%, #CFE9F7 100%)'},
+];
+const WALK_ITEMS = ['⭐','🦋','🪙','🎁','🧸'];
+
+const ACHIEVEMENTS = [
+  {id:'firstPet', emoji:'🏆', title:'First Pet', desc:'Choose your first pet', check: s => !!s.pet},
+  {id:'walkies', emoji:'🚶', title:'Walkies!', desc:'Take your pet for its first walk', check: s => s.locationsVisited.size >= 1},
+  {id:'gameMaster', emoji:'🎮', title:'Game Master', desc:'Play 10 games', check: s => s.gamesPlayed >= 10},
+  {id:'bestFriend', emoji:'❤️', title:'Best Friend', desc:'Keep your pet happy (100%)', check: s => s.stats.happiness >= 100},
+  {id:'explorer', emoji:'🌟', title:'Explorer', desc:'Visit every location', check: s => s.locationsVisited.size >= LOCATIONS.length},
+  {id:'collector', emoji:'🎁', title:'Collector', desc:'Find 20 special items', check: s => s.itemsFound >= 20},
+];
+
+const SHOP_ITEMS = [
+  {id:'toy1', emoji:'🧸', label:'Teddy Toy', price:15, cat:'toys'},
+  {id:'shirt1', emoji:'👕', label:'Comfy Shirt', price:20, cat:'clothes'},
+  {id:'hat2', emoji:'🎩', label:'Fancy Hat', price:20, cat:'hats'},
+  {id:'bowtie', emoji:'🎀', label:'Cute Bow', price:15, cat:'accessories'},
+  {id:'sofa', emoji:'🛋️', label:'Cozy Sofa', price:40, cat:'furniture'},
+  {id:'rug', emoji:'🌈', label:'Rainbow Rug', price:30, cat:'decorations'},
+  {id:'lamp', emoji:'💡', label:'Star Lamp', price:25, cat:'furniture'},
+  {id:'plant', emoji:'🪴', label:'Happy Plant', price:18, cat:'decorations'},
+];
+
+let state = {
+  coins: 20,
+  pet: null,
+  tempPet: {},
+  stats: {happiness:80, hunger:80, energy:80, clean:80},
+  soundOn: true,
+  streak: 1,
+  gamesPlayed: 0,
+  locationsVisited: new Set(),
+  itemsFound: 0,
+  unlocked: {},
+  owned: {},
+};
+
+/* ============================================================
+   NAVIGATION
+============================================================ */
+const SCREEN_IDS = {
+  home:'screen-home', select:'screen-select', customize:'screen-customize', meet:'screen-meet',
+  petHome:'screen-pethome', walk:'screen-walk', walkscene:'screen-walkscene', games:'screen-games',
+  ttt:'screen-ttt', memory:'screen-memory', snakes:'screen-snakes', catch:'screen-catch', bubble:'screen-bubble',
+  simon:'screen-simon', peek:'screen-peek',
+  achievements:'screen-achievements', shop:'screen-shop', settings:'screen-settings'
+};
+function go(name){
+  if(name === 'petHomeOrSelect'){ name = state.pet ? 'petHome' : 'select'; }
+  if(name === 'customizeAccessory'){ state.tempPet = {...state.pet}; renderCustomizeScreen(); name = 'customize'; }
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(SCREEN_IDS[name]).classList.add('active');
+  if(name === 'petHome') renderPetHome();
+  if(name === 'walk') renderWalkLocations();
+  if(name === 'achievements') renderAchievements();
+  if(name === 'shop') renderShop();
+  updateAllCoinBadges();
+}
+function goToStart(){
+  go(state.pet ? 'petHome' : 'select');
+}
+
+/* ============================================================
+   SOUND (WebAudio, no external files)
+============================================================ */
+let actx;
+function ensureAudio(){ if(!actx){ actx = new (window.AudioContext||window.webkitAudioContext)(); } }
+function beep(freq, dur, type, gain){
+  if(!state.soundOn) return;
+  try{
+    ensureAudio();
+    const o = actx.createOscillator();
+    const g = actx.createGain();
+    o.type = type || 'sine';
+    o.frequency.value = freq;
+    g.gain.value = gain || 0.08;
+    o.connect(g); g.connect(actx.destination);
+    o.start();
+    g.gain.exponentialRampToValueAtTime(0.0001, actx.currentTime + dur);
+    o.stop(actx.currentTime + dur);
+  }catch(e){}
+}
+function playClick(){ beep(520, .07, 'square', .05); }
+function playCoin(){ beep(880,.08,'triangle',.07); setTimeout(()=>beep(1180,.1,'triangle',.07),70); }
+function playCelebrate(){ [660,880,1046,1318].forEach((f,i)=>setTimeout(()=>beep(f,.18,'triangle',.08), i*90)); }
+function playPop(){ beep(300+Math.random()*300,.06,'sine',.06); }
+function toggleSound(){
+  state.soundOn = !state.soundOn;
+  document.getElementById('soundToggleBtn').textContent = state.soundOn ? '🔊 Sound: On' : '🔇 Sound: Off';
+  if(state.soundOn) playClick();
+}
+
+/* ============================================================
+   COINS
+============================================================ */
+function addCoins(n){
+  state.coins += n;
+  updateAllCoinBadges();
+  playCoin();
+}
+function updateAllCoinBadges(){
+  for(let i=1;i<=16;i++){
+    const el = document.getElementById('coinCount'+i);
+    if(el) el.textContent = state.coins;
+  }
+}
+
+/* ============================================================
+   ACHIEVEMENTS
+============================================================ */
+function checkAchievements(){
+  let newlyUnlocked = [];
+  ACHIEVEMENTS.forEach(a=>{
+    if(!state.unlocked[a.id] && a.check(state)){
+      state.unlocked[a.id] = true;
+      newlyUnlocked.push(a);
+    }
+  });
+  if(newlyUnlocked.length){
+    playCelebrate();
+    addCoins(10 * newlyUnlocked.length);
+  }
+}
+function renderAchievements(){
+  document.getElementById('streakCount').textContent = state.streak;
+  const grid = document.getElementById('achGrid');
+  grid.innerHTML = '';
+  ACHIEVEMENTS.forEach(a=>{
+    const unlocked = !!state.unlocked[a.id];
+    const div = document.createElement('div');
+    div.className = 'sticker ach-card' + (unlocked ? ' unlocked':'');
+    div.innerHTML = `<span class="ach-emoji">${a.emoji}</span><div><div style="font-weight:900;">${a.title}</div><div style="font-size:.85rem;">${a.desc}</div></div>`;
+    grid.appendChild(div);
+  });
+}
+
+/* ============================================================
+   PET SELECT / CUSTOMIZE
+============================================================ */
+function renderAnimalGrid(){
+  const grid = document.getElementById('animalGrid');
+  grid.innerHTML = '';
+  ANIMALS.forEach(a=>{
+    const card = document.createElement('div');
+    card.className = 'sticker pick-card';
+    card.innerHTML = `<span class="pick-emoji">${a.emoji}</span><span class="pick-label">${a.label}</span>`;
+    card.onclick = ()=>{
+      playClick();
+      document.querySelectorAll('#animalGrid .pick-card').forEach(c=>c.classList.remove('selected'));
+      card.classList.add('selected');
+      state.tempPet = {type:a.id, emoji:a.emoji, label:a.label, color:'sky', pattern:'solid', accessory:'none', name:''};
+      document.getElementById('selectNextBtn').disabled = false;
+    };
+    grid.appendChild(card);
+  });
+}
+function goCustomize(){
+  go('customize');
+  renderCustomizeScreen();
+}
+function renderCustomizeScreen(){
+  const customEmojiEl = document.getElementById('customEmoji');
+  const accEmoji = (ACCESSORIES.find(a=>a.id===state.tempPet.accessory)||{}).emoji || '';
+  customEmojiEl.innerHTML = `${state.tempPet.emoji} <span class="pet-accessory" id="customAccessory">${accEmoji}</span>`;
+  applySpotStyle(document.getElementById('customSpot'), state.tempPet);
+
+  const colorGrid = document.getElementById('colorGrid');
+  colorGrid.innerHTML = '';
+  COLORS.forEach(c=>{
+    const card = document.createElement('div');
+    card.className = 'sticker pick-card' + (state.tempPet.color===c.id ? ' selected':'');
+    card.style.background = c.hex;
+    card.innerHTML = `<span class="pick-label">${c.label}</span>`;
+    card.onclick = ()=>{ playClick(); state.tempPet.color=c.id; renderCustomizeScreen(); };
+    colorGrid.appendChild(card);
+  });
+
+  const patGrid = document.getElementById('patternGrid');
+  patGrid.innerHTML = '';
+  PATTERNS.forEach(p=>{
+    const card = document.createElement('div');
+    card.className = 'sticker pick-card' + (state.tempPet.pattern===p.id ? ' selected':'');
+    card.innerHTML = `<span class="pick-emoji">${p.emojiOverlay||'⚪'}</span><span class="pick-label">${p.label}</span>`;
+    card.onclick = ()=>{ playClick(); state.tempPet.pattern=p.id; renderCustomizeScreen(); };
+    patGrid.appendChild(card);
+  });
+
+  const accGrid = document.getElementById('accessoryGrid');
+  accGrid.innerHTML = '';
+  ACCESSORIES.forEach(a=>{
+    const card = document.createElement('div');
+    card.className = 'sticker pick-card' + (state.tempPet.accessory===a.id ? ' selected':'');
+    card.innerHTML = `<span class="pick-emoji">${a.emoji||'🚫'}</span><span class="pick-label">${a.label}</span>`;
+    card.onclick = ()=>{ playClick(); state.tempPet.accessory=a.id; renderCustomizeScreen(); };
+    accGrid.appendChild(card);
+  });
+
+  document.getElementById('petNameInput').value = state.tempPet.name || '';
+}
+function applySpotStyle(el, pet){
+  const color = COLORS.find(c=>c.id===pet.color) || COLORS[0];
+  const pattern = PATTERNS.find(p=>p.id===pet.pattern) || PATTERNS[0];
+  el.style.background = color.hex;
+  if(pattern.style){
+    el.style.backgroundImage = pattern.style;
+    el.style.backgroundSize = pattern.size || '';
+  } else {
+    el.style.backgroundImage = '';
+  }
+  // clear any previous emoji-overlay pattern (e.g. hearts) before re-adding
+  el.querySelectorAll('.pattern-overlay-emoji').forEach(n => n.remove());
+  if(pattern.emojiOverlay){
+    const positions = [
+      {top:'14%', left:'18%'}, {top:'18%', right:'16%'}, {top:'58%', left:'14%'},
+      {top:'62%', right:'18%'}, {top:'38%', left:'6%'}, {top:'42%', right:'6%'}
+    ];
+    positions.forEach(pos=>{
+      const span = document.createElement('span');
+      span.className = 'pattern-overlay-emoji';
+      span.textContent = pattern.emojiOverlay;
+      span.style.position = 'absolute';
+      span.style.fontSize = '1rem';
+      span.style.opacity = '0.85';
+      span.style.pointerEvents = 'none';
+      Object.assign(span.style, pos);
+      el.appendChild(span);
+    });
+  }
+}
+document.getElementById('petNameInput').addEventListener('input', e=>{
+  state.tempPet.name = e.target.value;
+});
+function confirmPet(){
+  if(!state.tempPet.name || !state.tempPet.name.trim()){
+    state.tempPet.name = state.tempPet.label + ' Pet';
+  }
+  state.pet = {...state.tempPet};
+  playCelebrate();
+  const meetAccEmoji = (ACCESSORIES.find(a=>a.id===state.pet.accessory)||{}).emoji || '';
+  document.getElementById('meetEmoji').innerHTML = `${state.pet.emoji} <span class="pet-accessory">${meetAccEmoji}</span>`;
+  document.getElementById('meetName').textContent = state.pet.name;
+  applySpotStyle(document.getElementById('meetSpot'), state.pet);
+  checkAchievements();
+  go('meet');
+}
+
+/* ============================================================
+   PET HOME
+============================================================ */
+let statDecayTimer = null;
+function renderPetHome(){
+  document.getElementById('homeEmoji').firstChild ? null : null;
+  const emojiWrap = document.getElementById('homeEmoji');
+  emojiWrap.innerHTML = `${getExpression()} <span class="pet-accessory" id="homeAccessory">${getAccessoryEmoji()}</span>`;
+  document.getElementById('homeName').textContent = state.pet.name;
+  applySpotStyle(document.getElementById('homeSpot'), state.pet);
+  updateStatBars();
+  if(!statDecayTimer){
+    statDecayTimer = setInterval(()=>{
+      state.stats.happiness = clamp(state.stats.happiness - 1);
+      state.stats.hunger = clamp(state.stats.hunger - 2);
+      state.stats.energy = clamp(state.stats.energy - 1);
+      state.stats.clean = clamp(state.stats.clean - 1);
+      updateStatBars();
+    }, 8000);
+  }
+}
+function getAccessoryEmoji(){
+  const a = ACCESSORIES.find(x=>x.id===state.pet.accessory);
+  return a ? a.emoji : '';
+}
+function clamp(v){ return Math.max(0, Math.min(100, v)); }
+function updateStatBars(){
+  document.getElementById('barHappy').style.width = state.stats.happiness+'%';
+  document.getElementById('barHunger').style.width = state.stats.hunger+'%';
+  document.getElementById('barEnergy').style.width = state.stats.energy+'%';
+  document.getElementById('barClean').style.width = state.stats.clean+'%';
+  const emojiWrap = document.getElementById('homeEmoji');
+  if(document.getElementById('screen-pethome').classList.contains('active')){
+    emojiWrap.childNodes[0].textContent = getExpression()+' ';
+  }
+}
+function getExpression(){
+  if(state.stats.energy <= 25) return state.pet.emoji; // sleepy handled visually via zzz
+  if(state.stats.hunger <= 25) return state.pet.emoji;
+  if(state.stats.happiness >= 80) return state.pet.emoji;
+  return state.pet.emoji;
+}
+function faceTag(){
+  if(state.stats.energy <= 25) return '😴';
+  if(state.stats.hunger <= 25) return '🥺';
+  if(state.stats.happiness >= 80) return '🤩';
+  if(state.stats.happiness >= 50) return '😄';
+  return '😐';
+}
+function doAction(type){
+  playClick();
+  const stage = document.getElementById('petHomeStage');
+  let popText = '';
+  switch(type){
+    case 'pet': state.stats.happiness = clamp(state.stats.happiness+10); popText='+10 ❤️'; break;
+    case 'feed': state.stats.hunger = clamp(state.stats.hunger+20); state.stats.happiness=clamp(state.stats.happiness+3); popText='+20 🍎'; break;
+    case 'water': state.stats.hunger = clamp(state.stats.hunger+8); state.stats.clean=clamp(state.stats.clean+3); popText='+8 💧'; break;
+    case 'bath': state.stats.clean = clamp(state.stats.clean+30); popText='+30 ✨'; break;
+    case 'sleep': state.stats.energy = clamp(state.stats.energy+30); popText='+30 ⚡'; break;
+    case 'toy': state.stats.happiness = clamp(state.stats.happiness+15); state.stats.energy=clamp(state.stats.energy-5); popText='+15 ❤️'; break;
+    case 'cuddle': state.stats.happiness = clamp(state.stats.happiness+15); popText='+15 ❤️'; break;
+  }
+  updateStatBars();
+  const pop = document.createElement('div');
+  pop.className = 'float-pop';
+  pop.style.left = '50%'; pop.style.top = '20px'; pop.style.color = 'var(--pink-dark)';
+  pop.textContent = popText;
+  stage.appendChild(pop);
+  setTimeout(()=>pop.remove(), 1000);
+  if(Math.random() < 0.4) addCoins(2);
+  checkAchievements();
+}
+
+/* ============================================================
+   WALK
+============================================================ */
+function renderWalkLocations(){
+  const grid = document.getElementById('locationGrid');
+  grid.innerHTML = '';
+  LOCATIONS.forEach(loc=>{
+    const card = document.createElement('div');
+    card.className = 'sticker pick-card';
+    card.innerHTML = `<span class="pick-emoji">${loc.emoji}</span><span class="pick-label">${loc.label}</span>`;
+    card.onclick = ()=>{ playClick(); startWalk(loc); };
+    grid.appendChild(card);
+  });
+}
+function startWalk(loc){
+  state.locationsVisited.add(loc.id);
+  document.getElementById('walkSceneTitle').textContent = `${loc.emoji} ${loc.label}`;
+  const box = document.getElementById('walkSceneBox');
+  box.style.background = loc.bg;
+  box.innerHTML = `<div class="walk-pet">${state.pet ? state.pet.emoji : '🐶'}</div>`;
+  go('walkscene');
+  for(let i=0;i<7;i++){
+    const item = document.createElement('div');
+    item.className = 'walk-item';
+    item.textContent = WALK_ITEMS[Math.floor(Math.random()*WALK_ITEMS.length)];
+    item.style.left = (8 + Math.random()*80) + '%';
+    item.style.top = (10 + Math.random()*55) + '%';
+    item.style.animationDelay = (Math.random()*1.4)+'s';
+    item.onclick = ()=>{
+      playCoin();
+      state.itemsFound++;
+      addCoins(3);
+      item.remove();
+      checkAchievements();
+    };
+    box.appendChild(item);
+  }
+  checkAchievements();
+}
+
+/* ============================================================
+   GAME: TIC TAC TOE
+============================================================ */
+let tttState, tttOver;
+function startTTT(){
+  go('ttt');
+  tttState = Array(9).fill(null);
+  tttOver = false;
+  document.getElementById('tttMsg').textContent = "Your turn! You're ❌";
+  document.getElementById('tttPetLine').textContent = `${state.pet ? state.pet.emoji:'🐾'} Tic-Tac-Toe`;
+  const board = document.getElementById('tttBoard');
+  board.innerHTML = '';
+  for(let i=0;i<9;i++){
+    const cell = document.createElement('div');
+    cell.className = 'ttt-cell';
+    cell.onclick = ()=>tttMove(i, cell);
+    board.appendChild(cell);
+  }
+}
+function tttMove(i, cell){
+  if(tttOver || tttState[i]) return;
+  playClick();
+  tttState[i] = 'X'; cell.textContent = '❌';
+  if(tttCheckEnd('X')) return;
+  setTimeout(()=>{
+    const move = tttAiMove();
+    if(move !== -1){
+      tttState[move] = 'O';
+      document.getElementById('tttBoard').children[move].textContent = '🐾';
+      tttCheckEnd('O');
+    }
+  }, 450);
+}
+function tttAiMove(){
+  const empties = tttState.map((v,i)=>v?null:i).filter(v=>v!==null);
+  // try win
+  for(const i of empties){ tttState[i]='O'; if(tttWinner()==='O'){tttState[i]=null; return i;} tttState[i]=null; }
+  // block
+  for(const i of empties){ tttState[i]='X'; if(tttWinner()==='X'){tttState[i]=null; return i;} tttState[i]=null; }
+  if(empties.length===0) return -1;
+  return empties[Math.floor(Math.random()*empties.length)];
+}
+function tttWinner(){
+  const lines = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+  for(const [a,b,c] of lines){
+    if(tttState[a] && tttState[a]===tttState[b] && tttState[a]===tttState[c]) return tttState[a];
+  }
+  return null;
+}
+function tttCheckEnd(lastMover){
+  const w = tttWinner();
+  if(w){
+    tttOver = true;
+    if(w==='X'){ document.getElementById('tttMsg').textContent = 'You win! 🎉 Your Pet Pet cheers for you!'; playCelebrate(); addCoins(15); state.gamesPlayed++; checkAchievements(); }
+    else { document.getElementById('tttMsg').textContent = 'Your Pet Pet wins this time! Try again 🐾'; addCoins(5); state.gamesPlayed++; checkAchievements(); }
+    return true;
+  }
+  if(tttState.every(v=>v)){
+    tttOver = true;
+    document.getElementById('tttMsg').textContent = "It's a tie! Good game 🤝"; addCoins(8); state.gamesPlayed++; checkAchievements();
+    return true;
+  }
+  return false;
+}
+
+/* ============================================================
+   GAME: MEMORY MATCH
+============================================================ */
+let memCards, memFlipped, memMatched, memMoves;
+function startMemory(){
+  go('memory');
+  const pool = ['🐶','🍎','🧸','⭐','🦋','🎾'];
+  let deck = [...pool, ...pool];
+  deck.sort(()=>Math.random()-0.5);
+  memCards = deck;
+  memFlipped = [];
+  memMatched = new Set();
+  memMoves = 0;
+  updateMemHud();
+  const board = document.getElementById('memBoard');
+  board.innerHTML = '';
+  memCards.forEach((sym, idx)=>{
+    const card = document.createElement('div');
+    card.className = 'mem-card';
+    card.dataset.idx = idx;
+    card.textContent = '';
+    card.onclick = ()=>memFlip(idx, card);
+    board.appendChild(card);
+  });
+}
+function updateMemHud(){
+  document.getElementById('memMoves').textContent = 'Moves: '+memMoves;
+  document.getElementById('memPairs').textContent = 'Pairs: '+memMatched.size+'/6';
+}
+function memFlip(idx, cardEl){
+  if(memFlipped.length===2 || memFlipped.includes(idx) || memMatched.has(idx)) return;
+  playClick();
+  cardEl.classList.add('flipped');
+  cardEl.textContent = memCards[idx];
+  memFlipped.push(idx);
+  if(memFlipped.length===2){
+    memMoves++; updateMemHud();
+    const [a,b] = memFlipped;
+    if(memCards[a]===memCards[b]){
+      memMatched.add(a); memMatched.add(b);
+      document.querySelector(`.mem-card[data-idx="${a}"]`).classList.add('matched');
+      document.querySelector(`.mem-card[data-idx="${b}"]`).classList.add('matched');
+      memFlipped = [];
+      updateMemHud();
+      playCoin(); addCoins(2);
+      if(memMatched.size===12){
+        setTimeout(()=>{ playCelebrate(); addCoins(15); state.gamesPlayed++; checkAchievements(); }, 200);
+      }
+    } else {
+      setTimeout(()=>{
+        memFlipped.forEach(i=>{
+          const el = document.querySelector(`.mem-card[data-idx="${i}"]`);
+          el.classList.remove('flipped'); el.textContent='';
+        });
+        memFlipped = [];
+      }, 700);
+    }
+  }
+}
+
+/* ============================================================
+   GAME: SNAKES AND LADDERS (linear, simplified 30 cells)
+============================================================ */
+const SNL_LEN = 30;
+const SNL_LADDERS = {3:12, 9:20, 14:24};
+const SNL_SNAKES = {17:6, 22:11, 27:15};
+let snlYou, snlPet, snlOver;
+function startSnakes(){
+  go('snakes');
+  snlYou = 0; snlPet = 0; snlOver = false;
+  document.getElementById('snlMsg').textContent = "You vs your Pet Pet — race to 30!";
+  document.getElementById('snlDiceFace').textContent = '';
+  document.getElementById('snlRollBtn').disabled = false;
+  renderSnl();
+}
+function renderSnl(){
+  const track = document.getElementById('snlTrack');
+  track.innerHTML = '';
+  for(let i=1;i<=SNL_LEN;i++){
+    const cell = document.createElement('div');
+    cell.className = 'snl-cell';
+    if(SNL_LADDERS[i]) cell.classList.add('ladder');
+    if(SNL_SNAKES[i]) cell.classList.add('snake');
+    cell.textContent = i;
+    if(snlYou===i){ const t=document.createElement('span'); t.className='snl-token you'; t.textContent='🐾'; cell.appendChild(t); }
+    if(snlPet===i){ const t=document.createElement('span'); t.className='snl-token pet'; t.textContent= state.pet?state.pet.emoji:'🐶'; cell.appendChild(t); }
+    track.appendChild(cell);
+  }
+}
+function snlRoll(){
+  if(snlOver) return;
+  playClick();
+  document.getElementById('snlRollBtn').disabled = true;
+  const yourRoll = 1+Math.floor(Math.random()*6);
+  document.getElementById('snlDiceFace').textContent = '🎲 You rolled: '+yourRoll;
+  snlYou = Math.min(SNL_LEN, snlYou + yourRoll);
+  if(SNL_LADDERS[snlYou]){ snlYou = SNL_LADDERS[snlYou]; }
+  else if(SNL_SNAKES[snlYou]){ snlYou = SNL_SNAKES[snlYou]; }
+  renderSnl();
+  if(snlYou >= SNL_LEN){ snlWin('You'); return; }
+  setTimeout(()=>{
+    const petRoll = 1+Math.floor(Math.random()*6);
+    document.getElementById('snlDiceFace').textContent = `🎲 You rolled ${yourRoll} · Pet rolled ${petRoll}`;
+    snlPet = Math.min(SNL_LEN, snlPet + petRoll);
+    if(SNL_LADDERS[snlPet]){ snlPet = SNL_LADDERS[snlPet]; }
+    else if(SNL_SNAKES[snlPet]){ snlPet = SNL_SNAKES[snlPet]; }
+    renderSnl();
+    if(snlPet >= SNL_LEN){ snlWin('Pet'); return; }
+    document.getElementById('snlRollBtn').disabled = false;
+  }, 600);
+}
+function snlWin(who){
+  snlOver = true;
+  document.getElementById('snlRollBtn').disabled = true;
+  state.gamesPlayed++;
+  if(who==='You'){
+    document.getElementById('snlMsg').textContent = "🎉 You win the race! Your Pet Pet is so proud!";
+    playCelebrate(); addCoins(18);
+  } else {
+    document.getElementById('snlMsg').textContent = "Your Pet Pet won this time! Funny victory dance 🐾💃";
+    addCoins(6);
+  }
+  checkAchievements();
+}
+
+/* ============================================================
+   GAME: BALL CATCH
+============================================================ */
+let catchInterval, catchTimerInt, catchScore, catchTimeLeft, catchActive;
+function startCatch(){
+  go('catch');
+  stopCatch();
+  catchScore = 0; catchTimeLeft = 15; catchActive = true;
+  document.getElementById('catchScore').textContent = 'Caught: 0';
+  document.getElementById('catchTime').textContent = 'Time: 15';
+  const zone = document.getElementById('catchZone');
+  zone.innerHTML = '';
+  catchInterval = setInterval(spawnFallItem, 850);
+  catchTimerInt = setInterval(()=>{
+    catchTimeLeft--;
+    document.getElementById('catchTime').textContent = 'Time: '+catchTimeLeft;
+    if(catchTimeLeft<=0){ endCatch(); }
+  },1000);
+}
+function spawnFallItem(){
+  if(!catchActive) return;
+  const zone = document.getElementById('catchZone');
+  const item = document.createElement('div');
+  item.className = 'fall-item';
+  item.textContent = '🎾';
+  const startX = 10 + Math.random()*75;
+  item.style.left = startX+'%';
+  item.style.top = '-40px';
+  zone.appendChild(item);
+  const duration = 2600 + Math.random()*900;
+  const start = performance.now();
+  const zoneHeight = zone.clientHeight;
+  function step(now){
+    if(!catchActive || !item.parentNode) return;
+    const t = (now-start)/duration;
+    if(t>=1){ item.remove(); return; }
+    item.style.top = (t*(zoneHeight+40) - 40)+'px';
+    requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+  item.onclick = ()=>{
+    if(!catchActive) return;
+    playCoin();
+    catchScore++;
+    document.getElementById('catchScore').textContent = 'Caught: '+catchScore;
+    item.remove();
+    addCoins(1);
+  };
+}
+function endCatch(){
+  catchActive = false;
+  clearInterval(catchInterval); clearInterval(catchTimerInt);
+  state.gamesPlayed++;
+  document.getElementById('catchZone').innerHTML += `<div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:1.3rem; background:#ffffffcc;">🎉 Nice! You caught ${catchScore}!</div>`;
+  if(catchScore>0) addCoins(Math.min(20, catchScore*2));
+  checkAchievements();
+}
+function stopCatch(){
+  catchActive = false;
+  clearInterval(catchInterval); clearInterval(catchTimerInt);
+}
+
+/* ============================================================
+   GAME: BUBBLE POP
+============================================================ */
+let bubbleInterval, bubbleTimerInt, bubbleScore, bubbleTimeLeft, bubbleActive;
+function startBubble(){
+  go('bubble');
+  stopBubble();
+  bubbleScore = 0; bubbleTimeLeft = 15; bubbleActive = true;
+  document.getElementById('bubbleScore').textContent = 'Popped: 0';
+  document.getElementById('bubbleTime').textContent = 'Time: 15';
+  const zone = document.getElementById('bubbleZone');
+  zone.innerHTML = '';
+  bubbleInterval = setInterval(spawnBubble, 650);
+  bubbleTimerInt = setInterval(()=>{
+    bubbleTimeLeft--;
+    document.getElementById('bubbleTime').textContent = 'Time: '+bubbleTimeLeft;
+    if(bubbleTimeLeft<=0){ endBubble(); }
+  },1000);
+}
+function spawnBubble(){
+  if(!bubbleActive) return;
+  const zone = document.getElementById('bubbleZone');
+  const size = 40+Math.random()*40;
+  const bub = document.createElement('div');
+  bub.className = 'bubble';
+  bub.style.width = size+'px'; bub.style.height = size+'px';
+  bub.style.left = (Math.random()*(zone.clientWidth-size))+'px';
+  bub.style.top = (Math.random()*(zone.clientHeight-size))+'px';
+  bub.style.background = 'radial-gradient(circle at 30% 30%, #ffffffcc, #9EE6FFaa)';
+  bub.style.border = '2px solid #ffffffcc';
+  bub.textContent = '🫧';
+  zone.appendChild(bub);
+  const life = setTimeout(()=>{ if(bub.parentNode) bub.remove(); }, 2200);
+  bub.onclick = ()=>{
+    if(!bubbleActive) return;
+    playPop();
+    clearTimeout(life);
+    bubbleScore++;
+    document.getElementById('bubbleScore').textContent = 'Popped: '+bubbleScore;
+    bub.remove();
+    addCoins(1);
+  };
+}
+function endBubble(){
+  bubbleActive = false;
+  clearInterval(bubbleInterval); clearInterval(bubbleTimerInt);
+  state.gamesPlayed++;
+  document.getElementById('bubbleZone').innerHTML += `<div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:1.3rem; background:#ffffffcc;">🎉 You popped ${bubbleScore} bubbles!</div>`;
+  if(bubbleScore>0) addCoins(Math.min(20, bubbleScore*2));
+  checkAchievements();
+}
+function stopBubble(){
+  bubbleActive = false;
+  clearInterval(bubbleInterval); clearInterval(bubbleTimerInt);
+}
+
+/* ============================================================
+   GAME: SIMON SAYS
+============================================================ */
+const SIMON_PADS = [
+  {id:0, color:'var(--pink)', flash:'#FFD6E6'},
+  {id:1, color:'var(--sky)', flash:'#D6F3FF'},
+  {id:2, color:'var(--green)', flash:'#DFF7E2'},
+  {id:3, color:'var(--yellow)', flash:'#FFF3C2'},
+];
+let simonSequence, simonPlayerStep, simonLevel, simonBusy, simonOver;
+function startSimon(){
+  go('simon');
+  simonSequence = [];
+  simonPlayerStep = 0;
+  simonLevel = 1;
+  simonBusy = false;
+  simonOver = false;
+  document.getElementById('simonMsg').textContent = "Watch your Pet Pet's pattern, then repeat it!";
+  document.getElementById('simonLevel').textContent = 'Level: 1';
+  document.getElementById('simonStartBtn').disabled = false;
+  document.getElementById('simonStartBtn').textContent = '▶ Watch Pattern';
+  const wrap = document.getElementById('simonPads');
+  wrap.innerHTML = '';
+  SIMON_PADS.forEach(p=>{
+    const pad = document.createElement('div');
+    pad.className = 'sticker';
+    pad.dataset.id = p.id;
+    pad.style.background = p.color;
+    pad.style.borderRadius = '20px';
+    pad.style.cursor = 'pointer';
+    pad.style.display = 'flex';
+    pad.style.alignItems = 'center';
+    pad.style.justifyContent = 'center';
+    pad.style.fontSize = '2rem';
+    pad.onclick = ()=>simonPadClick(p.id, pad);
+    wrap.appendChild(pad);
+  });
+}
+function simonBeginRound(){
+  if(simonBusy || simonOver) return;
+  simonBusy = true;
+  document.getElementById('simonStartBtn').disabled = true;
+  simonSequence.push(Math.floor(Math.random()*4));
+  simonPlayerStep = 0;
+  document.getElementById('simonLevel').textContent = 'Level: '+simonSequence.length;
+  document.getElementById('simonMsg').textContent = 'Watch closely...';
+  let i = 0;
+  const pads = document.getElementById('simonPads').children;
+  const iv = setInterval(()=>{
+    if(i > 0){
+      const prevPad = pads[simonSequence[i-1]];
+      prevPad.style.filter = '';
+    }
+    if(i >= simonSequence.length){
+      clearInterval(iv);
+      document.getElementById('simonMsg').textContent = 'Your turn! Repeat the pattern 🐾';
+      simonBusy = false;
+      return;
+    }
+    const pad = pads[simonSequence[i]];
+    pad.style.filter = 'brightness(1.4)';
+    playClick();
+    i++;
+  }, 650);
+}
+function simonPadClick(id, padEl){
+  if(simonBusy || simonOver) return;
+  padEl.style.filter = 'brightness(1.4)';
+  setTimeout(()=>{ padEl.style.filter=''; }, 200);
+  playClick();
+  if(id === simonSequence[simonPlayerStep]){
+    simonPlayerStep++;
+    if(simonPlayerStep === simonSequence.length){
+      document.getElementById('simonMsg').textContent = 'Great memory! Next round...';
+      addCoins(4);
+      document.getElementById('simonStartBtn').disabled = false;
+      document.getElementById('simonStartBtn').textContent = '▶ Next Pattern';
+      setTimeout(()=>{ if(!simonOver) simonBeginRound(); }, 900);
+      document.getElementById('simonStartBtn').disabled = true;
+    }
+  } else {
+    simonOver = true;
+    state.gamesPlayed++;
+    document.getElementById('simonMsg').textContent = `Oops! You reached level ${simonSequence.length}. Nice try!`;
+    document.getElementById('simonStartBtn').disabled = true;
+    addCoins(Math.max(5, simonSequence.length*2));
+    checkAchievements();
+  }
+}
+function stopSimon(){ simonBusy = true; simonOver = true; }
+
+/* ============================================================
+   GAME: PEEK-A-BOO
+============================================================ */
+let peekInterval, peekTimerInt, peekScore, peekTimeLeft, peekActive, peekCurrentHole;
+function startPeek(){
+  go('peek');
+  stopPeek();
+  peekScore = 0; peekTimeLeft = 20; peekActive = true; peekCurrentHole = -1;
+  document.getElementById('peekScore').textContent = 'Caught: 0';
+  document.getElementById('peekTime').textContent = 'Time: 20';
+  const grid = document.getElementById('peekGrid');
+  grid.innerHTML = '';
+  for(let i=0;i<9;i++){
+    const hole = document.createElement('div');
+    hole.className = 'sticker';
+    hole.dataset.idx = i;
+    hole.style.borderRadius = '18px';
+    hole.style.background = '#EADFF5';
+    hole.style.display = 'flex';
+    hole.style.alignItems = 'center';
+    hole.style.justifyContent = 'center';
+    hole.style.fontSize = '2.2rem';
+    hole.style.cursor = 'pointer';
+    hole.onclick = ()=>peekHit(i, hole);
+    grid.appendChild(hole);
+  }
+  peekInterval = setInterval(peekPop, 900);
+  peekTimerInt = setInterval(()=>{
+    peekTimeLeft--;
+    document.getElementById('peekTime').textContent = 'Time: '+peekTimeLeft;
+    if(peekTimeLeft<=0){ endPeek(); }
+  },1000);
+}
+function peekPop(){
+  if(!peekActive) return;
+  const grid = document.getElementById('peekGrid');
+  if(peekCurrentHole>=0){
+    grid.children[peekCurrentHole].textContent = '';
+  }
+  let idx;
+  do{ idx = Math.floor(Math.random()*9); } while(idx===peekCurrentHole);
+  peekCurrentHole = idx;
+  grid.children[idx].textContent = state.pet ? state.pet.emoji : '🐶';
+  setTimeout(()=>{
+    if(peekActive && peekCurrentHole===idx){
+      grid.children[idx].textContent = '';
+      peekCurrentHole = -1;
+    }
+  }, 700);
+}
+function peekHit(i, holeEl){
+  if(!peekActive || peekCurrentHole !== i) return;
+  playCoin();
+  peekScore++;
+  document.getElementById('peekScore').textContent = 'Caught: '+peekScore;
+  holeEl.textContent = '';
+  peekCurrentHole = -1;
+  addCoins(1);
+}
+function endPeek(){
+  peekActive = false;
+  clearInterval(peekInterval); clearInterval(peekTimerInt);
+  state.gamesPlayed++;
+  document.getElementById('peekGrid').innerHTML += '';
+  document.getElementById('peekTime').textContent = 'Time: 0';
+  const grid = document.getElementById('peekGrid');
+  const overlay = document.createElement('div');
+  overlay.style.gridColumn = '1 / -1';
+  overlay.style.textAlign = 'center';
+  overlay.style.fontWeight = '900';
+  overlay.style.fontSize = '1.1rem';
+  overlay.style.marginTop = '8px';
+  overlay.textContent = `🎉 You caught your Pet Pet ${peekScore} times!`;
+  grid.parentElement.appendChild(overlay);
+  if(peekScore>0) addCoins(Math.min(20, peekScore*2));
+  checkAchievements();
+}
+function stopPeek(){
+  peekActive = false;
+  clearInterval(peekInterval); clearInterval(peekTimerInt);
+}
+
+/* ============================================================
+   SHOP
+============================================================ */
+function renderShop(){
+  const grid = document.getElementById('shopGrid');
+  grid.innerHTML = '';
+  SHOP_ITEMS.forEach(item=>{
+    const owned = !!state.owned[item.id];
+    const card = document.createElement('div');
+    card.className = 'sticker shop-item';
+    card.innerHTML = `<span class="pick-emoji">${item.emoji}</span><div class="pick-label">${item.label}</div>
+      <div class="shop-price">${owned ? '✅ Owned' : '🪙 '+item.price}</div>`;
+    if(!owned){
+      const buyBtn = document.createElement('button');
+      buyBtn.className = 'btn small pink';
+      buyBtn.style.marginTop = '8px';
+      buyBtn.textContent = 'Buy';
+      buyBtn.onclick = ()=>{
+        if(state.coins >= item.price){
+          state.coins -= item.price;
+          state.owned[item.id] = true;
+          playCoin();
+          renderShop();
+          updateAllCoinBadges();
+        } else {
+          playClick();
+        }
+      };
+      card.appendChild(buyBtn);
+    }
+    grid.appendChild(card);
+  });
+}
+
+/* ============================================================
+   INIT
+============================================================ */
+renderAnimalGrid();
+updateAllCoinBadges();
+</script>
+<div class="side-credit">🐾 Made by Claude &amp; Saishvi 💛</div>
+</body>
+</html>

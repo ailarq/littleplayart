@@ -40,6 +40,9 @@ export default function HomePage() {
               <p className="text-lg mb-6 opacity-90 max-w-2xl">
                 {daughter.bio}
               </p>
+              <p className="text-lg mb-6 opacity-90 max-w-2xl">
+                {daughter.details}
+              </p>
 
               {/* Interests */}
               <div className="flex flex-wrap gap-3 justify-center md:justify-start mb-8">
@@ -58,7 +61,7 @@ export default function HomePage() {
                 href="/games"
                 className="inline-block bg-white text-pink-600 font-bold py-3 px-8 rounded-full hover:shadow-lg hover:-translate-y-1 transition-all text-lg"
               >
-                Play My Games →
+                Play My Games → 🎮
               </Link>
             </div>
           </div>

@@ -119,7 +119,7 @@ export default function AboutPage() {
             📖 My Story
           </h2>
           <p className="text-gray-700 dark:text-gray-300 text-lg leading-relaxed mb-4">
-            I started learning to code when I was 10 years old and fell in love with web development.
+            I started doing prompt engineering with the help of AI assistants and fell in love with web development.
             What started as a simple curiosity has turned into a passionate hobby!
           </p>
           <p className="text-gray-700 dark:text-gray-300 text-lg leading-relaxed">

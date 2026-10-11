@@ -1,0 +1,1932 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>html,body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Doodle Days</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gochi+Hand&family=Patrick+Hand&family=Permanent+Marker&display=swap">
+<style>
+/* Layout: a notebook page with one big taped-in game screen, controls underneath. Single light theme on purpose: it's paper. */
+:root{
+  --paper:#fdfbf3; --rule:#cadcea; --ink:#1e1d1b; --pencil:#6c675e; --hi:#fff06b; --red:#d4302a; --blue:#1d6bd0; --card:#ffffff; --tape:rgba(233,214,150,.8);
+  --display:'Permanent Marker','Comic Sans MS','Chalkboard SE',cursive;
+  --hand:'Patrick Hand','Comic Sans MS','Chalkboard SE',cursive;
+  --note:'Gochi Hand','Patrick Hand','Comic Sans MS',cursive;
+  --wobble:255px 14px 225px 16px/16px 225px 14px 255px;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background-color:var(--paper);background-image:repeating-linear-gradient(to bottom,transparent 0 31px,var(--rule) 31px 32px);color:var(--ink);font-family:var(--hand);font-size:1.15rem;line-height:1.4;padding-inline:16px;padding-block:0 40px}
+.wrap{max-width:1280px;margin:0 auto}
+.frame:fullscreen{display:grid;place-items:center;background:var(--paper);border:0;border-radius:0;box-shadow:none}
+.frame:fullscreen::before,.frame:fullscreen::after{display:none}
+.frame:fullscreen canvas{width:min(100vw,177.7vh);border-radius:0}
+header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:6px 24px;padding-block:22px 16px}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(2.4rem,8vw,4rem);margin:0;line-height:1;transform:rotate(-2deg)}
+h1 span{background:linear-gradient(transparent 40%,var(--hi) 40% 88%,transparent 88%);padding:0 .08em}
+.tag{margin:0;color:var(--pencil);font-family:var(--note);font-size:1.15rem;max-width:30em}
+.frame{position:relative;border:3px solid var(--ink);border-radius:14px 6px 16px 8px/8px 16px 6px 14px;background:var(--card);box-shadow:5px 6px 0 rgba(30,29,27,.18)}
+.frame::before,.frame::after{content:"";position:absolute;top:-12px;width:90px;height:24px;background:var(--tape);z-index:2}
+.frame::before{left:20px;transform:rotate(-5deg)}
+.frame::after{right:20px;transform:rotate(4deg)}
+canvas{display:block;width:100%;height:auto;aspect-ratio:16/9;touch-action:none;background:var(--paper);border-radius:12px 5px 14px 6px/6px 14px 5px 12px}
+canvas:focus-visible{outline:3px dashed var(--blue);outline-offset:3px}
+.start{position:absolute;inset:0;display:grid;place-items:center;background:rgba(253,251,243,.93);text-align:center;padding:16px;border-radius:inherit}
+.start h2{font-family:var(--display);font-weight:400;font-size:clamp(2rem,7vw,3.6rem);margin:0 0 4px;transform:rotate(-2deg)}
+.start p{margin:0 auto 16px;max-width:30em}
+.btn{cursor:pointer;background:var(--hi);border:3px solid var(--ink);border-radius:var(--wobble);padding:8px 28px;font-family:var(--display);font-size:1.5rem;color:var(--ink);transition:transform .08s}
+.btn:hover{transform:rotate(-2deg) scale(1.04)}
+.btn:focus-visible{outline:3px dashed var(--blue);outline-offset:3px}
+.bar{display:flex;flex-wrap:wrap;gap:10px 20px;align-items:center;justify-content:space-between;margin-top:14px;font-family:var(--note);color:var(--pencil)}
+.keys{display:flex;flex-wrap:wrap;gap:6px 16px}
+kbd{font-family:var(--hand);border:2px solid var(--ink);border-radius:6px;padding:0 6px;background:var(--card);color:var(--ink);font-size:1rem}
+.toggles{display:flex;flex-wrap:wrap;gap:8px 16px}
+.linkbtn{background:none;border:0;border-bottom:2px dashed currentColor;padding:0;cursor:pointer;color:var(--blue);font-family:var(--note);font-size:1.05rem}
+.pad{display:none;justify-content:space-between;gap:12px;margin-top:14px;user-select:none;-webkit-user-select:none}
+.pad.show{display:flex}
+.pad > div{display:flex;gap:12px;align-items:center}
+.pad button{width:74px;height:74px;border:3px solid var(--ink);border-radius:50%;background:var(--card);color:var(--ink);font-family:var(--display);font-size:1.15rem;touch-action:none;-webkit-tap-highlight-color:transparent}
+.pad button.jump{background:#ffe45c;width:86px;height:86px}
+.pad button.on{background:var(--hi);transform:scale(.94)}
+.guide{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px 24px;margin-top:26px}
+.guide h2{grid-column:1/-1;font-family:var(--display);font-weight:400;font-size:1.6rem;margin:0}
+.guide div{min-width:0}
+.guide h3{font-family:var(--display);font-weight:400;font-size:1.15rem;margin:0}
+.guide p{margin:2px 0 0;font-size:1.05rem}
+footer{margin-top:34px;font-family:var(--note);color:var(--pencil);border-top:2px dashed var(--rule);padding-top:10px;font-size:1rem}
+/* ---- site shell ---- */
+header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:10px 24px;padding-block:22px 14px}
+.brand{min-width:0}
+.tabs{display:flex;gap:10px}
+.navtab{cursor:pointer;font-family:var(--display);font-size:1.25rem;padding:6px 20px;border:3px solid var(--ink);border-radius:var(--wobble);background:var(--card);color:var(--ink);transform:rotate(-1deg)}
+.navtab:nth-child(2){transform:rotate(1.2deg)}
+.navtab[aria-pressed="true"]{background:var(--hi)}
+.navtab:focus-visible{outline:3px dashed var(--blue);outline-offset:3px}
+.picker{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:18px}
+.pick{cursor:pointer;text-align:left;display:flex;flex-direction:column;gap:2px;padding:10px 14px;background:var(--card);border:2.5px solid var(--ink);border-radius:var(--wobble);color:var(--ink);font-family:var(--hand);transition:transform .1s;min-width:0}
+.pick b{font-family:var(--display);font-weight:400;font-size:1.15rem;line-height:1.15}
+.pick span{font-size:1rem}
+.pick small{font-family:var(--note);color:var(--pencil);font-size:.95rem}
+.pick:hover{transform:translateY(-2px) rotate(-.6deg)}
+.pick.on{background:var(--hi);box-shadow:3px 4px 0 rgba(30,29,27,.2)}
+.pick:focus-visible{outline:3px dashed var(--blue);outline-offset:3px}
+/* ---- diary ---- */
+.meet{display:grid;grid-template-columns:minmax(0,220px) minmax(0,1fr);gap:18px 28px;align-items:center;margin:6px 0 26px}
+@media (max-width:640px){.meet{grid-template-columns:1fr}.portrait{max-width:180px}}
+.portrait svg{width:100%;height:auto;display:block}
+.meet-card{background:var(--card);border:2.5px solid var(--ink);border-radius:var(--wobble);padding:16px 20px;position:relative;transform:rotate(-.6deg);box-shadow:4px 5px 0 rgba(30,29,27,.14)}
+.meet-card::before{content:"";position:absolute;top:-12px;left:40px;width:80px;height:22px;background:var(--tape);transform:rotate(-4deg)}
+.meet-card h2{font-family:var(--display);font-weight:400;font-size:1.8rem;margin:0 0 8px}
+.meet-card dl{margin:0;display:grid;gap:4px}
+.meet-card dl div{display:grid;grid-template-columns:7.5em minmax(0,1fr);gap:10px}
+.meet-card dt{font-family:var(--note);color:var(--pencil)}
+.meet-card dd{margin:0}
+.shelf-title{font-family:var(--display);font-weight:400;font-size:1.8rem;margin:10px 0 0}
+.shelf-sub{margin:2px 0 16px;color:var(--pencil);font-family:var(--note)}
+.bookshelf{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,300px));gap:28px;padding-bottom:18px;border-bottom:8px solid #c9a36b}
+.book{cursor:pointer;position:relative;aspect-ratio:3/4;max-width:100%;border:3px solid var(--ink);border-radius:6px 16px 16px 6px;background:var(--cover);color:var(--ink);padding:22px 18px 18px 30px;display:flex;flex-direction:column;align-items:flex-start;gap:10px;text-align:left;box-shadow:inset 14px 0 0 rgba(0,0,0,.18),5px 6px 0 rgba(30,29,27,.2);transition:transform .15s}
+.book:hover{transform:rotate(-2deg) translateY(-4px)}
+.book:focus-visible{outline:3px dashed var(--blue);outline-offset:4px}
+.book-label{background:var(--card);border:2px solid var(--ink);padding:8px 12px;transform:rotate(-2deg);display:flex;flex-direction:column;box-shadow:2px 2px 0 rgba(0,0,0,.15)}
+.book-label b{font-family:var(--display);font-weight:400;font-size:1.5rem}
+.book-label span{font-family:var(--note);font-size:1.05rem}
+.book-doodle{width:92px;height:92px;background:var(--card);border-radius:50%;padding:12px;border:2px solid var(--ink);margin-top:auto;align-self:flex-end;transform:rotate(8deg)}
+.book-doodle svg{width:100%;height:100%}
+.book-meta{font-family:var(--note);color:#fff;font-size:1.05rem;text-shadow:0 1px 0 rgba(0,0,0,.35)}
+.book-open{font-family:var(--display);background:var(--hi);border:2px solid var(--ink);padding:2px 10px;font-size:1rem}
+.reader-bar{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 20px;margin-bottom:14px}
+.reader-bar h2{font-family:var(--display);font-weight:400;font-size:1.5rem;margin:0;flex:1;min-width:0}
+.page-info{font-family:var(--note);color:var(--pencil)}
+.spread{display:grid;grid-template-columns:1fr 1fr;border:3px solid var(--ink);border-radius:10px;background:var(--card);box-shadow:6px 7px 0 rgba(30,29,27,.18);overflow:hidden;touch-action:pan-y}
+.spread.single{grid-template-columns:1fr}
+.spread.turn-r{animation:turnR .35s ease-out}
+.spread.turn-l{animation:turnL .35s ease-out}
+@keyframes turnR{from{opacity:.3;transform:translateX(18px)}to{opacity:1;transform:none}}
+@keyframes turnL{from{opacity:.3;transform:translateX(-18px)}to{opacity:1;transform:none}}
+.page{position:relative;min-height:540px;padding:30px 26px 50px 62px;min-width:0;
+  background-color:#fffdf6;background-image:linear-gradient(90deg,transparent 0 46px,#e9a4a1 46px 48px,transparent 48px),repeating-linear-gradient(to bottom,transparent 0 31px,#cadcea 31px 32px);background-position:0 6px}
+.spread:not(.single) .page:first-child{box-shadow:inset -18px 0 22px -18px rgba(0,0,0,.25)}
+.spread:not(.single) .page:nth-child(2){box-shadow:inset 18px 0 22px -18px rgba(0,0,0,.25)}
+.page.blank{background-image:repeating-linear-gradient(to bottom,transparent 0 31px,#e3ecf4 31px 32px)}
+.pdate{font-family:var(--display);font-size:1.15rem;text-align:right;margin-bottom:6px;line-height:32px}
+.pdate::after{content:"";display:block;height:3px;width:60%;margin-left:auto;background:var(--hi)}
+.ptext{font-family:var(--note);font-size:1.3rem;line-height:32px;margin:0;overflow-wrap:break-word}
+.pdoodle{float:right;width:96px;height:96px;margin:4px 0 8px 12px;transform:rotate(6deg)}
+.pdoodle svg{width:100%;height:100%}
+.pnote{margin-top:14px;display:inline-block;font-family:var(--display);color:var(--red);font-size:1.1rem;transform:rotate(-3deg);border:2.5px solid var(--red);border-radius:40% 30% 45% 35%;padding:2px 12px}
+.pnum{position:absolute;bottom:14px;left:0;right:0;text-align:center;font-family:var(--note);color:var(--pencil)}
+.title-page .tp-inner{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;padding-top:20px}
+.tp-small{margin:0;font-family:var(--note);color:var(--pencil);font-size:1.15rem}
+.tp-name{margin:0;font-family:var(--display);font-size:2.6rem;line-height:1.1;transform:rotate(-3deg);background:linear-gradient(transparent 45%,var(--hi) 45% 90%,transparent 90%)}
+.tp-doodle{width:120px;height:120px;margin:12px 0}
+.tp-doodle svg{width:100%;height:100%}
+.tp-title{margin:0;font-family:var(--display);font-size:1.25rem}
+.tp-warn{margin:18px 0 0;font-family:var(--note);color:var(--red);font-size:1.15rem;max-width:18em;transform:rotate(2deg)}
+.reader-controls{display:flex;flex-wrap:wrap;align-items:center;gap:12px 18px;margin-top:16px}
+.btn.small{font-size:1.1rem;padding:4px 18px}
+.btn:disabled{opacity:.4;cursor:default;transform:none}
+.slider{flex:1;min-width:140px;display:flex}
+.slider input{width:100%;accent-color:var(--red)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.reader-hint{font-family:var(--note);color:var(--pencil);margin:8px 0 0}
+@media (max-width:560px){.page{padding:24px 16px 48px 52px;min-height:500px}.pdoodle{width:72px;height:72px}.ptext{font-size:1.2rem}}
+
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <h1>Doodle <span>Days</span></h1>
+      <p class="tag">The diary and games of Tilly Marsh, age 10.</p>
+    </div>
+    <nav class="tabs" aria-label="Sections">
+      <button class="navtab" type="button" data-view="games" aria-pressed="true">Games</button>
+      <button class="navtab" type="button" data-view="diary" aria-pressed="false">Diary</button>
+    </nav>
+  </header>
+
+  <section id="gamesView" aria-label="Games">
+    <div class="picker" id="picker"></div>
+    <div class="frame">
+      <canvas id="game" width="960" height="540" tabindex="0" aria-label="Game screen"></canvas>
+      <div class="start" id="start">
+        <div>
+          <h2>Doodle Dash</h2>
+          <p>Help Tilly get through four worlds and sixteen levels: the hallway, the library, a field trip and a very icy snow day. Crumpled homework, runaway erasers, pencil hoppers and paper airplanes are in her way.</p>
+          <button class="btn" id="playBtn" type="button">Play</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="pad" id="pad" aria-hidden="true">
+      <div><button type="button" data-k="left">◀</button><button type="button" data-k="right">▶</button></div>
+      <div><button type="button" data-k="run">RUN</button><button type="button" class="jump" data-k="jump">JUMP</button></div>
+    </div>
+
+    <div class="bar">
+      <div class="keys" id="keys"></div>
+      <div class="toggles">
+        <button class="linkbtn" id="sfxBtn" type="button">Sound: on</button>
+        <button class="linkbtn" id="musicBtn" type="button">Music: on</button>
+        <button class="linkbtn" id="padBtn" type="button">Touch buttons: off</button>
+        <button class="linkbtn" id="fsBtn" type="button">Full screen</button>
+      </div>
+    </div>
+
+    <section class="guide" id="dashGuide">
+      <h2>Doodle Dash field notes</h2>
+      <div><h3>Sticky-note boxes</h3><p>Bonk them from below. Most hold a star. Some hold a power-up.</p></div>
+      <div><h3>Pudding Cup</h3><p>Makes Tilly bigger. Big Tilly can smash textbook bricks and survive one extra hit.</p></div>
+      <div><h3>Spitball Straw</h3><p>Hold it and press Run to fire bouncing spitballs. Works on everything, including pencils.</p></div>
+      <div><h3>Pencil Hoppers</h3><p>Sharp end up. Don't stomp them. Jump over or spit at them.</p></div>
+      <div><h3>Stomp combos</h3><p>Chain stomps without landing to double your points each time. Hold Jump on a stomp to bounce higher.</p></div>
+      <div><h3>Springs</h3><p>Land on a spring to launch over tall lockers. Holding Jump isn't needed.</p></div>
+      <div><h3>Moving rulers</h3><p>Ride them across wide gaps. Wait for one to come back if you miss it.</p></div>
+      <div><h3>Snow Day</h3><p>World 4 is icy. You slide, so start stopping early.</p></div>
+      <div><h3>Random level</h3><p>Press R on the map (or tap the blue button) for a brand-new level every time.</p></div>
+      <div><h3>Stars</h3><p>Collect 50 for an extra life. Your best star count per level is saved in this browser.</p></div>
+    </section>
+  </section>
+
+  <section id="diaryView" aria-label="Diary" hidden>
+    <div id="shelfArea">
+      <div class="meet">
+        <div class="portrait" id="tillyPortrait"></div>
+        <div class="meet-card">
+          <h2>Meet Tilly</h2>
+          <dl>
+            <div><dt>Name</dt><dd>Tilly Marsh (“Tully” at the ice-cream shop)</dd></div>
+            <div><dt>Age</dt><dd>10</dd></div>
+            <div><dt>School</dt><dd>Year 4, Wobbleton Primary</dd></div>
+            <div><dt>Plays</dt><dd>Ukulele in The Soggy Waffles (a yellow one with a shark sticker)</dd></div>
+            <div><dt>Loves</dt><dd>Scoops ice-cream shop, animals, and Sir Squeaks the class hamster</dd></div>
+            <div><dt>Family</dt><dd>Mum, Dad (puns), Nan, little brother Tater (4), Meatball the dog</dd></div>
+            <div><dt>Best friend</dt><dd>Pickles, who has a hypothesis about everything</dd></div>
+            <div><dt>Biggest fear</dt><dd>Falling up the stairs. Again.</dd></div>
+          </dl>
+        </div>
+      </div>
+      <h2 class="shelf-title">Tilly's diaries</h2>
+      <p class="shelf-sub">Two books, one school year. Pick one up. (She'd kill us if she knew.)</p>
+      <div class="bookshelf" id="bookshelf"></div>
+    </div>
+
+    <div class="reader" id="reader" hidden>
+      <div class="reader-bar">
+        <button class="linkbtn" id="backToShelf" type="button">← Back to the shelf</button>
+        <h2 id="readerTitle">Book One</h2>
+        <span id="pageInfo" class="page-info"></span>
+      </div>
+      <div class="spread" id="spread"></div>
+      <div class="reader-controls">
+        <button class="btn small" id="prevPage" type="button">← Back</button>
+        <label class="slider"><span class="sr">Jump to page</span><input type="range" id="pageSlider" min="0" max="100" value="0"></label>
+        <button class="linkbtn" id="randomPage" type="button">Random page</button>
+        <button class="btn small" id="nextPage" type="button">Next →</button>
+      </div>
+      <p class="reader-hint">Use the arrow keys, swipe, or drag the slider. Your place is saved.</p>
+    </div>
+  </section>
+
+  <footer>Doodle Days is original: Tilly, Wobbleton Primary, everyone in it and every drawing here were made up for this page. Scores, levels and your diary bookmark are saved in this browser only.</footer>
+</div>
+
+<script>
+(() => {
+'use strict';
+const $ = s => document.querySelector(s);
+const cv = $('#game'), ctx = cv.getContext('2d');
+const VW = 960, VH = 540, T = 36, ROWS = 15, STEP = 1 / 120, Z = 1.3, VWW = VW / Z, VHW = VH / Z;
+const INK = '#1e1d1b', PAPER = '#fdfbf3', PENCIL = '#b9b2a3';
+let ACTIVE = 'dash', VIEW = 'games';
+const FD = '"Permanent Marker", "Comic Sans MS", cursive', FH = '"Patrick Hand", "Comic Sans MS", cursive';
+const store = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+};
+function resize() { const dpr = Math.min(2, window.devicePixelRatio || 1); cv.width = VW * dpr; cv.height = VH * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0); }
+resize(); window.addEventListener('resize', resize);
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+function jit(a, b, k) { const h = Math.sin(a * 127.1 + b * 311.7 + k * 74.7) * 43758.5453; return h - Math.floor(h) - 0.5; }
+
+/* ================= AUDIO ================= */
+let ac = null, sfxOn = store.get('dash-sfx', true), musicOn = store.get('dash-music', true);
+function audio() { try { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); if (ac.state === 'suspended') ac.resume(); return ac; } catch (e) { return null; } }
+function tone(freq, dur, type = 'square', vol = .06, slide = 0, when = 0) {
+  if (!ac) return; const t = (when || ac.currentTime), o = ac.createOscillator(), g = ac.createGain();
+  o.type = type; o.frequency.setValueAtTime(freq, t); if (slide) o.frequency.exponentialRampToValueAtTime(Math.max(30, freq + slide), t + dur);
+  g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+  o.connect(g); g.connect(ac.destination); o.start(t); o.stop(t + dur + .02);
+}
+let noiseBuf = null;
+function noise(dur, vol, when = 0, hp = 800) {
+  if (!ac) return; if (!noiseBuf) { noiseBuf = ac.createBuffer(1, ac.sampleRate * .5, ac.sampleRate); const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; }
+  const t = when || ac.currentTime, s = ac.createBufferSource(), f = ac.createBiquadFilter(), g = ac.createGain();
+  s.buffer = noiseBuf; f.type = 'highpass'; f.frequency.value = hp; g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+  s.connect(f); f.connect(g); g.connect(ac.destination); s.start(t); s.stop(t + dur + .02);
+}
+const S = (fn) => (...a) => { if (sfxOn && ac) fn(...a); };
+const sfx = {
+  jump: S(() => tone(300, .16, 'square', .05, 400)),
+  stomp: S(() => { tone(220, .12, 'square', .07, -120); noise(.08, .08, 0, 400); }),
+  star: S(() => { tone(988, .07, 'square', .05); setTimeout(() => tone(1319, .16, 'square', .05), 60); }),
+  bump: S(() => tone(140, .1, 'triangle', .12, -40)),
+  smash: S(() => { noise(.25, .15, 0, 300); tone(120, .15, 'square', .05, -60); }),
+  power: S(() => [523, 659, 784, 1046, 1318].forEach((f, i) => setTimeout(() => tone(f, .09, 'square', .05), i * 55))),
+  appear: S(() => [392, 523, 659].forEach((f, i) => setTimeout(() => tone(f, .08, 'triangle', .08), i * 70))),
+  shrink: S(() => [659, 523, 392, 330].forEach((f, i) => setTimeout(() => tone(f, .09, 'square', .05), i * 70))),
+  spit: S(() => { tone(700, .06, 'triangle', .06, -300); noise(.04, .05, 0, 2000); }),
+  die: S(() => [494, 466, 440, 392, 330, 262].forEach((f, i) => setTimeout(() => tone(f, .16, 'square', .06), i * 130))),
+  clear: S(() => [523, 659, 784, 1046, 784, 1046, 1318].forEach((f, i) => setTimeout(() => tone(f, i === 6 ? .5 : .13, 'square', .06), i * 120))),
+  oneup: S(() => [659, 784, 1318, 1046, 1175, 1568].forEach((f, i) => setTimeout(() => tone(f, .08, 'square', .05), i * 80))),
+  check: S(() => { tone(784, .1, 'triangle', .1); setTimeout(() => tone(1175, .2, 'triangle', .1), 90); }),
+  select: S(() => tone(660, .05, 'square', .04)),
+  pause: S(() => tone(440, .08, 'triangle', .08)),
+  boing: S(() => tone(180, .35, 'sine', .14, 700)),
+};
+/* Original bouncy loop: 64 eighth-notes, C major */
+const MEL = [72,0,76,79, 81,79,76,72, 74,0,77,81, 79,77,74,71, 72,0,76,79, 84,83,81,79, 77,76,74,72, 74,76,72,0,
+             69,0,72,76, 77,76,72,69, 71,0,74,77, 79,77,74,71, 72,76,79,84, 83,79,76,72, 74,77,76,74, 72,0,0,0];
+const BASS = [48, 53, 55, 55, 45, 50, 55, 48];
+const mtof = m => 440 * Math.pow(2, (m - 69) / 12);
+const Music = {
+  timer: null, step: 0, next: 0, tempo: 150, transpose: 0,
+  start(tempo, transpose = 0) { if (!audio()) return; this.stop(); this.tempo = tempo; this.transpose = transpose; this.step = 0; this.next = ac.currentTime + .08; this.timer = setInterval(() => this.tick(), 25); },
+  stop() { clearInterval(this.timer); this.timer = null; },
+  tick() {
+    const spb = 60 / this.tempo / 2;
+    while (this.next < ac.currentTime + .12) {
+      if (musicOn) {
+        const m = MEL[this.step % 64]; if (m) tone(mtof(m + this.transpose), spb * .85, 'square', .028, 0, this.next);
+        if (this.step % 2 === 0) { const r = BASS[Math.floor(this.step / 8) % 8] + this.transpose; tone(mtof(this.step % 4 === 0 ? r : r + 7), spb * 1.7, 'triangle', .07, 0, this.next); }
+        if (this.step % 4 === 2) noise(.04, .025, this.next, 3000);
+      }
+      this.next += spb; this.step++;
+    }
+  }
+};
+
+/* ================= LEVELS ================= */
+function build(W, fn) {
+  const g = Array.from({ length: ROWS }, () => Array(W).fill('.'));
+  const set = (x, y, c) => { if (x >= 0 && x < W && y >= 0 && y < ROWS) g[y][x] = c; };
+  const movers = [];
+  const api = {
+    set, W,
+    put(x, y, c) { if (x >= 0 && x < W && y >= 0 && y < ROWS && g[y][x] === '.') g[y][x] = c; },
+    mover(x, y, range, speed) { movers.push({ tx: x, ty: y, range, speed }); },
+    ground(x0, x1, top = 13) { for (let x = x0; x <= x1; x++) for (let y = top; y < ROWS; y++) set(x, y, '#'); },
+    row(x, y, s) { [...s].forEach((c, i) => { if (c !== ' ') set(x + i, y, c); }); },
+    pillar(x, h, w = 2, top = 13) { for (let i = 0; i < w; i++) for (let y = top - h; y < top; y++) set(x + i, y, 'L'); },
+    stairs(x, n, dir = 1, top = 13) { for (let i = 0; i < n; i++) { const hh = dir > 0 ? i + 1 : n - i; for (let y = top - hh; y < top; y++) set(x + i, y, '#'); } }
+  };
+  fn(api); const out = g.map(r => r.join('')); out.movers = movers; return out;
+}
+const LEVELS = [
+  { name: 'Hallway Hustle', theme: 'hall', tempo: 150, tr: 0, time: 250, map: build(180, L => {
+      L.ground(0, 38); L.ground(42, 86); L.ground(90, 147); L.ground(151, 180);
+      L.set(3, 12, '@');
+      L.row(12, 9, '?'); L.row(17, 9, 'B?BPB'); L.row(19, 5, '?');
+      L.set(22, 12, 'e'); L.pillar(27, 2); L.set(32, 12, 'e'); L.set(34, 12, 'e'); L.pillar(36, 3);
+      L.row(44, 8, 'SSSS'); L.set(50, 12, 'r'); L.pillar(55, 4);
+      L.row(60, 9, '====='); L.row(66, 6, '====='); L.row(66, 5, 'SSSSS'); L.set(62, 12, 'e'); L.set(64, 12, 'e');
+      L.row(72, 9, 'B?B?B'); L.row(74, 5, 'P'); L.set(78, 12, 'r'); L.set(84, 12, 'C');
+      L.row(87, 9, 'SSS');
+      L.row(94, 9, 'BBPBB'); L.set(98, 12, 'e'); L.set(100, 12, 'e');
+      L.row(104, 12, '^^'); L.set(112, 7, 'f'); L.set(116, 12, 'r'); L.set(120, 12, 'e');
+      L.set(128, 12, 'h'); L.row(131, 9, '?S?S?');
+      L.stairs(140, 8); L.row(148, 4, 'SSS');
+      L.set(158, 12, 'e'); L.set(166, 12, 'G');
+    }) },
+  { name: 'Cafeteria Chaos', theme: 'cafe', tempo: 162, tr: 2, time: 260, map: build(200, L => {
+      L.ground(0, 30); L.ground(34, 60); L.ground(65, 70); L.ground(74, 110); L.ground(115, 140); L.ground(146, 200);
+      L.set(3, 12, '@');
+      L.row(10, 9, '?P?'); L.set(17, 12, 'e'); L.set(19, 12, 'e');
+      L.row(22, 10, '======'); L.row(22, 8, 'SSSSSS'); L.set(26, 12, 'h'); L.pillar(29, 2);
+      L.row(31, 8, '===');
+      L.set(38, 12, 'r'); L.set(42, 12, 'r'); L.row(48, 12, '^^^'); L.row(47, 9, '====='); L.set(52, 5, 'f');
+      L.row(54, 9, 'B?B'); L.row(55, 5, '?');
+      L.row(61, 9, '=='); L.set(67, 12, 'h'); L.row(71, 9, '==');
+      L.row(78, 9, 'BBBPBBB'); L.set(80, 12, 'e'); L.set(82, 12, 'e'); L.set(84, 12, 'e');
+      L.set(90, 6, 'f'); L.set(98, 4, 'f'); L.pillar(92, 3); L.pillar(100, 5); L.row(100, 6, 'SS');
+      L.set(106, 12, 'C');
+      L.row(111, 10, '=='); L.row(113, 7, '==');
+      L.row(118, 12, '^^^^'); L.row(117, 9, '======'); L.row(117, 8, 'SSSSSS'); L.set(126, 12, 'h'); L.set(130, 12, 'r'); L.set(134, 12, 'e');
+      L.row(136, 8, '?B?');
+      L.row(141, 10, '='); L.row(143, 8, '=');
+      L.set(152, 6, 'f'); L.set(158, 12, 'h'); L.set(162, 12, 'h'); L.row(156, 9, 'B?BPB');
+      L.stairs(166, 6); L.row(174, 12, '^^'); L.set(179, 12, 'r'); L.set(186, 12, 'G');
+    }) },
+  { name: 'Rooftop Run', theme: 'roof', tempo: 174, tr: -3, time: 280, map: build(220, L => {
+      L.ground(0, 20); L.ground(25, 32); L.ground(37, 40, 11); L.ground(45, 60); L.ground(66, 70, 10); L.ground(75, 100);
+      L.ground(106, 108, 9); L.ground(113, 140); L.ground(146, 150, 11); L.ground(155, 175); L.ground(181, 220);
+      L.set(3, 12, '@');
+      L.row(8, 9, '?P?'); L.set(15, 12, 'e'); L.row(21, 8, 'SSSS'); L.set(28, 12, 'r'); L.set(38, 10, 'h'); L.row(42, 8, '==');
+      L.row(48, 9, 'B?B?B'); L.set(52, 12, 'e'); L.set(56, 12, 'e'); L.set(50, 6, 'f'); L.set(58, 4, 'f');
+      L.row(62, 10, '==='); L.set(68, 9, 'h'); L.row(72, 8, '==');
+      L.set(80, 12, 'r'); L.set(84, 12, 'r'); L.row(88, 12, '^^^'); L.row(87, 9, '====='); L.row(87, 8, 'SSSSS'); L.set(94, 5, 'f'); L.pillar(96, 4);
+      L.set(99, 12, 'C');
+      L.row(102, 9, '=='); L.row(106, 7, 'SSS'); L.row(110, 7, '==');
+      L.row(119, 9, 'BPBB?B'); L.set(118, 12, 'h'); L.set(122, 12, 'e'); L.set(124, 12, 'e'); L.set(126, 12, 'e');
+      L.set(130, 5, 'f'); L.set(134, 7, 'f'); L.row(136, 12, '^^^');
+      L.row(142, 9, '=='); L.set(148, 10, 'h'); L.row(152, 8, '==');
+      L.row(158, 9, '?B?B?'); L.set(160, 12, 'r'); L.set(164, 12, 'r'); L.set(166, 6, 'f'); L.set(172, 4, 'f');
+      L.row(177, 10, '='); L.row(179, 7, '=');
+      L.set(186, 12, 'h'); L.stairs(190, 8); L.row(198, 4, 'SSS'); L.set(206, 12, 'G');
+    }) }
+];
+
+function rng(seed) { let a = seed >>> 0 || 1; return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+function genLevel(seed, d, feat) {
+  const W = Math.round(180 + d * 60);
+  return build(W, L => {
+    const r = rng(seed), I = (a, b) => a + Math.floor(r() * (b - a + 1)), chance = p => r() < p;
+    const foe = (x, y = 12) => { const k = r(); let t = 'e'; if (k < .28 + d * .12) t = 'r'; if (d >= .3 && k > .86 - d * .18) t = 'h'; L.put(x, y, t); };
+    const starRow = (x, y, n) => { for (let i = 0; i < n; i++) L.put(x + i, y, 'S'); };
+    const C = {
+      flat(x) { const n = I(8, 13); L.ground(x, x + n - 1); if (chance(.6)) starRow(x + I(2, 4), I(8, 10), I(2, 4)); for (let k = 0; k < I(0, 1 + Math.round(d * 2)); k++) foe(x + I(4, n - 2)); return x + n; },
+      gap(x) { const w = I(2, 3 + (d > .5 ? 1 : 0)); L.ground(x, x + 2); for (let i = 0; i < w; i++) L.put(x + 3 + i, i === 0 || i === w - 1 ? 9 : 8, 'S'); L.ground(x + 3 + w, x + 6 + w); if (chance(d * .6)) foe(x + 5 + w); return x + 7 + w; },
+      pillars(x) { L.ground(x, x + 14); const h1 = I(2, 3), h2 = I(2, 4); L.pillar(x + 2, h1); L.pillar(x + 8, h2); if (chance(.5)) L.pillar(x + 12, I(1, 2)); foe(x + 5); if (chance(d)) foe(x + 6); starRow(x + 8, 12 - h2, 2); return x + 15; },
+      blocks(x) { L.ground(x, x + 12); const pats = ['B?B', 'B?BPB', '?B?B?', 'BB?BB', '??', 'BPB']; let p = pats[I(0, pats.length - 1)]; if (!chance(.45)) p = p.replace('P', '?'); L.row(x + 3, 9, p); if (chance(.5)) L.row(x + 3 + Math.floor(p.length / 2), 5, chance(.3) ? 'P' : '?'); foe(x + 6); if (chance(d)) foe(x + 9); return x + 13; },
+      stairs(x) { const n = I(3, 5), g = chance(.3 + d * .5) ? I(1, 2) : 0; L.ground(x, x + n); L.stairs(x + 1, n); const x2 = x + 1 + n + g; L.ground(x2, x2 + n + 2); L.stairs(x2, n, -1); starRow(x + n - 1, 12 - n - 1, 2 + g); return x2 + n + 3; },
+      hop(x) { const w = I(5, 6 + (d > .6 ? 1 : 0)); L.ground(x, x + 2); const y1 = I(9, 10), y2 = I(Math.max(7, y1 - 2), 10); L.row(x + 4, y1, '==='); L.row(x + w, y2, '=='); starRow(x + 4, y1 - 1, 3); L.ground(x + 3 + w, x + 7 + w); if (chance(.3 + d * .4)) L.put(x + I(3, w), I(4, 6), 'f'); return x + 8 + w; },
+      spikes(x) { const n = I(2, 3 + Math.round(d * 2)); L.ground(x, x + n + 6); L.row(x + 3, 12, '^'.repeat(n)); if (n > 3 || chance(.5)) { L.row(x + 3, 9, '='.repeat(n)); starRow(x + 3, 8, n); } return x + n + 7; },
+      spring(x) { const h = I(5, 6); L.ground(x, x + 13); L.set(x + 4, 12, 'T'); L.pillar(x + 7, h, 2); starRow(x + 7, 12 - h, 2); if (chance(.5)) L.row(x + 5, 3, 'SSS'); if (chance(d)) foe(x + 11); return x + 14; },
+      mover(x) { const w = I(6, 8); L.ground(x, x + 2); L.mover(x + 3, 10, w - 3, 60 + d * 50); starRow(x + 4, 7, 3); L.ground(x + 3 + w, x + 7 + w); return x + 8 + w; },
+      raised(x) { L.ground(x, x + 4, 11); L.ground(x + 5, x + 10, 9); L.ground(x + 11, x + 15, 11); foe(x + 7, 8); L.row(x + 7, 5, chance(.4) ? 'P' : '?'); if (chance(d)) foe(x + 13, 10); return x + 16; },
+      parade(x) { L.ground(x, x + 16); for (let k = 0; k < 2 + Math.round(d * 3); k++) foe(x + 4 + k * 3); L.row(x + 5, 9, '====='); starRow(x + 5, 8, 5); return x + 17; }
+    };
+    let pool = ['flat', 'gap', 'gap', 'pillars', 'blocks', 'blocks', 'stairs', 'hop', 'spikes', 'raised', 'parade'];
+    for (let i = 0; i < (feat.springs || 0); i++) pool.push('spring', 'spring');
+    for (let i = 0; i < (feat.movers || 0); i++) pool.push('mover', 'mover');
+    L.ground(0, 12); L.set(3, 12, '@'); L.row(8, 9, chance(.5) ? '?P?' : 'B?B');
+    let x = 13, cp = false, lastC = '';
+    while (x < W - 52) {
+      if (!cp && x > W * .45) { L.ground(x, x + 5); L.set(x + 2, 12, 'C'); x += 6; cp = true; continue; }
+      let c; do { c = pool[Math.floor(r() * pool.length)]; } while (c === lastC && pool.length > 1);
+      lastC = c; x = C[c](x);
+      if (feat.planes && chance(.2 + d * .3)) L.put(x - I(2, 6), I(4, 8), 'f');
+    }
+    L.ground(x, W - 1); L.stairs(x + 3, 6); L.row(x + 9, 4, 'SSS'); L.set(x + 15, 12, 'G');
+  });
+}
+const WORLDS = ['School Day', 'After School', 'Field Trip', 'Snow Day'];
+[
+  ['Gym Class Gauntlet', 'gym', .35, { springs: 1, planes: 1 }, 104],
+  ['Library Leap', 'library', .3, { planes: 1 }, 201],
+  ['Band Room Bounce', 'music', .38, { springs: 2 }, 202],
+  ['Paint Spill Panic', 'art', .45, { planes: 1, springs: 1 }, 203],
+  ['Science Lab Scramble', 'lab', .5, { movers: 2 }, 204],
+  ['Bus Stop Blitz', 'bus', .52, { planes: 1 }, 301],
+  ['Playground Parkour', 'park', .56, { springs: 1, movers: 1 }, 302],
+  ['Museum Mayhem', 'museum', .6, { movers: 1, planes: 1 }, 303],
+  ['Campfire Night', 'night', .65, { planes: 1, springs: 1 }, 304],
+  ['Snow Day Slide', 'snow', .6, { slip: 1 }, 401],
+  ['Icicle Alley', 'snow', .7, { slip: 1, movers: 1 }, 402],
+  ["Principal's Office", 'office', .8, { springs: 1, movers: 1, planes: 1 }, 403],
+  ['The Final Bell', 'roofnight', .9, { springs: 1, movers: 1, planes: 1 }, 404]
+].forEach(([name, theme, d, feat, seed], i) => LEVELS.push({ name, theme, slip: !!feat.slip, tempo: Math.round(148 + d * 36), tr: [0, 2, -2, 3, -3, 5][i % 6], time: 300, map: genLevel(seed, d, feat) }));
+const RANDOM_THEMES = ['hall', 'cafe', 'roof', 'gym', 'library', 'music', 'art', 'lab', 'bus', 'park', 'museum', 'night', 'snow', 'office', 'roofnight'];
+function makeRandomLevel() {
+  const theme = RANDOM_THEMES[Math.floor(Math.random() * RANDOM_THEMES.length)], d = .35 + Math.random() * .45;
+  const feat = { springs: Math.random() < .6 ? 1 : 0, movers: Math.random() < .6 ? 1 : 0, planes: 1, slip: theme === 'snow' };
+  const bits = ['Surprise', 'Detention', 'Pop Quiz', 'Field Day', 'Hallway', 'Locker', 'Homework', 'Recess'], ends = ['Scramble', 'Dash', 'Mayhem', 'Rumble', 'Hustle', 'Shuffle'];
+  LEVELS[16] = { name: bits[Math.floor(Math.random() * bits.length)] + ' ' + ends[Math.floor(Math.random() * ends.length)], theme, slip: !!feat.slip, tempo: 160, tr: 1, time: 300, map: genLevel(Math.floor(Math.random() * 1e9), d, feat), random: true };
+}
+const SOLID = new Set(['#', 'B', '?', 'P', 'U', 'L', 'T']);
+
+/* ================= STATE ================= */
+const save = store.get('dash-save', { unlocked: 1, best: {}, cleared: [] });
+const G = { state: 'title', lvl: 0, lives: 5, score: 0, stars: 0, time: 0, grid: null, W: 0, cam: 0, shake: 0, t: 0, timer: 0,
+  enemies: [], items: [], balls: [], parts: [], plats: [], camY: 0, slip: false, checks: [], goal: null, bumps: new Map(), respawn: null, combo: 0, mapSel: 0, msg: '', paused: false, starTotal: 0 };
+const P = { x: 0, y: 0, w: 22, h: 40, vx: 0, vy: 0, face: 1, onGround: false, power: 0, inv: 0, coyote: 0, buffer: 0, run: 0, grow: 0 };
+
+/* ================= INPUT ================= */
+const held = { left: false, right: false, jump: false, run: false };
+const touch = { left: false, right: false, jump: false, run: false };
+const K = { ArrowLeft: 'left', KeyA: 'left', ArrowRight: 'right', KeyD: 'right', Space: 'jump', KeyZ: 'jump', ArrowUp: 'jump', KeyW: 'jump', KeyK: 'jump', ShiftLeft: 'run', ShiftRight: 'run', KeyX: 'run', KeyJ: 'run' };
+const down = k => held[k] || touch[k];
+function press(k) {
+  if (ACTIVE !== 'dash') return;
+  if (G.state === 'title') return;
+  if (G.state === 'map') return mapInput(k);
+  if (G.paused) return;
+  if (k === 'jump') P.buffer = .13;
+  if (k === 'run' && G.state === 'play') fire();
+}
+document.addEventListener('keydown', e => {
+  if (ACTIVE !== 'dash' || VIEW !== 'games') return;
+  if (G.state === 'title') return;
+  const k = K[e.code];
+  if (k) { e.preventDefault(); if (!held[k] && !e.repeat) { held[k] = true; press(k); } return; }
+  if (e.code === 'Enter' && G.state === 'map') { e.preventDefault(); mapInput('jump'); }
+  if (e.code === 'KeyR' && G.state === 'map') { e.preventDefault(); playRandom(); }
+  if ((e.code === 'KeyP' || e.code === 'Escape') && G.state !== 'map' && G.state !== 'title') { G.paused = !G.paused; sfx.pause(); if (G.paused) Music.stop(); else if (G.state === 'play') Music.start(LEVELS[G.lvl].tempo, LEVELS[G.lvl].tr); }
+  if (e.code === 'KeyM') toggleMusic();
+});
+document.addEventListener('keyup', e => { const k = K[e.code]; if (k) held[k] = false; });
+window.addEventListener('blur', () => { for (const k in held) held[k] = false; });
+document.addEventListener('visibilitychange', () => { if (document.hidden && (G.state === 'play') && !G.paused) { G.paused = true; Music.stop(); } });
+document.querySelectorAll('#pad button').forEach(b => {
+  const k = b.dataset.k;
+  b.addEventListener('pointerdown', e => { e.preventDefault(); audio(); touch[k] = true; b.classList.add('on'); press(k); try { b.setPointerCapture(e.pointerId); } catch (_) {} });
+  const up = () => { touch[k] = false; b.classList.remove('on'); };
+  b.addEventListener('pointerup', up); b.addEventListener('pointercancel', up); b.addEventListener('lostpointercapture', up);
+});
+let padOn = store.get('dash-pad', matchMedia('(pointer: coarse)').matches);
+function paintToggles() {
+  $('#sfxBtn').textContent = 'Sound: ' + (sfxOn ? 'on' : 'off');
+  $('#musicBtn').textContent = 'Music: ' + (musicOn ? 'on' : 'off');
+  $('#padBtn').textContent = 'Touch buttons: ' + (padOn ? 'on' : 'off');
+  $('#pad').classList.toggle('show', padOn);
+}
+function toggleMusic() { musicOn = !musicOn; store.set('dash-music', musicOn); paintToggles(); }
+$('#sfxBtn').addEventListener('click', () => { sfxOn = !sfxOn; store.set('dash-sfx', sfxOn); paintToggles(); });
+$('#musicBtn').addEventListener('click', toggleMusic);
+$('#padBtn').addEventListener('click', () => { padOn = !padOn; store.set('dash-pad', padOn); paintToggles(); });
+paintToggles();
+$('#fsBtn').addEventListener('click', () => { const fr = $('.frame'); try { const p = document.fullscreenElement ? document.exitFullscreen() : fr.requestFullscreen(); if (p && p.catch) p.catch(() => {}); } catch (e) {} cv.focus(); });
+$('#playBtn').addEventListener('click', () => {
+  if (ACTIVE !== 'dash') return; audio(); $('#start').hidden = true; G.state = 'map'; G.mapSel = Math.min(save.unlocked, 16) - 1; cv.focus(); });
+cv.addEventListener('pointerdown', e => {
+  if (ACTIVE !== 'dash') return;
+  audio(); cv.focus();
+  if (G.state !== 'map') return;
+  const r = cv.getBoundingClientRect(), x = (e.clientX - r.left) / r.width * VW, y = (e.clientY - r.top) / r.height * VH;
+  const w = Math.floor(G.mapSel / 4);
+  if (x > VW - 200 && y < 66) return playRandom();
+  for (let k = 0; k < 4; k++) { const tx = VW / 2 - 150 + k * 100; if (Math.abs(x - tx) < 40 && y > 78 && y < 116 && k * 4 < save.unlocked) { G.mapSel = k * 4; sfx.select(); return; } }
+  if (x > 880 && y > 310 && y < 400 && w < 3 && (w + 1) * 4 < save.unlocked) { G.mapSel = (w + 1) * 4; sfx.select(); return; }
+  MAPN.forEach((n, j) => { const i = w * 4 + j; if (Math.hypot(x - n.x, y - n.y) < 44 && i < save.unlocked) { if (G.mapSel === i) mapInput('jump'); else { G.mapSel = i; sfx.select(); } } });
+  if (y > 448 && y < 522 && Math.abs(x - VW / 2) < 330) mapInput('jump');
+});
+
+/* ================= MAP ================= */
+const MAPN = [{ x: 170, y: 330 }, { x: 380, y: 240 }, { x: 590, y: 320 }, { x: 790, y: 230 }];
+function mapInput(k) {
+  if (k === 'left' && G.mapSel > 0) { G.mapSel--; sfx.select(); }
+  if (k === 'right' && G.mapSel < Math.min(15, save.unlocked - 1)) { G.mapSel++; sfx.select(); }
+  if (k === 'jump') { G.lives = Math.max(G.lives, 3); startLevel(G.mapSel, false); }
+}
+function playRandom() { makeRandomLevel(); G.lives = Math.max(G.lives, 3); startLevel(16, false); }
+/* ================= LEVEL LOAD ================= */
+function startLevel(i, fromCheck) {
+  const L = LEVELS[i]; G.lvl = i;
+  G.grid = L.map.map(r => r.split('')); G.W = G.grid[0].length;
+  G.plats = (L.map.movers || []).map(m => ({ x: m.tx * T, y: m.ty * T, w: 3 * T, h: 11, x0: m.tx * T, x1: (m.tx + m.range) * T, speed: m.speed, dir: 1, dx: 0 }));
+  G.slip = !!L.slip; P.plat = null; P.spring = false; P.springT = 0;
+  G.enemies = []; G.items = []; G.balls = []; G.parts = []; G.checks = []; G.bumps.clear(); G.combo = 0; G.stars = 0; G.starTotal = 0;
+  let start = { x: 3, y: 12 };
+  for (let y = 0; y < ROWS; y++) for (let x = 0; x < G.W; x++) {
+    const c = G.grid[y][x];
+    if (c === '@') { start = { x, y }; G.grid[y][x] = '.'; }
+    else if ('erfh'.includes(c)) { G.enemies.push(makeEnemy(c, x, y)); G.grid[y][x] = '.'; }
+    else if (c === 'C') { G.checks.push({ x: x * T + T / 2, y: (y + 1) * T, on: false }); G.grid[y][x] = '.'; }
+    else if (c === 'G') { G.goal = { x: x * T + T / 2, base: (y + 1) * T, flag: 0 }; G.grid[y][x] = '.'; }
+    if (c === 'S' || c === '?') G.starTotal++;
+  }
+  if (!fromCheck) { G.respawn = null; G.time = L.time; }
+  else G.time = Math.max(G.time, 120);
+  const sp = fromCheck && G.respawn ? G.respawn : { x: start.x * T + 8, y: (start.y + 1) * T };
+  if (fromCheck && G.respawn) G.checks.forEach(c => { if (c.x <= G.respawn.x + 1) c.on = true; });
+  Object.assign(P, { w: 22, h: 40, power: 0, vx: 0, vy: 0, face: 1, inv: 0, coyote: 0, buffer: 0, grow: 0, onGround: false });
+  P.x = sp.x; P.y = sp.y - P.h;
+  G.cam = clamp(P.x - VWW * .35, 0, G.W * T - VWW); G.camY = VH - VHW;
+  G.state = 'card'; G.timer = 1.6; G.paused = false; Music.stop();
+}
+function makeEnemy(c, tx, ty) {
+  const dims = { e: [28, 28, -55], r: [32, 24, -105], f: [36, 18, -125], h: [18, 42, -40] }[c];
+  const e = { type: c, w: dims[0], h: dims[1], vx: dims[2], vy: 0, x: 0, y: 0, alive: true, active: false, dead: 0, flat: false, flip: false, t: Math.random() * 6, hop: .6 + Math.random() };
+  e.x = tx * T + (T - e.w) / 2; e.y = (ty + 1) * T - e.h; e.baseY = e.y; return e;
+}
+
+/* ================= PHYSICS ================= */
+const tile = (tx, ty) => (ty < 0 || ty >= ROWS || tx < 0 || tx >= G.W) ? '.' : G.grid[ty][tx];
+const solid = (tx, ty) => tx < 0 ? true : SOLID.has(tile(tx, ty));
+function moveX(o, dx) {
+  o.x += dx; o.hitWall = 0; if (!dx) return;
+  const top = Math.floor(o.y / T), bot = Math.floor((o.y + o.h - .01) / T);
+  if (dx > 0) { const tx = Math.floor((o.x + o.w - .01) / T); for (let ty = top; ty <= bot; ty++) if (solid(tx, ty)) { o.x = tx * T - o.w; o.hitWall = 1; return; } }
+  else { const tx = Math.floor(o.x / T); for (let ty = top; ty <= bot; ty++) if (solid(tx, ty)) { o.x = (tx + 1) * T; o.hitWall = -1; return; } }
+}
+function moveY(o, dy, isPlayer) {
+  const prevBottom = o.y + o.h; o.y += dy; o.onGround = false; if (!dy) return;
+  const l = Math.floor(o.x / T), r = Math.floor((o.x + o.w - .01) / T);
+  if (dy > 0) {
+    const ty = Math.floor((o.y + o.h - .01) / T);
+    for (let tx = l; tx <= r; tx++) { const c = tile(tx, ty); if (solid(tx, ty) || (c === '=' && prevBottom <= ty * T + 1)) { o.y = ty * T - o.h; o.vy = 0; o.onGround = true; if (isPlayer && c === 'T') { o.spring = true; G.bumps.set(tx + ',' + ty, .2); } return; } }
+  } else {
+    const ty = Math.floor(o.y / T);
+    for (let tx = l; tx <= r; tx++) if (solid(tx, ty)) {
+      o.y = (ty + 1) * T; o.vy = 0;
+      if (isPlayer) { const cx = Math.floor((o.x + o.w / 2) / T); bump(solid(cx, ty) ? cx : tx, ty); }
+      return;
+    }
+  }
+}
+
+/* ================= GAMEPLAY ================= */
+function addScore(n, x, y) { G.score += n; if (x != null) G.parts.push({ kind: 'text', text: String(n), x, y, vx: 0, vy: -60, life: .8 }); }
+function addStar(x, y) {
+  G.stars++; G.score += 100; sfx.star();
+  G.parts.push({ kind: 'star', x, y, vx: 0, vy: -380, life: .5 });
+  const total = (store.get('dash-starbank', 0) || 0) + 1; store.set('dash-starbank', total);
+  if (G.stars % 50 === 0) { G.lives++; sfx.oneup(); G.parts.push({ kind: 'text', text: '1-UP!', x: P.x, y: P.y - 10, vx: 0, vy: -50, life: 1.2 }); }
+}
+function burst(x, y, n, color, spd = 220) { for (let i = 0; i < n; i++) { const a = Math.random() * Math.PI * 2, s = spd * (.4 + Math.random() * .8); G.parts.push({ kind: 'dot', x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s - 120, life: .5 + Math.random() * .3, color, g: 900 }); } }
+function bump(tx, ty) {
+  const c = tile(tx, ty), key = tx + ',' + ty;
+  // enemies standing on the tile get knocked out
+  G.enemies.forEach(e => { if (e.alive && e.type !== 'f' && Math.abs(e.y + e.h - ty * T) < 4 && e.x + e.w > tx * T && e.x < (tx + 1) * T) knock(e); });
+  if (c === '?') { G.grid[ty][tx] = 'U'; G.bumps.set(key, .15); addStar(tx * T + T / 2, ty * T - 10); }
+  else if (c === 'P') {
+    G.grid[ty][tx] = 'U'; G.bumps.set(key, .15); sfx.appear();
+    G.items.push({ kind: P.power === 0 ? 'pudding' : 'straw', x: tx * T + 5, y: ty * T, w: 26, h: 26, vx: 0, vy: 0, emerge: T, startY: ty * T, t: 0 });
+  } else if (c === 'B') {
+    if (P.power > 0) {
+      G.grid[ty][tx] = '.'; sfx.smash(); addScore(50); G.shake = .12;
+      const col = BRICK[(tx * 7 + ty * 3) % 3];
+      for (let i = 0; i < 4; i++) G.parts.push({ kind: 'brick', x: tx * T + (i % 2) * 18 + 9, y: ty * T + (i < 2 ? 9 : 27), vx: (i % 2 ? 1 : -1) * (90 + Math.random() * 60), vy: -420 + (i < 2 ? -120 : 0), life: 1.4, g: 1600, color: col, rot: 0 });
+    } else { G.bumps.set(key, .15); sfx.bump(); }
+  } else sfx.bump();
+}
+function knock(e) { if (!e.alive) return; e.alive = false; e.flip = true; e.dead = 1.5; e.vy = -420; e.vx = (Math.random() < .5 ? -1 : 1) * 80; addScore(200, e.x, e.y); sfx.stomp(); }
+function fire() {
+  if (P.power !== 2 || G.balls.length >= 2) return;
+  sfx.spit();
+  G.balls.push({ x: P.x + (P.face > 0 ? P.w : -10), y: P.y + 16, w: 10, h: 10, vx: P.face * 430, vy: 120, life: 1.6 });
+}
+function setPower(p) {
+  const wasSmall = P.power === 0;
+  P.power = p;
+  if (p > 0 && wasSmall) { P.y -= 18; P.h = 58; P.w = 26; P.grow = .6; }
+  if (p === 0) { P.y += 18; P.h = 40; P.w = 22; P.grow = .6; }
+}
+function hurt() {
+  if (P.inv > 0 || G.state !== 'play') return;
+  if (P.power > 0) { setPower(0); P.inv = 1.8; sfx.shrink(); G.shake = .15; }
+  else die();
+}
+function die() {
+  if (G.state !== 'play') return;
+  G.state = 'dying'; G.timer = 2.6; P.vy = -640; P.vx = 0; Music.stop(); sfx.die();
+}
+function stepPlayer(dt) {
+  const L = down('left'), R = down('right'), run = down('run');
+  if (P.plat) moveX(P, P.plat.dx);
+  const slip = G.slip && P.onGround ? .35 : 1;
+  const max = run ? 330 : 205, acc = (P.onGround ? 1 : .75) * (run ? 1900 : 1500) * (G.slip && P.onGround ? .55 : 1);
+  if (L && !R) { P.vx -= acc * dt * (P.vx > 0 ? 1.8 : 1); P.face = -1; }
+  else if (R && !L) { P.vx += acc * dt * (P.vx < 0 ? 1.8 : 1); P.face = 1; }
+  else { const f = (P.onGround ? 1500 * slip : 400) * dt; P.vx = Math.abs(P.vx) <= f ? 0 : P.vx - Math.sign(P.vx) * f; }
+  if (Math.abs(P.vx) > max) P.vx -= Math.sign(P.vx) * Math.min(Math.abs(P.vx) - max, 900 * dt);
+  // skid dust
+  if (P.onGround && ((L && P.vx > 120) || (R && P.vx < -120)) && Math.random() < .5) G.parts.push({ kind: 'dust', x: P.x + P.w / 2, y: P.y + P.h, vx: -P.vx * .2, vy: -30, life: .35 });
+  P.coyote = P.onGround ? .09 : P.coyote - dt; P.buffer -= dt;
+  if (P.buffer > 0 && P.coyote > 0) { P.vy = -(560 + Math.abs(P.vx) * .18); P.coyote = 0; P.buffer = 0; P.onGround = false; sfx.jump(); }
+  P.springT = Math.max(0, (P.springT || 0) - dt);
+  const g = ((down('jump') || P.springT > 0) && P.vy < 0) ? 1150 : 2300;
+  P.vy = Math.min(P.vy + g * dt, 950);
+  const wasAir = !P.onGround, fallV = P.vy;
+  moveX(P, P.vx * dt); if (P.hitWall) P.vx = 0;
+  const pb = P.y + P.h;
+  moveY(P, P.vy * dt, true);
+  P.plat = null;
+  if (P.vy >= 0) for (const pl of G.plats) {
+    if (P.x + P.w > pl.x + 2 && P.x < pl.x + pl.w - 2 && pb <= pl.y + 3 + Math.abs(pl.dx) && P.y + P.h >= pl.y) { P.y = pl.y - P.h; P.vy = 0; P.onGround = true; P.plat = pl; break; }
+  }
+  if (P.spring) { P.spring = false; P.vy = -860; P.springT = .45; P.onGround = false; P.coyote = 0; sfx.boing(); }
+  if (P.onGround) { G.combo = 0; if (wasAir && fallV > 500) for (let i = 0; i < 4; i++) G.parts.push({ kind: 'dust', x: P.x + P.w / 2 + (i - 1.5) * 6, y: P.y + P.h, vx: (i - 1.5) * 40, vy: -40, life: .35 }); }
+  if (P.x < G.cam) { P.x = G.cam; P.vx = Math.max(0, P.vx); }
+  P.run += Math.abs(P.vx) * dt * .09;
+  P.inv = Math.max(0, P.inv - dt); P.grow = Math.max(0, P.grow - dt);
+  // stars & spikes
+  const l = Math.floor(P.x / T), r = Math.floor((P.x + P.w - .01) / T), t = Math.floor(P.y / T), b = Math.floor((P.y + P.h - .01) / T);
+  for (let ty = t; ty <= b; ty++) for (let tx = l; tx <= r; tx++) {
+    const c = tile(tx, ty);
+    if (c === 'S') { G.grid[ty][tx] = '.'; addStar(tx * T + T / 2, ty * T + T / 2); }
+    if (c === '^' && P.x + P.w > tx * T + 6 && P.x < (tx + 1) * T - 6 && P.y + P.h > ty * T + 16) hurt();
+  }
+  if (P.y > VH + 60) die();
+  // checkpoints
+  G.checks.forEach(c => { if (!c.on && P.x > c.x) { c.on = true; G.respawn = { x: c.x - 10, y: c.y }; sfx.check(); G.parts.push({ kind: 'text', text: 'SAVED!', x: c.x - 20, y: c.y - 110, vx: 0, vy: -30, life: 1.2 }); } });
+  // goal
+  if (G.goal && P.x + P.w > G.goal.x - 2) reachGoal();
+}
+function stepPlats(dt) {
+  for (const pl of G.plats) { const nx = clamp(pl.x + pl.dir * pl.speed * dt, pl.x0, pl.x1); pl.dx = nx - pl.x; pl.x = nx; if (nx >= pl.x1) pl.dir = -1; if (nx <= pl.x0) pl.dir = 1; }
+}
+function overlap(a, b, pad = 3) { return a.x + pad < b.x + b.w && a.x + a.w - pad > b.x && a.y + pad < b.y + b.h && a.y + a.h - pad > b.y; }
+function stepEnemies(dt) {
+  for (const e of G.enemies) {
+    if (!e.active) { if (e.x < G.cam + VWW + 60) e.active = true; else continue; }
+    e.t += dt;
+    if (!e.alive) {
+      e.dead -= dt;
+      if (e.flip) { e.vy += 1800 * dt; e.y += e.vy * dt; e.x += e.vx * dt; }
+      continue;
+    }
+    if (e.type === 'f') { e.x += e.vx * dt; e.y = e.baseY + Math.sin(e.t * 3) * 30; }
+    else {
+      if (e.type === 'h') { e.vx = Math.sign(P.x - e.x || 1) * 45; if (e.onGround) { e.hop -= dt; if (e.hop <= 0) { e.vy = -600; e.hop = 1 + Math.random() * .6; } } }
+      e.vy = Math.min(e.vy + 2000 * dt, 900);
+      moveX(e, e.vx * dt); if (e.hitWall) e.vx = -e.vx;
+      moveY(e, e.vy * dt, false);
+    }
+    if (e.y > VH + 80 || e.x < G.cam - 300) { e.alive = false; e.dead = 0; continue; }
+    // player contact
+    if (G.state === 'play' && overlap(P, e, 4)) {
+      const fromAbove = P.vy > 60 && (P.y + P.h) - e.y < 18 + P.vy * STEP * 2;
+      if (fromAbove && e.type !== 'h') {
+        e.alive = false; G.combo++;
+        if (e.type === 'f') { e.flip = true; e.vy = 0; e.vx = 0; e.dead = 1.4; } else { e.flat = true; e.dead = .5; }
+        P.vy = down('jump') ? -640 : -430; P.y = e.y - P.h;
+        const pts = Math.min(100 * Math.pow(2, G.combo - 1), 3200); addScore(pts, e.x, e.y - 10);
+        sfx.stomp(); G.shake = .1; burst(e.x + e.w / 2, e.y, 6, '#ffd84a', 160);
+      } else hurt();
+    }
+  }
+  G.enemies = G.enemies.filter(e => e.alive || e.dead > 0);
+}
+function stepItems(dt) {
+  for (const it of G.items) {
+    it.t += dt;
+    if (it.emerge > 0) { const d = Math.min(it.emerge, 40 * dt); it.emerge -= d; it.y -= d; if (it.emerge <= 0 && it.kind === 'pudding') it.vx = 100; continue; }
+    if (it.kind === 'pudding') { it.vy = Math.min(it.vy + 1800 * dt, 800); moveX(it, it.vx * dt); if (it.hitWall) it.vx = -it.vx; moveY(it, it.vy * dt, false); }
+    if (overlap(P, it, 2) && G.state === 'play') {
+      it.gone = true; addScore(1000, it.x, it.y);
+      if (it.kind === 'pudding') { if (P.power === 0) setPower(1); } else { if (P.power === 0) setPower(1); P.power = 2; }
+      sfx.power();
+    }
+    if (it.y > VH + 40) it.gone = true;
+  }
+  G.items = G.items.filter(i => !i.gone);
+}
+function stepBalls(dt) {
+  for (const b of G.balls) {
+    b.life -= dt; b.vy = Math.min(b.vy + 1800 * dt, 700);
+    moveX(b, b.vx * dt); if (b.hitWall) { b.life = 0; burst(b.x, b.y, 4, '#fff', 90); }
+    moveY(b, b.vy * dt, false); if (b.onGround) b.vy = -330;
+    for (const e of G.enemies) if (e.alive && e.active && overlap(b, e, 0)) { knock(e); b.life = 0; }
+    if (b.y > VH || b.x < G.cam - 40 || b.x > G.cam + VWW + 40) b.life = 0;
+  }
+  G.balls = G.balls.filter(b => b.life > 0);
+}
+function stepParts(dt) {
+  for (const p of G.parts) { p.life -= dt; p.x += p.vx * dt; p.y += p.vy * dt; if (p.g) p.vy += p.g * dt; if (p.kind === 'star') p.vy += 1400 * dt; if (p.rot != null) p.rot += dt * 10; }
+  G.parts = G.parts.filter(p => p.life > 0);
+  for (const [k, v] of G.bumps) { if (v - dt <= 0) G.bumps.delete(k); else G.bumps.set(k, v - dt); }
+}
+function reachGoal() {
+  if (G.state !== 'play') return;
+  G.state = 'clear'; G.timer = 0; Music.stop(); sfx.clear();
+  const h = clamp((G.goal.base - (P.y + P.h)) / (9 * T), 0, 1);
+  const bonus = [100, 400, 800, 2000, 5000][Math.min(4, Math.floor(h * 5))];
+  addScore(bonus, G.goal.x - 30, P.y - 20);
+  P.x = G.goal.x - P.w + 4; P.vx = 0; P.vy = 0; G.clearPhase = 0; G.timeBonus = Math.ceil(G.time);
+}
+function stepClear(dt) {
+  G.timer += dt;
+  if (G.clearPhase === 0) { // slide down pole
+    P.y = Math.min(P.y + 260 * dt, G.goal.base - P.h); G.goal.flag = Math.min(1, G.goal.flag + dt * .9);
+    if (P.y >= G.goal.base - P.h && G.goal.flag >= 1) { G.clearPhase = 1; P.face = 1; P.x += P.w; }
+  } else if (G.clearPhase === 1) { // walk off
+    P.vx = 150; P.run += 150 * dt * .09; P.vy = Math.min(P.vy + 2300 * dt, 900); moveX(P, P.vx * dt); moveY(P, P.vy * dt, false);
+    if (G.timeBonus > 0) { const n = Math.min(G.timeBonus, 4); G.timeBonus -= n; G.score += n * 10; if (Math.floor(G.timer * 30) % 3 === 0) tone(1600, .02, 'square', .02); }
+    if (G.timer > 3.2 && G.timeBonus <= 0) { G.clearPhase = 2; G.timer = 0; finishLevel(); }
+  } else if (G.timer > 2.6) { G.state = 'map'; if (G.lvl < 16) G.mapSel = Math.min(G.lvl + 1, save.unlocked - 1, 15); }
+}
+function finishLevel() {
+  const i = G.lvl; if (i >= 16) return;
+  const prev = save.best[i] || { stars: 0, score: 0 };
+  save.best[i] = { stars: Math.max(prev.stars, G.stars), total: G.starTotal, score: Math.max(prev.score, G.score) };
+  if (!save.cleared.includes(i)) save.cleared.push(i);
+  save.unlocked = Math.max(save.unlocked, Math.min(16, i + 2));
+  store.set('dash-save', save);
+}
+
+/* ================= UPDATE ================= */
+function update(dt) {
+  G.t += dt; G.shake = Math.max(0, G.shake - dt);
+  if (G.state === 'title' || G.state === 'map' || G.paused) return;
+  if (G.state === 'card') { G.timer -= dt; if (G.timer <= 0) { G.state = 'play'; Music.start(LEVELS[G.lvl].tempo, LEVELS[G.lvl].tr); } return; }
+  if (G.state === 'play') {
+    stepPlats(dt); stepPlayer(dt); stepEnemies(dt); stepItems(dt); stepBalls(dt);
+    G.time -= dt; if (G.time <= 0) { G.time = 0; die(); }
+  } else if (G.state === 'dying') {
+    G.timer -= dt; if (G.timer < 2.2) { P.vy += 1600 * dt; P.y += P.vy * dt; }
+    stepEnemies(dt);
+    if (G.timer <= 0) {
+      G.lives--;
+      if (G.lives <= 0) { G.state = 'over'; G.timer = 3; G.score = 0; }
+      else startLevel(G.lvl, true);
+    }
+  } else if (G.state === 'clear') { stepClear(dt); stepEnemies(dt); }
+  else if (G.state === 'over') { G.timer -= dt; if (G.timer <= 0) { G.lives = 5; G.state = 'map'; } }
+  stepParts(dt);
+  // camera
+  if (G.state === 'play' || G.state === 'clear') {
+    const target = clamp(P.x + P.w / 2 - VWW * .4 + P.face * 40, 0, G.W * T - VWW);
+    G.cam += (target - G.cam) * Math.min(1, dt * 5);
+    G.cam = clamp(G.cam, 0, G.W * T - VWW);
+  }
+  if (G.state !== 'card') {
+    const ty = clamp(P.y + P.h / 2 - VHW * .55, 0, VH - VHW);
+    G.camY += (ty - G.camY) * Math.min(1, dt * 4);
+  }
+}
+
+/* ================= DRAWING HELPERS ================= */
+function line(x1, y1, x2, y2) { ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke(); }
+function wrect(x, y, w, h, seed, fill) {
+  const j = k => jit(seed, k, 1) * 2.4;
+  ctx.beginPath();
+  ctx.moveTo(x + j(1), y + j(2));
+  ctx.lineTo(x + w + j(3), y + j(4));
+  ctx.lineTo(x + w + j(5), y + h + j(6));
+  ctx.lineTo(x + j(7), y + h + j(8));
+  ctx.closePath();
+  if (fill) { ctx.fillStyle = fill; ctx.fill(); }
+  ctx.stroke();
+}
+function star(x, y, r, fill) {
+  ctx.beginPath();
+  for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + i * Math.PI / 5, rr = i % 2 ? r * .45 : r; ctx.lineTo(x + Math.cos(a) * rr, y + Math.sin(a) * rr); }
+  ctx.closePath(); ctx.fillStyle = fill; ctx.fill(); ctx.stroke();
+}
+function text(s, x, y, size, font = FH, color = INK, align = 'left') { ctx.font = `${size}px ${font}`; ctx.fillStyle = color; ctx.textAlign = align; ctx.textBaseline = 'middle'; ctx.fillText(s, x, y); }
+function stamp(s, sub, color = '#d4302a') {
+  ctx.save(); ctx.translate(VW / 2, VH / 2 - 20); ctx.rotate(-.08);
+  ctx.font = `64px ${FD}`; const w = ctx.measureText(s).width + 50;
+  ctx.fillStyle = 'rgba(253,251,243,.92)'; ctx.strokeStyle = color; ctx.lineWidth = 6;
+  ctx.beginPath(); ctx.roundRect(-w / 2, -50, w, 100, 12); ctx.fill(); ctx.stroke();
+  text(s, 0, 4, 64, FD, color, 'center'); ctx.restore();
+  if (sub) text(sub, VW / 2, VH / 2 + 62, 28, FH, INK, 'center');
+}
+
+/* ================= DRAW WORLD ================= */
+const BRICK = ['#d9534f', '#5b8fd1', '#6fb36f'];
+const THEMES = {
+  hall: { sky: '#fdfbf3', fill: '#efe4c8', top: '#9fcf8a', hatch: '#c9b98e' },
+  cafe: { sky: '#fbfaf0', fill: '#efe4c8', top: '#e7c45c', hatch: '#c9b98e' },
+  roof: { sky: '#f4f8fd', fill: '#e4e4e4', top: '#b9b9b9', hatch: '#bcbcbc' },
+  gym: { sky: '#fdf6ee', fill: '#f0d3a6', top: '#d99a5b', hatch: '#d2a871' },
+  library: { sky: '#fbf7ef', fill: '#eadfca', top: '#b58a5a', hatch: '#cbb89a' },
+  music: { sky: '#f8f5fd', fill: '#e9e1f2', top: '#b99be0', hatch: '#c9bde0' },
+  art: { sky: '#fdf7f7', fill: '#f3e2e2', top: '#f08a8a', hatch: '#dfbcbc' },
+  lab: { sky: '#f3faf6', fill: '#e1efe7', top: '#7fc4a0', hatch: '#b5d3c2' },
+  bus: { sky: '#f4f8fd', fill: '#dedede', top: '#8a8a8a', hatch: '#bdbdbd' },
+  park: { sky: '#f3f9f1', fill: '#efe4c8', top: '#8ccf7a', hatch: '#c9b98e' },
+  museum: { sky: '#faf8f3', fill: '#ece6da', top: '#c2b59b', hatch: '#cfc4ad' },
+  night: { sky: '#e3e6f2', fill: '#d4d2e2', top: '#7b86b8', hatch: '#b3b3cc', dark: true },
+  snow: { sky: '#f6f9fd', fill: '#e9eef5', top: '#ffffff', hatch: '#c8d3e2', snow: true },
+  office: { sky: '#f7f5f0', fill: '#e9e3d6', top: '#b0a58c', hatch: '#cbc2ad' },
+  roofnight: { sky: '#e3e6f2', fill: '#d8d8de', top: '#9a9aa6', hatch: '#b7b7c2', dark: true }
+};
+function drawBackground(theme) {
+  const th = THEMES[theme];
+  ctx.fillStyle = th.sky; ctx.fillRect(0, 0, VW, VH);
+  ctx.strokeStyle = th.dark ? '#c6cbe0' : '#cadcea'; ctx.lineWidth = 1.5;
+  for (let y = 36; y < VH; y += 36) line(0, y, VW, y);
+  const mx = 70 - G.cam; if (mx > -4) { ctx.strokeStyle = '#e9a4a1'; ctx.lineWidth = 2; line(mx, 0, mx, VH); }
+  ctx.strokeStyle = th.dark ? '#9aa0bf' : PENCIL; ctx.lineWidth = 2;
+  if (th.dark) { // moon + little stars, fixed-ish
+    const mxm = 600 - G.cam * .05; ctx.fillStyle = '#fff6c8'; ctx.beginPath(); ctx.arc(mxm, 90, 30, 0, 7); ctx.fill(); ctx.stroke(); ctx.fillStyle = th.sky; ctx.beginPath(); ctx.arc(mxm + 14, 80, 26, 0, 7); ctx.fill();
+    for (let i = 0; i < 14; i++) { const sx = ((i * 173 - G.cam * .1) % 900 + 900) % 900, sy = 40 + (i * 67) % 160; ctx.lineWidth = 1.5; line(sx - 4, sy, sx + 4, sy); line(sx, sy - 4, sx, sy + 4); }
+    ctx.lineWidth = 2;
+  } else for (let i = -1; i < 6; i++) {
+    const base = Math.floor(G.cam * .25 / 380) + i, x = base * 380 - G.cam * .25 + 60 + jit(base, 1, 2) * 100, y = 70 + jit(base, 2, 2) * 60;
+    ctx.beginPath(); ctx.arc(x, y, 22, Math.PI * .9, Math.PI * 1.9); ctx.arc(x + 32, y - 8, 28, Math.PI * 1.1, Math.PI * 1.95); ctx.arc(x + 64, y, 20, Math.PI * 1.2, Math.PI * 2.1); ctx.lineTo(x - 18, y + 14); ctx.closePath(); ctx.stroke();
+  }
+  for (let i = -1; i < 5; i++) { const base = Math.floor(G.cam * .5 / 300) + i, x = base * 300 - G.cam * .5 + 40; ctx.save(); drawDeco(theme, x, base); ctx.restore(); }
+  if (th.snow) { ctx.strokeStyle = '#9fb6d6'; ctx.lineWidth = 1.5; for (let i = 0; i < 40; i++) { const sx = ((i * 97 + Math.sin(G.t + i) * 20 - G.cam * .6) % 820 + 820) % 820, sy = ((i * 53 + G.t * (30 + i % 5 * 8)) % 560) - 10; line(sx - 3, sy, sx + 3, sy); line(sx, sy - 3, sx, sy + 3); } }
+}
+function circ(x, y, r, fill) { ctx.beginPath(); ctx.arc(x, y, r, 0, 7); if (fill) { ctx.fillStyle = fill; ctx.fill(); } ctx.stroke(); }
+function drawDeco(theme, x, n) {
+  const th = THEMES[theme], P2 = th.dark ? '#9aa0bf' : PENCIL;
+  ctx.strokeStyle = P2; ctx.lineWidth = 2; ctx.fillStyle = P2;
+  const gy = 13 * T, a = Math.abs(n) % 2 === 0;
+  switch (theme) {
+    case 'hall':
+      if (a) { ctx.strokeRect(x, gy - 170, 80, 170); ctx.strokeRect(x + 18, gy - 150, 44, 50); circ(x + 66, gy - 80, 4, P2); text('7' + String.fromCharCode(65 + (Math.abs(n) % 4)), x + 40, gy - 185, 22, FH, P2, 'center'); }
+      else { ctx.strokeRect(x + 10, gy - 250, 70, 90); text('BE', x + 45, gy - 225, 20, FD, P2, 'center'); text('KIND', x + 45, gy - 195, 20, FD, P2, 'center'); circ(x + 180, gy - 300, 26); line(x + 180, gy - 300, x + 180, gy - 316); line(x + 180, gy - 300, x + 192, gy - 296); }
+      break;
+    case 'cafe':
+      if (a) { line(x, gy - 60, x + 160, gy - 60); line(x + 20, gy - 60, x + 20, gy); line(x + 140, gy - 60, x + 140, gy); ctx.strokeRect(x + 50, gy - 74, 50, 14); ctx.beginPath(); ctx.arc(x + 75, gy - 80, 8, Math.PI, 0); ctx.stroke(); }
+      else { ctx.strokeRect(x + 20, gy - 330, 150, 60); text('TODAY: MYSTERY MEAT', x + 95, gy - 300, 16, FD, P2, 'center'); }
+      break;
+    case 'roof': case 'roofnight':
+      if (Math.abs(n) % 3 === 0 && theme === 'roof') { circ(x + 100, 110, 30); for (let k = 0; k < 8; k++) { const r = k * Math.PI / 4; line(x + 100 + Math.cos(r) * 38, 110 + Math.sin(r) * 38, x + 100 + Math.cos(r) * 52, 110 + Math.sin(r) * 52); } }
+      else if (a) { ctx.strokeRect(x, gy - 90, 60, 90); ctx.strokeRect(x + 8, gy - 110, 44, 20); for (let k = 0; k < 4; k++) line(x + 10, gy - 75 + k * 16, x + 50, gy - 75 + k * 16); }
+      else { line(x + 60, gy, x + 60, gy - 180); line(x + 40, gy - 150, x + 80, gy - 150); line(x + 46, gy - 125, x + 74, gy - 125); }
+      break;
+    case 'gym':
+      if (a) { line(x + 60, gy, x + 60, gy - 220); ctx.strokeRect(x + 26, gy - 280, 80, 56); ctx.strokeRect(x + 50, gy - 262, 32, 24); ctx.beginPath(); ctx.ellipse(x + 66, gy - 220, 20, 5, 0, 0, 7); ctx.stroke(); for (let k = -1; k <= 1; k++) line(x + 66 + k * 12, gy - 218, x + 66 + k * 7, gy - 190); }
+      else { for (let k = 0; k < 5; k++) { line(x + k * 34, gy - k * 30, x + k * 34 + 34, gy - k * 30); line(x + k * 34 + 34, gy - k * 30, x + k * 34 + 34, gy - (k + 1) * 30); } text('GO TURNIPS!', x + 90, gy - 200, 20, FD, P2, 'center'); }
+      break;
+    case 'library':
+      if (a) { ctx.strokeRect(x, gy - 240, 130, 240); for (let s = 1; s < 4; s++) line(x, gy - s * 60, x + 130, gy - s * 60); for (let s = 0; s < 4; s++) for (let k = 0; k < 9; k++) { const bx = x + 8 + k * 13, h = 30 + ((k * 7 + s * 3) % 4) * 6; ctx.strokeRect(bx, gy - s * 60 - h, 10, h); } }
+      else { ctx.strokeRect(x + 30, gy - 300, 110, 50); text('SHHH!', x + 85, gy - 275, 24, FD, P2, 'center'); line(x + 180, gy, x + 180, gy - 120); ctx.beginPath(); ctx.moveTo(x + 160, gy - 120); ctx.lineTo(x + 200, gy - 120); ctx.lineTo(x + 190, gy - 145); ctx.lineTo(x + 170, gy - 145); ctx.closePath(); ctx.stroke(); }
+      break;
+    case 'music':
+      if (a) { for (let k = 0; k < 2; k++) { const nx = x + 40 + k * 50, ny = gy - 200 + k * 16; ctx.beginPath(); ctx.ellipse(nx, ny, 11, 8, -.4, 0, 7); ctx.fill(); line(nx + 10, ny, nx + 10, ny - 70 + k * 0); } ctx.lineWidth = 6; line(x + 50, gy - 270, x + 100, gy - 254); ctx.lineWidth = 2; }
+      else { ctx.strokeRect(x, gy - 90, 180, 90); for (let k = 1; k < 9; k++) line(x + k * 20, gy - 90, x + k * 20, gy); for (let k of [1, 2, 4, 5, 6, 8]) ctx.fillRect(x + k * 20 - 5, gy - 90, 10, 50); }
+      break;
+    case 'art':
+      if (a) { line(x + 40, gy, x + 70, gy - 200); line(x + 120, gy, x + 90, gy - 200); line(x + 80, gy, x + 80, gy - 190); ctx.strokeRect(x + 36, gy - 190, 90, 90); circ(x + 80, gy - 150, 16); for (let k = 0; k < 6; k++) { const r = k * Math.PI / 3; line(x + 80 + Math.cos(r) * 20, gy - 150 + Math.sin(r) * 20, x + 80 + Math.cos(r) * 28, gy - 150 + Math.sin(r) * 28); } }
+      else { ctx.globalAlpha = .35; [['#f08a8a', 40, 200, 30], ['#8fb3d9', 110, 150, 22], ['#9fcf8a', 170, 230, 26]].forEach(([c, dx, dy, r]) => { ctx.fillStyle = c; ctx.beginPath(); ctx.arc(x + dx, gy - dy, r, 0, 7); ctx.fill(); }); ctx.globalAlpha = 1; }
+      break;
+    case 'lab':
+      if (a) { ctx.beginPath(); ctx.moveTo(x + 60, gy - 200); ctx.lineTo(x + 60, gy - 150); ctx.lineTo(x + 25, gy - 60); ctx.lineTo(x + 125, gy - 60); ctx.lineTo(x + 90, gy - 150); ctx.lineTo(x + 90, gy - 200); ctx.stroke(); line(x + 40, gy - 100, x + 110, gy - 100); for (let k = 0; k < 3; k++) circ(x + 70 + k * 8, gy - 220 - k * 22 - (G.t * 20 % 20), 5 + k); }
+      else { const els = ['H', 'He', 'Li', 'Be', 'B', 'C', 'N', 'O']; els.forEach((e, k) => { const bx = x + (k % 4) * 40, by = gy - 300 + Math.floor(k / 4) * 40; ctx.strokeRect(bx, by, 36, 36); text(e, bx + 18, by + 19, 16, FH, P2, 'center'); }); }
+      break;
+    case 'bus':
+      if (a) { ctx.strokeRect(x, gy - 110, 240, 80); for (let k = 0; k < 5; k++) ctx.strokeRect(x + 14 + k * 44, gy - 98, 34, 26); circ(x + 50, gy - 26, 18); circ(x + 190, gy - 26, 18); text('SCHOOL BUS', x + 120, gy - 50, 18, FD, P2, 'center'); }
+      else { line(x + 60, gy, x + 60, gy - 170); ctx.strokeRect(x + 30, gy - 220, 60, 50); text('BUS', x + 60, gy - 195, 20, FD, P2, 'center'); }
+      break;
+    case 'park':
+      if (a) { line(x + 60, gy, x + 62, gy - 120); line(x + 80, gy, x + 78, gy - 120); ctx.beginPath(); ctx.arc(x + 70, gy - 170, 60, Math.PI * .75, Math.PI * 2.25); ctx.stroke(); ctx.beginPath(); ctx.arc(x + 40, gy - 150, 34, Math.PI * .5, Math.PI * 1.4); ctx.stroke(); }
+      else { line(x + 20, gy, x + 60, gy - 160); line(x + 100, gy, x + 60, gy - 160); line(x + 140, gy, x + 180, gy - 160); line(x + 220, gy, x + 180, gy - 160); line(x + 60, gy - 160, x + 180, gy - 160); line(x + 105, gy - 160, x + 105, gy - 50); line(x + 135, gy - 160, x + 135, gy - 50); line(x + 98, gy - 50, x + 142, gy - 50); }
+      break;
+    case 'museum':
+      if (a) { for (let k = 0; k < 2; k++) { const cx = x + 30 + k * 110; ctx.strokeRect(cx, gy - 220, 36, 220); ctx.strokeRect(cx - 8, gy - 232, 52, 12); ctx.strokeRect(cx - 8, gy - 12, 52, 12); for (let q = 1; q < 3; q++) line(cx + q * 12, gy - 220, cx + q * 12, gy - 12); } }
+      else { ctx.beginPath(); ctx.moveTo(x, gy - 90); ctx.quadraticCurveTo(x + 60, gy - 130, x + 140, gy - 110); ctx.quadraticCurveTo(x + 190, gy - 160, x + 200, gy - 250); ctx.stroke(); for (let k = 0; k < 6; k++) { ctx.beginPath(); ctx.arc(x + 40 + k * 18, gy - 115, 22, 0, Math.PI); ctx.stroke(); } line(x + 60, gy - 100, x + 55, gy); line(x + 120, gy - 100, x + 125, gy); circ(x + 205, gy - 258, 12); }
+      break;
+    case 'night':
+      if (a) { ctx.beginPath(); ctx.moveTo(x, gy); ctx.lineTo(x + 70, gy - 110); ctx.lineTo(x + 140, gy); ctx.closePath(); ctx.stroke(); line(x + 70, gy - 110, x + 70, gy); }
+      else { for (let k = 0; k < 3; k++) line(x + 60 + k * 10, gy, x + 70 + k * 6, gy - 30); ctx.strokeStyle = '#e7a14a'; ctx.beginPath(); ctx.moveTo(x + 60, gy - 30); ctx.quadraticCurveTo(x + 75, gy - 80 - Math.sin(G.t * 8) * 6, x + 90, gy - 30); ctx.stroke(); }
+      break;
+    case 'snow':
+      if (a) { circ(x + 60, gy - 30, 30); circ(x + 60, gy - 82, 22); circ(x + 60, gy - 118, 15); ctx.fillStyle = P2; circ(x + 55, gy - 121, 2, P2); circ(x + 65, gy - 121, 2, P2); line(x + 40, gy - 85, x + 14, gy - 105); line(x + 80, gy - 85, x + 106, gy - 105); }
+      else { for (let k = 0; k < 2; k++) { const tx = x + 40 + k * 110; ctx.beginPath(); ctx.moveTo(tx - 40, gy - 30); ctx.lineTo(tx, gy - 180); ctx.lineTo(tx + 40, gy - 30); ctx.closePath(); ctx.stroke(); line(tx, gy - 30, tx, gy); } }
+      break;
+    case 'office':
+      if (a) { ctx.strokeRect(x, gy - 150, 70, 150); for (let k = 0; k < 3; k++) { ctx.strokeRect(x + 6, gy - 144 + k * 48, 58, 42); line(x + 26, gy - 124 + k * 48, x + 44, gy - 124 + k * 48); } }
+      else { ctx.strokeRect(x + 20, gy - 190, 90, 190); ctx.strokeRect(x + 30, gy - 230, 70, 30); text('PRINCIPAL', x + 65, gy - 215, 14, FD, P2, 'center'); circ(x + 96, gy - 95, 4, P2); }
+      break;
+  }
+}
+function drawTiles() {
+  const x0 = Math.floor(G.cam / T) - 1, x1 = x0 + Math.ceil(VWW / T) + 2;
+  ctx.lineWidth = 2.5; ctx.strokeStyle = INK;
+  for (let ty = 0; ty < ROWS; ty++) for (let tx = x0; tx <= x1; tx++) {
+    const c = tile(tx, ty); if (c === '.') continue;
+    let x = tx * T - G.cam, y = ty * T; const seed = tx * 31 + ty * 17;
+    const b = G.bumps.get(tx + ',' + ty); if (b) y -= Math.sin((.15 - b) / .15 * Math.PI) * 10;
+    if (c === '#') {
+      const th = THEMES[LEVELS[G.lvl].theme];
+      ctx.fillStyle = th.fill; ctx.fillRect(x, y, T + .5, T + .5);
+      ctx.strokeStyle = th.hatch; ctx.lineWidth = 1.5; line(x + 6, y + T - 4, x + 18, y + 10); line(x + 20, y + T - 4, x + 32, y + 12);
+      ctx.strokeStyle = INK; ctx.lineWidth = 2.5;
+      if (tile(tx, ty - 1) !== '#') { ctx.fillStyle = th.top; ctx.fillRect(x, y, T + .5, 8); line(x, y + jit(seed, 1, 3) * 2, x + T, y + jit(seed + 1, 1, 3) * 2); line(x + 6, y, x + 9, y - 6); line(x + 22, y, x + 24, y - 5); }
+      if (tile(tx - 1, ty) !== '#') line(x, y, x, y + T);
+      if (tile(tx + 1, ty) !== '#') line(x + T, y, x + T, y + T);
+    } else if (c === 'B') {
+      const col = BRICK[(tx * 7 + ty * 3) % 3];
+      wrect(x + 1, y + 1, T - 2, T - 2, seed, col);
+      ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; line(x + 5, y + 8, x + T - 5, y + 8); line(x + 5, y + T - 8, x + T - 5, y + T - 8);
+      ctx.fillStyle = '#fbf6e6'; ctx.fillRect(x + T - 7, y + 3, 4, T - 6);
+      ctx.strokeStyle = INK; ctx.lineWidth = 2.5;
+    } else if (c === '?' || c === 'P') {
+      const bob = Math.sin(G.t * 4 + tx) * 1.2;
+      wrect(x + 1, y + 1 + bob, T - 2, T - 2, seed, '#ffe45c');
+      ctx.fillStyle = 'rgba(0,0,0,.08)'; ctx.fillRect(x + T - 10, y + T - 10, 8, 8);
+      text(c === 'P' ? '!' : '?', x + T / 2, y + T / 2 + 2 + bob, 26, FD, INK, 'center');
+    } else if (c === 'U') {
+      wrect(x + 1, y + 1, T - 2, T - 2, seed, '#d8d2c4');
+      ctx.lineWidth = 1.5; line(x + 9, y + 10, x + T - 9, y + T - 10); line(x + T - 9, y + 10, x + 9, y + T - 10); ctx.lineWidth = 2.5;
+    } else if (c === 'L') {
+      const topL = tile(tx, ty - 1) !== 'L';
+      ctx.fillStyle = '#8fa8c8'; ctx.fillRect(x, y, T + .5, T + .5);
+      if (topL) { line(x, y, x + T, y); ctx.lineWidth = 2; for (let k = 0; k < 3; k++) line(x + 10, y + 8 + k * 5, x + T - 10, y + 8 + k * 5); ctx.lineWidth = 2.5; }
+      if (tile(tx - 1, ty) !== 'L') line(x, y, x, y + T);
+      if (tile(tx + 1, ty) !== 'L') line(x + T, y, x + T, y + T);
+      if ((tx % 2) === 1 && tile(tx - 1, ty) === 'L') line(x, y + 4, x, y + T);
+      if (tile(tx, ty + 1) !== 'L' && !topL) { ctx.fillStyle = INK; ctx.fillRect(x + (tx % 2 ? 4 : T - 8), y + 6, 4, 12); }
+    } else if (c === '=') {
+      wrect(x, y, T, 11, seed, '#f2c94c');
+      ctx.lineWidth = 1.5; for (let k = 4; k < T; k += 6) line(x + k, y, x + k, y + (k % 12 === 4 ? 6 : 3)); ctx.lineWidth = 2.5;
+    } else if (c === '^') {
+      for (let k = 0; k < 2; k++) {
+        const px = x + 2 + k * 17, by = y + T;
+        ctx.beginPath(); ctx.moveTo(px, by); ctx.lineTo(px + 8, by - 24); ctx.lineTo(px + 16, by); ctx.closePath(); ctx.fillStyle = '#e8c28e'; ctx.fill(); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(px + 5, by - 15); ctx.lineTo(px + 8, by - 24); ctx.lineTo(px + 11, by - 15); ctx.closePath(); ctx.fillStyle = INK; ctx.fill();
+      }
+    } else if (c === 'T') {
+      const sq = b ? 8 : 0; y = ty * T;
+      ctx.lineWidth = 2.5; ctx.beginPath(); ctx.moveTo(x + 8, y + T); for (let k = 1; k <= 5; k++) ctx.lineTo(x + (k % 2 ? T - 8 : 8), y + T - k * (T - 12 - sq) / 5); ctx.stroke();
+      wrect(x + 2, y + sq, T - 4, 10, seed, '#f08a8a'); wrect(x + 4, y + T - 5, T - 8, 5, seed + 1, '#b8b8b8');
+    } else if (c === 'S') {
+      const bob = Math.sin(G.t * 5 + tx * .7) * 3; ctx.lineWidth = 2.2;
+      ctx.save(); ctx.translate(x + T / 2, y + T / 2 + bob); ctx.scale(Math.cos(G.t * 3 + tx) * .25 + .85, 1); star(0, 0, 12, '#ffd84a'); ctx.restore(); ctx.lineWidth = 2.5;
+    }
+  }
+}
+function drawGoal() {
+  if (!G.goal) return;
+  const x = G.goal.x - G.cam, base = G.goal.base, top = base - 9 * T;
+  if (x < -80 || x > VW + 80) return;
+  ctx.strokeStyle = INK; ctx.lineWidth = 2.5;
+  wrect(x - 18, base - T, 36, T, 99, '#d8d2c4');
+  ctx.lineWidth = 4; line(x, base - T, x, top); ctx.lineWidth = 2.5;
+  // bell
+  ctx.beginPath(); ctx.moveTo(x - 16, top + 4); ctx.quadraticCurveTo(x - 16, top - 22, x, top - 24); ctx.quadraticCurveTo(x + 16, top - 22, x + 16, top + 4); ctx.closePath(); ctx.fillStyle = '#e7c45c'; ctx.fill(); ctx.stroke();
+  ctx.beginPath(); ctx.arc(x, top + 7, 4, 0, 7); ctx.fillStyle = INK; ctx.fill();
+  // flag
+  const fy = top + 14 + G.goal.flag * (base - T - top - 50), wave = Math.sin(G.t * 6) * 3;
+  ctx.beginPath(); ctx.moveTo(x, fy); ctx.lineTo(x - 46, fy + 12 + wave); ctx.lineTo(x, fy + 30); ctx.closePath(); ctx.fillStyle = '#d4302a'; ctx.fill(); ctx.stroke();
+  text('EXIT', x - 20, fy + 15 + wave / 2, 11, FD, '#fff', 'center');
+  text('FINAL BELL', x, top - 42, 18, FD, INK, 'center');
+}
+function drawChecks() {
+  for (const c of G.checks) {
+    const x = c.x - G.cam; if (x < -60 || x > VW + 60) continue;
+    ctx.strokeStyle = INK; ctx.lineWidth = 3; line(x, c.y, x, c.y - 90);
+    ctx.beginPath(); ctx.moveTo(x, c.y - 90); ctx.lineTo(x + 32, c.y - 80); ctx.lineTo(x, c.y - 68); ctx.closePath(); ctx.fillStyle = c.on ? '#4aa564' : '#d8d2c4'; ctx.fill(); ctx.stroke();
+  }
+}
+function drawKid(px, py, pw, ph, face, power, runPhase, air, dead, inv) {
+  if (inv > 0 && Math.floor(inv * 14) % 2) return;
+  const s = power > 0 ? 1.7 : 1.2, grow = P.grow > 0 && Math.floor(P.grow * 16) % 2 ? (power > 0 ? .8 : 1.25) : 1;
+  ctx.save(); ctx.translate(px + pw / 2, py + ph); ctx.scale(face * s * grow, s * grow);
+  ctx.lineWidth = 2.4 / (s * grow); ctx.strokeStyle = INK; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  const sw = air ? 0 : Math.sin(runPhase) * 5;
+  // backpack
+  ctx.beginPath(); ctx.roundRect(-13, -20, 7, 12, 2); ctx.fillStyle = '#e7c45c'; ctx.fill(); ctx.stroke();
+  // legs & shoes
+  const l1 = air ? [-6, -3] : [-3 + sw, 0], l2 = air ? [6, -5] : [3 - sw, 0];
+  line(-3, -8, l1[0], l1[1]); line(3, -8, l2[0], l2[1]);
+  ctx.fillStyle = INK; ctx.beginPath(); ctx.ellipse(l1[0] + 1.5, l1[1], 3.5, 2, 0, 0, 7); ctx.fill(); ctx.beginPath(); ctx.ellipse(l2[0] + 1.5, l2[1], 3.5, 2, 0, 0, 7); ctx.fill();
+  // body
+  ctx.beginPath(); ctx.roundRect(-7, -20, 14, 13, 3); ctx.fillStyle = power === 2 ? '#9b7fd1' : '#3fa7a0'; ctx.fill(); ctx.stroke();
+  // arm
+  line(0, -16, air ? 7 : 5 - sw * .6, air ? -26 : -10);
+  // ponytail (behind the head, swings when running)
+  const HAIR = '#6b3e26', sway = air ? -4 : Math.sin(runPhase * 1.3) * 2.5;
+  ctx.beginPath(); ctx.moveTo(-6, -33); ctx.quadraticCurveTo(-17, -33 + sway, -16, -20 + sway); ctx.quadraticCurveTo(-12, -25, -7, -28); ctx.closePath(); ctx.fillStyle = HAIR; ctx.fill(); ctx.stroke();
+  // head
+  ctx.beginPath(); ctx.arc(0, -27, 8.5, 0, 7); ctx.fillStyle = '#f0c7a0'; ctx.fill(); ctx.stroke();
+  // hair with fringe
+  ctx.beginPath(); ctx.moveTo(-8.8, -25); ctx.quadraticCurveTo(-10, -37.5, 0, -37); ctx.quadraticCurveTo(10, -37.5, 9.2, -28); ctx.quadraticCurveTo(5, -32, 1.5, -30.5); ctx.quadraticCurveTo(-2, -34, -8.8, -25); ctx.closePath(); ctx.fillStyle = HAIR; ctx.fill(); ctx.stroke();
+  ctx.beginPath(); ctx.arc(-7, -32, 1.8, 0, 7); ctx.fillStyle = '#ffd84a'; ctx.fill();
+  if (power === 2) { ctx.strokeStyle = '#d4302a'; ctx.lineWidth = 2.5 / s; line(-8.5, -33, 8.8, -33); ctx.strokeStyle = INK; ctx.lineWidth = 2.4 / s; line(6, -23, 12, -21); }
+  // face
+  if (dead) { ctx.lineWidth = 1.5 / s; line(2, -29, 5, -26); line(5, -29, 2, -26); ctx.beginPath(); ctx.arc(4, -21.5, 1.8, 0, 7); ctx.stroke(); }
+  else { ctx.fillStyle = INK; ctx.beginPath(); ctx.arc(4, -27, 1.5, 0, 7); ctx.fill(); ctx.lineWidth = 1.3 / s; line(4.6, -28.3, 6.6, -29.6); ctx.lineWidth = 2.4 / s; line(3, -22.5, 6.5, air ? -21.5 : -23); ctx.fillStyle = 'rgba(240,138,138,.55)'; ctx.beginPath(); ctx.arc(1, -23.5, 1.8, 0, 7); ctx.fill(); }
+  ctx.restore();
+}
+function drawEnemy(e) {
+  const x = e.x - G.cam, y = e.y; if (x < -60 || x > VW + 60) return;
+  ctx.save(); ctx.strokeStyle = INK; ctx.lineWidth = 2.4; ctx.lineJoin = 'round';
+  const dir = e.vx > 0 ? 1 : -1;
+  if (e.flip) { ctx.translate(x + e.w / 2, y + e.h / 2); ctx.scale(1, -1); ctx.translate(-(x + e.w / 2), -(y + e.h / 2)); }
+  if (e.type === 'e') {
+    if (e.flat) { ctx.beginPath(); ctx.ellipse(x + e.w / 2, y + e.h - 4, 17, 5, 0, 0, 7); ctx.fillStyle = '#fff'; ctx.fill(); ctx.stroke(); ctx.restore(); return; }
+    const cx = x + e.w / 2, cy = y + e.h / 2 - 2, st = Math.sin(e.t * 10) * 3;
+    ctx.fillStyle = INK; ctx.beginPath(); ctx.ellipse(cx - 6 + st, y + e.h - 2, 5, 3, 0, 0, 7); ctx.fill(); ctx.beginPath(); ctx.ellipse(cx + 6 - st, y + e.h - 2, 5, 3, 0, 0, 7); ctx.fill();
+    ctx.beginPath(); for (let i = 0; i < 11; i++) { const a = i / 11 * Math.PI * 2, r = 13 + jit(i, 3, 5) * 5; ctx.lineTo(cx + Math.cos(a) * r, cy + Math.sin(a) * r); } ctx.closePath(); ctx.fillStyle = '#fff'; ctx.fill(); ctx.stroke();
+    ctx.lineWidth = 1.2; ctx.strokeStyle = '#9a948a'; line(cx - 9, cy + 6, cx - 2, cy + 2); line(cx + 3, cy + 9, cx + 9, cy + 3); line(cx - 4, cy - 10, cx + 2, cy - 5);
+    ctx.strokeStyle = INK; ctx.lineWidth = 2;
+    ctx.fillStyle = INK; ctx.beginPath(); ctx.arc(cx - 4 + dir * 2, cy - 1, 2, 0, 7); ctx.arc(cx + 5 + dir * 2, cy - 1, 2, 0, 7); ctx.fill();
+    line(cx - 8, cy - 7, cx - 2, cy - 4); line(cx + 9, cy - 7, cx + 3, cy - 4);
+  } else if (e.type === 'r') {
+    if (e.flat) { wrect(x, y + e.h - 8, e.w, 8, 5, '#f5a3b5'); ctx.restore(); return; }
+    const bob = Math.abs(Math.sin(e.t * 12)) * 2;
+    ctx.beginPath(); ctx.roundRect(x, y - bob, e.w, e.h, 6); ctx.fillStyle = '#f5a3b5'; ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#5b8fd1'; ctx.fillRect(dir < 0 ? x + e.w - 12 : x + 2, y - bob + 2, 10, e.h - 4);
+    const ex = x + e.w / 2 + dir * 5;
+    ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(ex - 5, y + 10 - bob, 4, 0, 7); ctx.arc(ex + 5, y + 10 - bob, 4, 0, 7); ctx.fill();
+    ctx.fillStyle = INK; ctx.beginPath(); ctx.arc(ex - 5 + dir, y + 11 - bob, 2, 0, 7); ctx.arc(ex + 5 + dir, y + 11 - bob, 2, 0, 7); ctx.fill();
+    ctx.lineWidth = 2; line(ex - 9, y + 4 - bob, ex - 2, y + 7 - bob); line(ex + 9, y + 4 - bob, ex + 2, y + 7 - bob);
+  } else if (e.type === 'f') {
+    const nose = x, tail = x + e.w;
+    ctx.beginPath(); ctx.moveTo(nose, y + e.h / 2); ctx.lineTo(tail, y - 2); ctx.lineTo(tail - 10, y + e.h / 2); ctx.lineTo(tail, y + e.h + 2); ctx.closePath(); ctx.fillStyle = '#fff'; ctx.fill(); ctx.stroke();
+    ctx.lineWidth = 1.5; line(nose, y + e.h / 2, tail - 10, y + e.h / 2);
+    ctx.fillStyle = INK; ctx.beginPath(); ctx.arc(nose + 12, y + e.h / 2 - 3, 1.8, 0, 7); ctx.fill(); line(nose + 8, y + e.h / 2 - 7, nose + 15, y + e.h / 2 - 5);
+  } else if (e.type === 'h') {
+    const sq = e.onGround ? 0 : -2;
+    ctx.beginPath(); ctx.moveTo(x, y + 14); ctx.lineTo(x + e.w / 2, y + sq); ctx.lineTo(x + e.w, y + 14); ctx.closePath(); ctx.fillStyle = '#e8c28e'; ctx.fill(); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x + 5, y + 6); ctx.lineTo(x + e.w / 2, y + sq); ctx.lineTo(x + e.w - 5, y + 6); ctx.closePath(); ctx.fillStyle = INK; ctx.fill();
+    wrect(x, y + 14, e.w, e.h - 24, 7, '#f2c94c');
+    wrect(x, y + e.h - 10, e.w, 4, 8, '#b8b8b8'); wrect(x, y + e.h - 6, e.w, 6, 9, '#f5a3b5');
+    ctx.fillStyle = INK; ctx.beginPath(); ctx.arc(x + 6, y + 22, 1.8, 0, 7); ctx.arc(x + 12, y + 22, 1.8, 0, 7); ctx.fill();
+    ctx.lineWidth = 1.5; line(x + 6, y + 28, x + 12, y + 27);
+  }
+  ctx.restore();
+}
+function drawItem(it) {
+  const x = it.x - G.cam, y = it.y; ctx.strokeStyle = INK; ctx.lineWidth = 2.2;
+  if (it.emerge > 0) { ctx.save(); ctx.beginPath(); ctx.rect(x - 5, it.startY - T - 2, it.w + 10, T + 2); ctx.clip(); }
+  if (it.kind === 'pudding') {
+    ctx.beginPath(); ctx.moveTo(x + 2, y + 8); ctx.lineTo(x + it.w - 2, y + 8); ctx.lineTo(x + it.w - 5, y + it.h); ctx.lineTo(x + 5, y + it.h); ctx.closePath(); ctx.fillStyle = '#fff'; ctx.fill(); ctx.stroke();
+    ctx.beginPath(); ctx.ellipse(x + it.w / 2, y + 8, it.w / 2 - 1, 5, 0, 0, 7); ctx.fillStyle = '#8a5a33'; ctx.fill(); ctx.stroke();
+    ctx.lineWidth = 2.5; line(x + it.w / 2 + 3, y + 7, x + it.w / 2 + 10, y - 6);
+    text('P', x + it.w / 2, y + 18, 12, FD, '#d4302a', 'center');
+  } else {
+    const bob = Math.sin(it.t * 5) * 3;
+    ctx.save(); ctx.translate(x + it.w / 2, y + it.h / 2 + bob); ctx.rotate(-.6);
+    ctx.fillStyle = '#fff'; ctx.fillRect(-4, -16, 8, 32); ctx.strokeRect(-4, -16, 8, 32);
+    ctx.strokeStyle = '#d4302a'; ctx.lineWidth = 2.5; for (let k = -12; k < 16; k += 8) line(-4, k, 4, k + 4);
+    ctx.restore();
+    ctx.strokeStyle = '#ffd84a'; ctx.lineWidth = 2; const sp = (G.t * 3) % 1; line(x - 4, y - 2 - sp * 6, x - 4, y + 4 - sp * 6); line(x + it.w + 4, y + 10, x + it.w + 4, y + 16);
+  }
+  if (it.emerge > 0) ctx.restore();
+}
+function drawParts() {
+  for (const p of G.parts) {
+    const x = p.x - G.cam;
+    if (p.kind === 'text') { ctx.globalAlpha = clamp(p.life * 2, 0, 1); text(p.text, x, p.y, 20, FD, p.text === '1-UP!' ? '#2c8a43' : '#1d6bd0', 'center'); ctx.globalAlpha = 1; }
+    else if (p.kind === 'star') { ctx.strokeStyle = INK; ctx.lineWidth = 2; star(x, p.y, 10, '#ffd84a'); }
+    else if (p.kind === 'dot') { ctx.fillStyle = p.color; ctx.strokeStyle = INK; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(x, p.y, 3, 0, 7); ctx.fill(); ctx.stroke(); }
+    else if (p.kind === 'dust') { ctx.globalAlpha = clamp(p.life * 3, 0, 1); ctx.strokeStyle = PENCIL; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(x, p.y, 5 + (0.35 - p.life) * 14, 0, 7); ctx.stroke(); ctx.globalAlpha = 1; }
+    else if (p.kind === 'brick') { ctx.save(); ctx.translate(x, p.y); ctx.rotate(p.rot); ctx.fillStyle = p.color; ctx.strokeStyle = INK; ctx.lineWidth = 2; ctx.fillRect(-8, -8, 16, 16); ctx.strokeRect(-8, -8, 16, 16); ctx.restore(); }
+  }
+}
+function drawHUD() {
+  ctx.fillStyle = 'rgba(253,251,243,.9)'; ctx.fillRect(0, 0, VW, 44);
+  ctx.strokeStyle = INK; ctx.lineWidth = 2; line(0, 44, VW, 44 + jit(G.lvl, 1, 1) * 3);
+  ctx.save(); ctx.translate(24, 22); ctx.beginPath(); ctx.moveTo(-6, -7); ctx.quadraticCurveTo(-18, -6, -16, 8); ctx.quadraticCurveTo(-12, 2, -8, -2); ctx.closePath(); ctx.fillStyle = '#6b3e26'; ctx.fill(); ctx.stroke(); ctx.beginPath(); ctx.arc(0, 0, 10, 0, 7); ctx.fillStyle = '#f0c7a0'; ctx.fill(); ctx.stroke(); ctx.beginPath(); ctx.moveTo(-10, 2); ctx.quadraticCurveTo(-11, -12, 0, -11); ctx.quadraticCurveTo(11, -12, 10, -2); ctx.quadraticCurveTo(2, -6, -10, 2); ctx.fillStyle = '#6b3e26'; ctx.fill(); ctx.restore();
+  text('× ' + G.lives, 42, 23, 26, FH);
+  ctx.lineWidth = 2; star(118, 22, 12, '#ffd84a'); text('× ' + G.stars, 135, 23, 26, FH);
+  text('SCORE ' + String(G.score).padStart(6, '0'), 222, 23, 26, FH);
+  text(levelLabel(G.lvl).toUpperCase(), VW / 2 + 110, 23, 20, FD, INK, 'center');
+  const tl = Math.ceil(G.time); text('TIME ' + tl, VW - 16, 23, 26, FH, tl <= 30 ? '#d4302a' : INK, 'right');
+  if (P.power === 2) text('Shift = spit', VW - 16, 62, 20, FH, '#2c8a43', 'right');
+}
+function levelLabel(i) { return i >= 16 ? 'Random: ' + LEVELS[16].name : `${Math.floor(i / 4) + 1}-${i % 4 + 1} ${LEVELS[i].name}`; }
+
+/* ================= MAP DRAW ================= */
+function drawMap() {
+  const w = Math.floor(G.mapSel / 4);
+  ctx.fillStyle = '#fdfbf3'; ctx.fillRect(0, 0, VW, VH);
+  ctx.strokeStyle = '#cadcea'; ctx.lineWidth = 1.5; for (let y = 36; y < VH; y += 36) line(0, y, VW, y);
+  ctx.strokeStyle = '#e9a4a1'; ctx.lineWidth = 2; line(60, 0, 60, VH);
+  text(`World ${w + 1}: ${WORLDS[w]}`, VW / 2, 50, 44, FD, INK, 'center');
+  // world tabs
+  for (let k = 0; k < 4; k++) {
+    const tx = VW / 2 - 150 + k * 100, open = k * 4 < save.unlocked, cur = k === w;
+    ctx.lineWidth = cur ? 3 : 2; ctx.strokeStyle = open ? INK : '#b9b2a3';
+    wrect(tx - 38, 82, 76, 30, 60 + k, cur ? '#fff06b' : open ? '#fff' : '#efe9da');
+    text(`World ${k + 1}`, tx, 98, 18, FH, open ? INK : '#9a948a', 'center');
+  }
+  // random button
+  ctx.strokeStyle = INK; ctx.lineWidth = 2.5; wrect(VW - 196, 16, 176, 46, 77, '#bfe3f5');
+  text('Random level (R)', VW - 108, 40, 20, FH, INK, 'center');
+  // path
+  const pts = MAPN.map(p => p);
+  ctx.setLineDash([8, 10]); ctx.strokeStyle = INK; ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.moveTo(70, 390); pts.forEach((p, i) => { const prev = i ? pts[i - 1] : { x: 70, y: 390 }; ctx.quadraticCurveTo((prev.x + p.x) / 2, Math.min(prev.y, p.y) - 70, p.x, p.y); }); ctx.quadraticCurveTo(900, 200, 915, 330); ctx.stroke(); ctx.setLineDash([]);
+  // end marker
+  const nextOpen = (w + 1) * 4 < save.unlocked;
+  ctx.lineWidth = 2.5;
+  if (w < 3) { ctx.beginPath(); ctx.moveTo(900, 330); ctx.lineTo(930, 350); ctx.lineTo(900, 370); ctx.closePath(); ctx.fillStyle = nextOpen ? '#9fcf8a' : '#efe9da'; ctx.fill(); ctx.stroke(); text(`World ${w + 2}`, 905, 392, 18, FH, nextOpen ? INK : '#9a948a', 'center'); }
+  else { const done = save.cleared.includes(15); circ(905, 340, 24, done ? '#ffd84a' : '#efe9da'); for (let a = 0; a < 8; a++) { const r = a * Math.PI / 4; line(905 + Math.cos(r) * 30, 340 + Math.sin(r) * 30, 905 + Math.cos(r) * 40, 340 + Math.sin(r) * 40); } text('SUMMER', 905, 398, 18, FD, done ? '#2c8a43' : '#9a948a', 'center'); }
+  // nodes
+  MAPN.forEach((n, j) => {
+    const i = w * 4 + j, locked = i >= save.unlocked, done = save.cleared.includes(i), sel = i === G.mapSel;
+    ctx.lineWidth = sel ? 4 : 2.5; ctx.strokeStyle = INK;
+    circ(n.x, n.y, 30, locked ? '#d8d2c4' : done ? '#9fcf8a' : '#ffe45c');
+    if (locked) { ctx.lineWidth = 2.5; ctx.beginPath(); ctx.arc(n.x, n.y - 6, 7, Math.PI, 0); ctx.stroke(); ctx.fillStyle = INK; ctx.fillRect(n.x - 10, n.y - 6, 20, 15); }
+    else text(`${w + 1}-${j + 1}`, n.x, n.y + 2, 22, FD, INK, 'center');
+    text(LEVELS[i].name, n.x, n.y + 50, 20, FH, locked ? '#9a948a' : INK, 'center');
+    const b = save.best[i]; if (b) { ctx.lineWidth = 1.5; star(n.x - 22, n.y + 74, 8, '#ffd84a'); text(`${b.stars}/${b.total}`, n.x - 10, n.y + 75, 18, FH, '#6c675e'); }
+  });
+  const n = MAPN[G.mapSel % 4], bob = Math.abs(Math.sin(G.t * 4)) * 8;
+  P.grow = 0; drawKid(n.x - 11, n.y - 78 - bob, 22, 40, 1, 0, 0, bob > 1, false, 0);
+  ctx.lineWidth = 2.5; wrect(VW / 2 - 330, 452, 660, 66, 44, '#fff');
+  text(`${w + 1}-${G.mapSel % 4 + 1}: ${LEVELS[G.mapSel].name}`, VW / 2 - 310, 474, 26, FD, INK);
+  text('Press JUMP or tap here to play  ·  ← → to choose  ·  tap a World tab', VW / 2 - 310, 501, 19, FH, '#6c675e');
+  text(`♥ ${G.lives}`, VW / 2 + 312, 484, 26, FH, '#d4302a', 'right');
+  if (save.cleared.includes(15)) text('School year survived! Go back for every star.', VW / 2, 140, 20, FH, '#2c8a43', 'center');
+}
+
+/* ================= RENDER ================= */
+function drawPlats() {
+  for (const pl of G.plats) {
+    const x = pl.x - G.cam; if (x < -120 || x > VWW + 20) continue;
+    ctx.strokeStyle = INK; ctx.lineWidth = 2.5; wrect(x, pl.y, pl.w, pl.h, 12, '#f2c94c');
+    ctx.lineWidth = 1.5; for (let k = 5; k < pl.w; k += 7) line(x + k, pl.y, x + k, pl.y + (k % 14 === 5 ? 6 : 3));
+    ctx.lineWidth = 2; line(x + 20, pl.y + 20, x + 36, pl.y + 20); line(x + pl.w - 20, pl.y + 20, x + pl.w - 36, pl.y + 20);
+    ctx.beginPath(); ctx.moveTo(x + 14, pl.y + 20); ctx.lineTo(x + 22, pl.y + 15); ctx.lineTo(x + 22, pl.y + 25); ctx.closePath(); ctx.fillStyle = INK; ctx.fill();
+    ctx.beginPath(); ctx.moveTo(x + pl.w - 14, pl.y + 20); ctx.lineTo(x + pl.w - 22, pl.y + 15); ctx.lineTo(x + pl.w - 22, pl.y + 25); ctx.closePath(); ctx.fill();
+  }
+}
+function render() {
+  if (G.state === 'title' || G.state === 'map') { drawMap(); return; }
+  const L = LEVELS[G.lvl];
+  ctx.save();
+  if (G.shake > 0) ctx.translate((Math.random() - .5) * 8, (Math.random() - .5) * 8);
+  ctx.scale(Z, Z); ctx.translate(0, -G.camY);
+  drawBackground(L.theme);
+  drawTiles(); drawPlats(); drawGoal(); drawChecks();
+  G.items.forEach(drawItem);
+  G.enemies.forEach(drawEnemy);
+  if (G.state !== 'over') drawKid(P.x - G.cam, P.y, P.w, P.h, P.face, P.power, P.run, !P.onGround, G.state === 'dying', P.inv);
+  ctx.strokeStyle = INK; ctx.lineWidth = 2;
+  for (const b of G.balls) { ctx.beginPath(); ctx.arc(b.x - G.cam + 5, b.y + 5, 5, 0, 7); ctx.fillStyle = '#fff'; ctx.fill(); ctx.stroke(); }
+  drawParts();
+  ctx.restore();
+  drawHUD();
+  if (G.state === 'card') {
+    ctx.fillStyle = 'rgba(253,251,243,.95)'; ctx.fillRect(0, 0, VW, VH);
+    text(G.lvl >= 16 ? 'Random level' : `World ${Math.floor(G.lvl / 4) + 1} · Level ${G.lvl % 4 + 1}`, VW / 2, VH / 2 - 70, 30, FH, '#6c675e', 'center');
+    text(L.name, VW / 2, VH / 2 - 8, 60, FD, INK, 'center');
+    drawKid(VW / 2 - 80, VH / 2 + 44, 22, 40, 1, 0, 0, false, false, 0);
+    text(`× ${G.lives}`, VW / 2 - 30, VH / 2 + 70, 32, FH, INK, 'left');
+    if (L.slip) text('Careful: the floor is icy.', VW / 2, VH / 2 + 130, 22, FH, '#1d6bd0', 'center');
+  }
+  if (G.state === 'clear' && G.clearPhase >= 1) stamp('LEVEL CLEAR!', G.clearPhase === 2 ? (G.lvl === 15 ? 'You survived the whole school year!' : G.lvl >= 16 ? 'Nice. Press R on the map for another.' : 'Next level unlocked.') : `Time bonus… ★ ${G.stars}/${G.starTotal}`, '#2c8a43');
+  if (G.state === 'dying' && G.timer < 1.6) stamp('OOPS!', `${G.lives - 1 > 0 ? (G.lives - 1) + ' lives left' : 'Last one…'}`);
+  if (G.state === 'over') stamp('GAME OVER', 'The dog ate your lives. Back to the map.');
+  if (G.paused) { ctx.fillStyle = 'rgba(253,251,243,.8)'; ctx.fillRect(0, 0, VW, VH); stamp('PAUSED', 'Press P to keep going', '#1d6bd0'); }
+}
+
+
+/* ================= GAME PICKER + ARCADE GAMES ================= */
+const PICK = [
+  { id: 'dash', name: 'Doodle Dash', tag: 'Platformer · 16 levels', help: '<span><kbd>←</kbd> <kbd>→</kbd> move</span><span><kbd>Space</kbd> jump (hold for higher)</span><span><kbd>Shift</kbd> run / spit</span><span><kbd>P</kbd> pause</span><span><kbd>R</kbd> random level (on the map)</span>' },
+  { id: 'plane', name: 'Paper Plane Panic', tag: 'Fly through the classroom', help: '<span>Hold <kbd>Space</kbd> (or hold the screen) to climb</span><span>Let go to glide down</span><span>Grab stars for bonus points</span>' },
+  { id: 'stack', name: 'Sandwich Stacker', tag: 'Build the tallest lunch', help: '<span><kbd>Space</kbd> or tap to drop a layer</span><span>Line it up exactly for a PERFECT</span><span>3 perfects in a row makes it wider</span>' },
+  { id: 'dodge', name: 'Dodgeball Frenzy', tag: 'Survive the gym', help: '<span><kbd>←</kbd><kbd>↑</kbd><kbd>↓</kbd><kbd>→</kbd> or drag on the screen to move</span><span>Grab stars</span><span>The hoodie gives you a shield</span>' },
+  { id: 'run', name: 'Hallway Runner', tag: "Don't be late!", help: '<span><kbd>←</kbd> <kbd>→</kbd> or swipe to switch lanes</span><span><kbd>Space</kbd> or tap to jump buckets and signs</span>' }
+];
+const ABEST = store.get('dd-arcade-best', {});
+const AK = { left: false, right: false, up: false, down: false, jump: false };
+const ACODE = { ArrowLeft: 'left', KeyA: 'left', ArrowRight: 'right', KeyD: 'right', ArrowUp: 'up', KeyW: 'up', ArrowDown: 'down', KeyS: 'down', Space: 'jump', KeyZ: 'jump', Enter: 'jump', KeyX: 'jump' };
+const AP = { down: false, x: 0, y: 0, sx: 0, sy: 0, t: 0 };
+let aState = 'ready', aScore = 0, aOverT = 0, aNew = false, aShake = 0;
+const AG = {};
+const curA = () => AG[ACTIVE];
+function aStart() { const g = curA(); if (!g) return; aState = 'play'; aScore = 0; aOverT = 0; aNew = false; g.reset(); Music.start(g.tempo || 165, g.tr || 0); }
+function aEnd() {
+  if (aState !== 'play') return;
+  aState = 'over'; aOverT = 0; Music.stop(); sfx.die(); aShake = .25;
+  if (aScore > (ABEST[ACTIVE] || 0)) { ABEST[ACTIVE] = aScore; store.set('dd-arcade-best', ABEST); aNew = aScore > 0; }
+  paintPicker();
+}
+function aPress(k) {
+  audio();
+  if (aState !== 'play') { if ((k === 'jump' || k === 'tap') && (aState === 'ready' || aOverT > .8)) aStart(); return; }
+  const g = curA(); if (g.press) g.press(k);
+}
+document.addEventListener('keydown', e => {
+  if (ACTIVE === 'dash' || VIEW !== 'games') return;
+  if (e.code === 'KeyM') { toggleMusic(); return; }
+  const k = ACODE[e.code]; if (!k) return; e.preventDefault();
+  if (!AK[k] && !e.repeat) { AK[k] = true; aPress(k); }
+});
+document.addEventListener('keyup', e => { const k = ACODE[e.code]; if (k) AK[k] = false; });
+window.addEventListener('blur', () => { for (const k in AK) AK[k] = false; AP.down = false; });
+function cvPos(e) { const r = cv.getBoundingClientRect(); return { x: (e.clientX - r.left) / r.width * VW, y: (e.clientY - r.top) / r.height * VH }; }
+cv.addEventListener('pointerdown', e => {
+  if (ACTIVE === 'dash') return; e.preventDefault(); cv.focus();
+  const p = cvPos(e); Object.assign(AP, { down: true, x: p.x, y: p.y, sx: p.x, sy: p.y, t: performance.now() });
+  try { cv.setPointerCapture(e.pointerId); } catch (_) {}
+  if (aState !== 'play') { aPress('tap'); return; }
+  const g = curA(); if (g.pdown) g.pdown(p.x, p.y);
+});
+cv.addEventListener('pointermove', e => { if (ACTIVE === 'dash' || !AP.down) return; const p = cvPos(e); AP.x = p.x; AP.y = p.y; });
+const aUp = () => { if (ACTIVE === 'dash' || !AP.down) return; AP.down = false; const g = curA(); if (aState === 'play' && g.pup) g.pup(AP.x - AP.sx, AP.y - AP.sy, performance.now() - AP.t); };
+cv.addEventListener('pointerup', aUp); cv.addEventListener('pointercancel', aUp);
+document.querySelectorAll('#pad button').forEach(b => {
+  const k = b.dataset.k === 'run' ? 'jump' : b.dataset.k;
+  b.addEventListener('pointerdown', () => { if (ACTIVE === 'dash') return; audio(); if (!AK[k]) { AK[k] = true; aPress(k); } });
+  const up = () => { if (ACTIVE !== 'dash') AK[k] = false; };
+  b.addEventListener('pointerup', up); b.addEventListener('pointercancel', up); b.addEventListener('lostpointercapture', up);
+});
+
+function paperBg(theme, scroll) { const oc = G.cam; G.cam = scroll; drawBackground(theme); G.cam = oc; }
+function heart(x, y, s, fill) { ctx.beginPath(); ctx.moveTo(x, y + s * .9); ctx.bezierCurveTo(x - s * 1.4, y, x - s * .8, y - s, x, y - s * .3); ctx.bezierCurveTo(x + s * .8, y - s, x + s * 1.4, y, x, y + s * .9); ctx.closePath(); ctx.fillStyle = fill; ctx.fill(); ctx.stroke(); }
+function aPanel(g) {
+  ctx.fillStyle = 'rgba(253,251,243,.55)'; ctx.fillRect(0, 0, VW, VH);
+  ctx.strokeStyle = INK; ctx.lineWidth = 3; wrect(VW / 2 - 320, 96, 640, 330, 91, '#fff');
+  ctx.fillStyle = 'rgba(233,214,150,.85)'; ctx.save(); ctx.translate(VW / 2, 96); ctx.rotate(-.04); ctx.fillRect(-55, -12, 110, 24); ctx.restore();
+  text(g.title, VW / 2, 150, 46, FD, INK, 'center');
+  g.lines.forEach((l, i) => text(l, VW / 2, 208 + i * 34, 24, FH, i === g.lines.length - 1 ? '#1d6bd0' : INK, 'center'));
+  const pulse = 1 + Math.sin(G.t * 5) * .04;
+  ctx.save(); ctx.translate(VW / 2, 368); ctx.scale(pulse, pulse); ctx.lineWidth = 3; wrect(-150, -26, 300, 52, 5, '#fff06b'); text('Press JUMP or tap to start', 0, 1, 24, FD, INK, 'center'); ctx.restore();
+  if (ABEST[ACTIVE]) text('Your best: ' + ABEST[ACTIVE], VW / 2, 450, 22, FH, '#6c675e', 'center');
+}
+function aHud(g) {
+  ctx.fillStyle = 'rgba(253,251,243,.9)'; ctx.fillRect(0, 0, VW, 44);
+  ctx.strokeStyle = INK; ctx.lineWidth = 2; line(0, 44, VW, 44);
+  text('SCORE ' + aScore, 16, 23, 26, FH);
+  text(g.title.toUpperCase(), VW / 2 + 60, 23, 20, FD, INK, 'center');
+  text('BEST ' + Math.max(aScore, ABEST[ACTIVE] || 0), VW - 16, 23, 24, FH, '#6c675e', 'right');
+  if (g.hud) g.hud();
+}
+function arcadeFrame(dt) {
+  const g = curA(); G.t += dt; aShake = Math.max(0, aShake - dt);
+  if (aState === 'play') g.update(Math.min(dt, .05)); else if (aState === 'over') aOverT += dt;
+  if (!g.ready) { g.reset(); g.ready = true; }
+  ctx.save(); if (aShake > 0) ctx.translate((Math.random() - .5) * 10, (Math.random() - .5) * 10);
+  g.render(); ctx.restore();
+  if (aState === 'play') aHud(g);
+  if (aState === 'ready') aPanel(g);
+  if (aState === 'over') {
+    aHud(g);
+    stamp(g.overText || 'GAME OVER', `Score ${aScore}${aNew ? '  ·  New best!' : '  ·  Best ' + (ABEST[ACTIVE] || 0)}`, aNew ? '#2c8a43' : '#d4302a');
+    if (aOverT > .8) text('Press JUMP or tap to play again', VW / 2, VH / 2 + 110, 24, FH, '#1d6bd0', 'center');
+  }
+}
+
+/* ---------- Paper Plane Panic ---------- */
+AG.plane = {
+  title: 'Paper Plane Panic', tempo: 168, tr: 2, overText: 'CRUMPLED!',
+  lines: ['Mr Grindlewald said NO paper planes.', 'Fly one through the whole classroom anyway.', 'Hold JUMP (or hold the screen) to climb.'],
+  reset() { this.x = 230; this.y = VH / 2; this.vy = 0; this.obs = []; this.stars = []; this.speed = 250; this.next = 420; this.dist = 0; this.got = 0; this.trail = []; this.t = 0; },
+  update(dt) {
+    this.t += dt;
+    const hold = AK.jump || AK.up || AP.down;
+    this.vy = clamp(this.vy + (hold ? -1150 : 760) * dt, -360, 430); this.y += this.vy * dt;
+    this.speed = Math.min(540, this.speed + 7 * dt); const d = this.speed * dt; this.dist += d; this.next -= d;
+    if (this.next <= 0) {
+      const gap = clamp(220 - this.dist / 240, 145, 220), lo = 44 + 30 + gap / 2, hi = VH - 30 - gap / 2, mid = lo + Math.random() * (hi - lo);
+      this.obs.push({ x: VW + 40, w: 64, top: mid - gap / 2, bot: mid + gap / 2, kind: Math.random() < .5 ? 'pencil' : 'ruler', seed: Math.floor(Math.random() * 99) });
+      if (Math.random() < .75) this.stars.push({ x: VW + 72, y: mid, got: false });
+      this.next = 280 + Math.random() * 150;
+    }
+    this.obs.forEach(o => o.x -= d); this.stars.forEach(s => s.x -= d);
+    this.obs = this.obs.filter(o => o.x > -100); this.stars = this.stars.filter(s => s.x > -30 && !s.got);
+    this.trail.push({ x: this.x, y: this.y }); if (this.trail.length > 18) this.trail.shift(); this.trail.forEach(t => t.x -= d);
+    const r = 11;
+    if (this.y < 44 + r || this.y > VH - r) return this.crash();
+    for (const o of this.obs) if (this.x + r > o.x + 4 && this.x - r < o.x + o.w - 4 && (this.y - r < o.top || this.y + r > o.bot)) return this.crash();
+    for (const s of this.stars) if (Math.hypot(s.x - this.x, s.y - this.y) < 30) { s.got = true; this.got++; sfx.star(); }
+    aScore = Math.floor(this.dist / 50) + this.got * 10;
+  },
+  crash() { sfx.smash(); aEnd(); },
+  render() {
+    paperBg('library', this.dist * .8);
+    ctx.lineWidth = 2.5; ctx.strokeStyle = INK;
+    for (const o of this.obs) {
+      // hanging giant pencil from the top
+      const th = o.top - 44;
+      if (o.kind === 'pencil') {
+        wrect(o.x + 8, 44, o.w - 16, Math.max(0, th - 40), o.seed, '#f2c94c');
+        ctx.beginPath(); ctx.moveTo(o.x + 8, o.top - 40); ctx.lineTo(o.x + o.w / 2, o.top); ctx.lineTo(o.x + o.w - 8, o.top - 40); ctx.closePath(); ctx.fillStyle = '#e8c28e'; ctx.fill(); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(o.x + o.w / 2 - 7, o.top - 14); ctx.lineTo(o.x + o.w / 2, o.top); ctx.lineTo(o.x + o.w / 2 + 7, o.top - 14); ctx.closePath(); ctx.fillStyle = INK; ctx.fill();
+      } else {
+        wrect(o.x + 10, 44, o.w - 20, th, o.seed, '#f2c94c');
+        ctx.lineWidth = 1.5; for (let y = 52; y < o.top - 4; y += 10) line(o.x + 10, y, o.x + 10 + (y % 30 === 22 ? 16 : 8), y); ctx.lineWidth = 2.5;
+      }
+      // stack of books from the floor
+      let y = VH, k = 0;
+      while (y > o.bot) {
+        const h = Math.min(26, y - o.bot), inset = (jit(o.seed, k, 3) * 10);
+        wrect(o.x + 2 + inset, y - h, o.w - 4, h, o.seed + k, BRICK[(o.seed + k) % 3]);
+        ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5; if (h > 12) line(o.x + 8 + inset, y - h / 2, o.x + o.w - 10 + inset, y - h / 2); ctx.strokeStyle = INK; ctx.lineWidth = 2.5;
+        y -= 26; k++;
+      }
+    }
+    ctx.lineWidth = 2; for (const s of this.stars) star(s.x, s.y + Math.sin(G.t * 5 + s.x * .01) * 4, 12, '#ffd84a');
+    ctx.fillStyle = '#9fb6d6'; this.trail.forEach((t, i) => { if (i % 3 === 0) { ctx.beginPath(); ctx.arc(t.x - 14, t.y, 2, 0, 7); ctx.fill(); } });
+    ctx.save(); ctx.translate(this.x, this.y); ctx.rotate(clamp(this.vy / 900, -.6, .6));
+    ctx.strokeStyle = INK; ctx.lineWidth = 2.5;
+    ctx.beginPath(); ctx.moveTo(24, 0); ctx.lineTo(-20, -15); ctx.lineTo(-10, 0); ctx.lineTo(-20, 13); ctx.closePath(); ctx.fillStyle = '#fff'; ctx.fill(); ctx.stroke();
+    ctx.lineWidth = 1.5; line(24, 0, -10, 0); ctx.fillStyle = '#d4302a'; ctx.fillRect(-16, -7, 6, 3);
+    ctx.restore();
+    if (aState === 'play' && this.t < 2.5) text('Hold to climb!', this.x + 40, this.y - 40, 22, FD, '#1d6bd0');
+  }
+};
+
+/* ---------- Sandwich Stacker ---------- */
+const FOODS = [['bread', '#e8c28e', '#b07a3a'], ['lettuce', '#8ccf7a', '#4a8f3a'], ['cheese', '#ffd84a', '#c9a21a'], ['tomato', '#f07a6a', '#b8392a'], ['ham', '#f5a3b5', '#c46a80'], ['egg', '#fffbe8', '#e7b93c'], ['pickle', '#9fcf8a', '#5a8f3a']];
+function drawFood(x, y, w, f, LH) {
+  const [n, fill, edge] = FOODS[f], top = y - LH;
+  ctx.strokeStyle = INK; ctx.lineWidth = 2.2; ctx.fillStyle = fill;
+  if (w < 2) return;
+  if (n === 'bread') { ctx.beginPath(); ctx.roundRect(x, top + 1, w, LH - 1, Math.min(9, w / 2)); ctx.fill(); ctx.stroke(); ctx.strokeStyle = edge; ctx.lineWidth = 1.5; if (w > 14) line(x + 6, top + 7, x + w - 6, top + 7); }
+  else if (n === 'lettuce') { ctx.beginPath(); ctx.moveTo(x, y - 3); for (let k = 0; k < w; k += 14) ctx.quadraticCurveTo(x + k + 7, top - 2, x + Math.min(w, k + 14), top + 8); ctx.lineTo(x + w, y - 3); ctx.closePath(); ctx.fill(); ctx.stroke(); }
+  else if (n === 'cheese') { ctx.beginPath(); ctx.rect(x, top + 6, w, LH - 8); ctx.fill(); ctx.stroke(); ctx.fillStyle = '#e8b82a'; for (let k = 10; k < w - 6; k += 34) { ctx.beginPath(); ctx.arc(x + k, top + 14, 3.5, 0, 7); ctx.fill(); } }
+  else if (n === 'tomato') { const c = Math.max(1, Math.round(w / 48)), sw = w / c; for (let k = 0; k < c; k++) { ctx.beginPath(); ctx.ellipse(x + sw * k + sw / 2, top + LH / 2 + 2, sw / 2, LH / 2 - 3, 0, 0, 7); ctx.fillStyle = fill; ctx.fill(); ctx.stroke(); ctx.fillStyle = '#ffd9a0'; ctx.beginPath(); ctx.arc(x + sw * k + sw / 2, top + LH / 2 + 2, 3, 0, 7); ctx.fill(); } }
+  else if (n === 'ham') { ctx.beginPath(); ctx.moveTo(x, top + 6); for (let k = 0; k <= w; k += 10) ctx.lineTo(x + k, top + 5 + (k / 10 % 2) * 3); ctx.lineTo(x + w, y - 3); ctx.lineTo(x, y - 3); ctx.closePath(); ctx.fill(); ctx.stroke(); ctx.strokeStyle = edge; ctx.lineWidth = 1.2; if (w > 20) line(x + 8, top + 14, x + w - 8, top + 14); }
+  else if (n === 'egg') { ctx.beginPath(); ctx.roundRect(x, top + 5, w, LH - 7, 8); ctx.fill(); ctx.stroke(); ctx.fillStyle = '#ffd84a'; const c = Math.max(1, Math.round(w / 70)); for (let k = 0; k < c; k++) { ctx.beginPath(); ctx.ellipse(x + w / c * (k + .5), top + LH / 2 + 2, Math.min(16, w / c / 2 - 2), 6, 0, 0, 7); ctx.fill(); ctx.stroke(); } }
+  else { const c = Math.max(1, Math.round(w / 30)), sw = w / c; for (let k = 0; k < c; k++) { ctx.beginPath(); ctx.ellipse(x + sw * k + sw / 2, top + LH / 2 + 2, sw / 2 - 1, LH / 2 - 4, 0, 0, 7); ctx.fillStyle = fill; ctx.fill(); ctx.stroke(); } }
+}
+AG.stack = {
+  title: 'Sandwich Stacker', tempo: 150, tr: -2, overText: 'SPLAT!', LH: 24,
+  lines: ['Big Doreen wants the tallest sandwich in history.', 'Drop each layer onto the one below.', 'Overhang gets chopped. Perfect drops keep it wide.'],
+  reset() { this.base = VH - 64; this.layers = [{ x: VW / 2 - 140, w: 280, f: 0 }]; this.fall = []; this.cam = 0; this.streak = 0; this.pops = []; this.endT = null; this.spawn(); },
+  spawn() {
+    const last = this.layers[this.layers.length - 1], n = this.layers.length, left = n % 2 === 1;
+    this.cur = { w: last.w, x: left ? 12 : VW - last.w - 12, dir: left ? 1 : -1, speed: Math.min(580, 240 + n * 10), f: n % 8 === 7 ? 0 : 1 + Math.floor(Math.random() * (FOODS.length - 1)) };
+  },
+  press(k) { if (k === 'jump' || k === 'up') this.drop(); },
+  pdown() { this.drop(); },
+  yOf(i) { return this.base - i * this.LH; },
+  drop() {
+    const c = this.cur; if (!c || this.endT != null) return;
+    const last = this.layers[this.layers.length - 1], l = Math.max(c.x, last.x), r = Math.min(c.x + c.w, last.x + last.w), ov = r - l, y = this.yOf(this.layers.length);
+    if (ov <= 2) { this.fall.push({ x: c.x, w: c.w, y, f: c.f, vy: 0, rot: 0, vx: c.dir * 60 }); this.cur = null; sfx.smash(); this.endT = .9; return; }
+    if (Math.abs(c.x - last.x) < 7) {
+      this.streak++; let w = last.w, x = last.x; if (this.streak >= 3 && w < 280) { w = Math.min(280, w + 14); x -= 7; }
+      this.layers.push({ x, w, f: c.f }); this.pops.push({ x: x + w / 2, y: y - 30, t: 1, txt: this.streak >= 3 ? 'PERFECT x' + this.streak + '!' : 'PERFECT!' }); sfx.star();
+    } else {
+      this.streak = 0; const cx = c.x < last.x ? c.x : r;
+      this.fall.push({ x: cx, w: c.w - ov, y, f: c.f, vy: 0, rot: 0, vx: (c.x < last.x ? -1 : 1) * 60 });
+      this.layers.push({ x: l, w: ov, f: c.f }); sfx.bump();
+    }
+    aScore = this.layers.length - 1; this.spawn();
+  },
+  update(dt) {
+    const c = this.cur;
+    if (c) { c.x += c.dir * c.speed * dt; if (c.dir > 0 && c.x + c.w > VW - 10) c.dir = -1; if (c.dir < 0 && c.x < 10) c.dir = 1; }
+    for (const f of this.fall) { f.vy += 1500 * dt; f.y += f.vy * dt; f.x += f.vx * dt; f.rot += dt * 2 * Math.sign(f.vx); }
+    this.fall = this.fall.filter(f => f.y < VH + this.cam + 200);
+    this.pops.forEach(p => p.t -= dt); this.pops = this.pops.filter(p => p.t > 0);
+    const target = Math.max(0, this.layers.length * this.LH - 250); this.cam += (target - this.cam) * Math.min(1, dt * 4);
+    if (this.endT != null) { this.endT -= dt; if (this.endT <= 0) { this.endT = null; aEnd(); } }
+  },
+  render() {
+    paperBg('cafe', 0);
+    ctx.save(); ctx.translate(0, this.cam);
+    ctx.strokeStyle = INK; ctx.lineWidth = 3;
+    wrect(VW / 2 - 200, this.base, 400, 22, 5, '#b8b8b8'); line(VW / 2 - 170, this.base + 22, VW / 2 - 170, this.base + 200); line(VW / 2 + 170, this.base + 22, VW / 2 + 170, this.base + 200);
+    this.layers.forEach((L, i) => drawFood(L.x, this.yOf(i), L.w, L.f, this.LH));
+    if (this.cur) { const y = this.yOf(this.layers.length); ctx.globalAlpha = .18; ctx.fillStyle = INK; ctx.fillRect(this.cur.x, y - 2, this.cur.w, 3); ctx.globalAlpha = 1; drawFood(this.cur.x, y - 6 - Math.abs(Math.sin(G.t * 6)) * 3, this.cur.w, this.cur.f, this.LH); }
+    for (const f of this.fall) { ctx.save(); ctx.translate(f.x + f.w / 2, f.y - this.LH / 2); ctx.rotate(f.rot); drawFood(-f.w / 2, this.LH / 2, f.w, f.f, this.LH); ctx.restore(); }
+    for (const p of this.pops) { ctx.globalAlpha = clamp(p.t * 1.5, 0, 1); text(p.txt, p.x, p.y - (1 - p.t) * 40, 26, FD, '#2c8a43', 'center'); ctx.globalAlpha = 1; }
+    ctx.restore();
+    if (aState === 'play') text(`${this.layers.length - 1} layers`, VW - 20, 70, 24, FH, '#6c675e', 'right');
+  }
+};
+
+/* ---------- Dodgeball Frenzy ---------- */
+AG.dodge = {
+  title: 'Dodgeball Frenzy', tempo: 176, tr: 3, overText: "YOU'RE OUT!",
+  lines: ['Coach B has released every ball in the storeroom.', 'Dodge them, grab stars, grab the hoodie for a shield.', 'Arrow keys, or drag anywhere on the screen.'],
+  A: { x: 40, y: 60, w: 880, h: 462 },
+  randPos() { const A = this.A; return { x: A.x + 50 + Math.random() * (A.w - 100), y: A.y + 50 + Math.random() * (A.h - 100) }; },
+  reset() { this.p = { x: VW / 2, y: VH / 2 + 30, face: 1 }; this.balls = []; this.warn = []; this.hearts = 3; this.inv = 0; this.shield = 0; this.time = 0; this.nextBall = 6; this.stars = 0; this.star = this.randPos(); this.hood = null; this.hoodT = 10; this.run = 0; this.queue(); this.queue(); },
+  queue() { const A = this.A, s = Math.floor(Math.random() * 4); let x, y; if (s < 2) { x = s ? A.x + A.w - 20 : A.x + 20; y = A.y + 30 + Math.random() * (A.h - 60); } else { y = s === 2 ? A.y + 20 : A.y + A.h - 20; x = A.x + 30 + Math.random() * (A.w - 60); } this.warn.push({ x, y, t: 1 }); },
+  update(dt) {
+    this.time += dt; const p = this.p, A = this.A;
+    let dx = (AK.right ? 1 : 0) - (AK.left ? 1 : 0), dy = (AK.down ? 1 : 0) - (AK.up ? 1 : 0);
+    if (AP.down) { const vx = AP.x - p.x, vy = AP.y - p.y, d = Math.hypot(vx, vy); if (d > 10) { dx = vx / d; dy = vy / d; } }
+    const m = Math.hypot(dx, dy); if (m) { p.x += dx / m * 300 * dt; p.y += dy / m * 300 * dt; this.run += dt * 14; if (dx) p.face = Math.sign(dx); }
+    p.x = clamp(p.x, A.x + 16, A.x + A.w - 16); p.y = clamp(p.y, A.y + 30, A.y + A.h - 10);
+    for (const w of this.warn) { w.t -= dt; if (w.t <= 0) { const sp = Math.min(400, 200 + this.time * 4), ang = Math.atan2(p.y - w.y, p.x - w.x) + (Math.random() - .5) * .8; this.balls.push({ x: w.x, y: w.y, vx: Math.cos(ang) * sp, vy: Math.sin(ang) * sp, r: 15 }); sfx.bump(); } }
+    this.warn = this.warn.filter(w => w.t > 0);
+    this.nextBall -= dt; if (this.nextBall <= 0 && this.balls.length + this.warn.length < 12) { this.queue(); this.nextBall = Math.max(3.5, 7 - this.time * .04); }
+    for (const b of this.balls) {
+      b.x += b.vx * dt; b.y += b.vy * dt;
+      if (b.x < A.x + b.r) { b.x = A.x + b.r; b.vx = Math.abs(b.vx); } if (b.x > A.x + A.w - b.r) { b.x = A.x + A.w - b.r; b.vx = -Math.abs(b.vx); }
+      if (b.y < A.y + b.r) { b.y = A.y + b.r; b.vy = Math.abs(b.vy); } if (b.y > A.y + A.h - b.r) { b.y = A.y + A.h - b.r; b.vy = -Math.abs(b.vy); }
+      const cx = p.x, cy = p.y - 22, d = Math.hypot(b.x - cx, b.y - cy);
+      if (d < b.r + 16) {
+        if (this.shield > 0) { const nx = (b.x - cx) / d, ny = (b.y - cy) / d, sp = Math.hypot(b.vx, b.vy); b.vx = nx * sp; b.vy = ny * sp; b.x = cx + nx * (b.r + 17); b.y = cy + ny * (b.r + 17); sfx.bump(); }
+        else if (this.inv <= 0) { this.hearts--; this.inv = 1.4; aShake = .2; sfx.shrink(); if (this.hearts <= 0) { aEnd(); return; } }
+      }
+    }
+    if (Math.hypot(this.star.x - p.x, this.star.y - (p.y - 22)) < 34) { this.stars++; sfx.star(); this.star = this.randPos(); }
+    this.hoodT -= dt; if (this.hoodT <= 0 && !this.hood) { this.hood = this.randPos(); this.hoodT = 14; }
+    if (this.hood && Math.hypot(this.hood.x - p.x, this.hood.y - (p.y - 22)) < 34) { this.hood = null; this.shield = 5; sfx.power(); }
+    this.inv = Math.max(0, this.inv - dt); this.shield = Math.max(0, this.shield - dt);
+    aScore = Math.floor(this.time * 10) + this.stars * 50;
+  },
+  hud() { ctx.lineWidth = 2; ctx.strokeStyle = INK; for (let i = 0; i < 3; i++) heart(210 + i * 30, 22, 11, i < this.hearts ? '#e05a4f' : '#efe9da'); },
+  render() {
+    const A = this.A;
+    ctx.fillStyle = '#fdf6ee'; ctx.fillRect(0, 0, VW, VH);
+    ctx.fillStyle = '#f0d3a6'; ctx.fillRect(A.x, A.y, A.w, A.h);
+    ctx.strokeStyle = '#dfb987'; ctx.lineWidth = 1.5; for (let x = A.x + 44; x < A.x + A.w; x += 44) line(x, A.y, x, A.y + A.h);
+    ctx.strokeStyle = '#d4302a'; ctx.lineWidth = 3; line(VW / 2, A.y, VW / 2, A.y + A.h); ctx.beginPath(); ctx.arc(VW / 2, A.y + A.h / 2, 70, 0, 7); ctx.stroke();
+    ctx.strokeStyle = INK; ctx.lineWidth = 3.5; wrect(A.x, A.y, A.w, A.h, 17);
+    for (const w of this.warn) { ctx.setLineDash([6, 6]); ctx.strokeStyle = '#d4302a'; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(w.x, w.y, 18 + Math.sin(G.t * 20) * 3, 0, 7); ctx.stroke(); ctx.setLineDash([]); text('!', w.x, w.y + 2, 26, FD, '#d4302a', 'center'); }
+    ctx.strokeStyle = INK; ctx.lineWidth = 2; star(this.star.x, this.star.y + Math.sin(G.t * 5) * 4, 14, '#ffd84a');
+    if (this.hood) { const h = this.hood; ctx.lineWidth = 2.5; ctx.beginPath(); ctx.roundRect(h.x - 16, h.y - 10, 32, 26, 6); ctx.fillStyle = '#3fa7a0'; ctx.fill(); ctx.stroke(); ctx.beginPath(); ctx.arc(h.x, h.y - 10, 10, Math.PI, 0); ctx.fill(); ctx.stroke(); text('SHIELD', h.x, h.y - 30, 14, FD, '#1d6bd0', 'center'); }
+    const p = this.p;
+    ctx.fillStyle = 'rgba(0,0,0,.12)'; ctx.beginPath(); ctx.ellipse(p.x, p.y, 18, 6, 0, 0, 7); ctx.fill();
+    P.grow = 0; drawKid(p.x - 13, p.y - 58, 26, 58, p.face, 1, this.run, false, aState === 'over', this.inv);
+    if (this.shield > 0) { ctx.strokeStyle = '#1d6bd0'; ctx.lineWidth = 3; ctx.globalAlpha = this.shield < 1.5 && Math.floor(G.t * 10) % 2 ? .3 : .8; ctx.beginPath(); ctx.arc(p.x, p.y - 26, 40, 0, 7); ctx.stroke(); ctx.globalAlpha = 1; }
+    for (const b of this.balls) { ctx.strokeStyle = INK; ctx.lineWidth = 2.5; ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, 7); ctx.fillStyle = '#e05a4f'; ctx.fill(); ctx.stroke(); ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(b.x - b.r * .9, b.y, b.r * .9, -.8, .8); ctx.stroke(); }
+  }
+};
+
+/* ---------- Hallway Runner ---------- */
+AG.run = {
+  title: 'Hallway Runner', tempo: 184, tr: 5, overText: 'LATE!',
+  lines: ['The bell is about to ring and you are SO late.', 'Switch lanes around lockers and teachers.', 'JUMP over mop buckets and wet-floor signs.'],
+  lanes: [VW / 2 - 150, VW / 2, VW / 2 + 150], py: VH - 90,
+  reset() { this.lane = 1; this.x = this.lanes[1]; this.jump = 0; this.speed = 330; this.dist = 0; this.rows = []; this.next = 150; this.got = 0; this.scroll = 0; this.run = 0; this.t = 0; },
+  press(k) {
+    if (k === 'left' && this.lane > 0) { this.lane--; sfx.select(); }
+    if (k === 'right' && this.lane < 2) { this.lane++; sfx.select(); }
+    if ((k === 'jump' || k === 'up') && this.jump <= 0) { this.jump = .6; sfx.jump(); }
+  },
+  pup(dx, dy, ms) { if (Math.abs(dx) > 36 && Math.abs(dx) > Math.abs(dy)) this.press(dx < 0 ? 'left' : 'right'); else if (dy < -36 || (ms < 350 && Math.abs(dx) < 24 && Math.abs(dy) < 24)) this.press('jump'); },
+  spawnRow() {
+    const r = Math.random(), tall = ['locker', 'teacher'], low = ['bucket', 'sign'], y = -70, pk = a => a[Math.floor(Math.random() * a.length)];
+    const lanes = [0, 1, 2].sort(() => Math.random() - .5);
+    if (r < .38) { this.rows.push({ lane: lanes[0], y, kind: pk(tall) }); this.rows.push({ lane: lanes[1], y, kind: 'star' }); }
+    else if (r < .66) { this.rows.push({ lane: lanes[0], y, kind: pk(tall) }); this.rows.push({ lane: lanes[1], y, kind: pk(tall) }); this.rows.push({ lane: lanes[2], y, kind: 'star' }); }
+    else if (r < .84) { for (let l = 0; l < 3; l++) this.rows.push({ lane: l, y, kind: pk(low), low: true }); }
+    else { this.rows.push({ lane: lanes[0], y, kind: pk(tall) }); this.rows.push({ lane: lanes[1], y, kind: pk(low), low: true }); this.rows.push({ lane: lanes[2], y: y - 60, kind: 'star' }); }
+  },
+  update(dt) {
+    this.t += dt; this.speed = Math.min(780, this.speed + 10 * dt); const d = this.speed * dt;
+    this.dist += d; this.scroll = (this.scroll + d) % 96; this.run += dt * 16;
+    this.x += (this.lanes[this.lane] - this.x) * Math.min(1, dt * 16); if (this.jump > 0) this.jump -= dt;
+    this.next -= d; if (this.next <= 0) { this.spawnRow(); this.next = Math.max(230, 330 - this.dist / 200) + Math.random() * 110; }
+    this.rows.forEach(o => o.y += d);
+    const air = this.jump > .08;
+    for (const o of this.rows) {
+      if (o.hit || o.y < this.py - 34 || o.y > this.py + 24) continue;
+      if (Math.abs(this.lanes[o.lane] - this.x) > 58) continue;
+      if (o.kind === 'star') { o.hit = true; this.got++; sfx.star(); }
+      else if (o.low && air) { if (!o.cleared) { o.cleared = true; aScore += 0; } }
+      else { o.hit = true; sfx.smash(); aEnd(); return; }
+    }
+    this.rows = this.rows.filter(o => o.y < VH + 90 && !(o.kind === 'star' && o.hit));
+    aScore = Math.floor(this.dist / 40) + this.got * 10;
+  },
+  drawThing(o) {
+    const x = this.lanes[o.lane], y = o.y; ctx.strokeStyle = INK; ctx.lineWidth = 2.5;
+    if (o.kind === 'star') { ctx.lineWidth = 2; star(x, y - 20 + Math.sin(G.t * 6 + o.lane) * 4, 15, '#ffd84a'); return; }
+    if (o.kind === 'locker') { wrect(x - 38, y - 96, 76, 100, o.lane + 7, '#8fa8c8'); ctx.lineWidth = 2; for (let k = 0; k < 3; k++) line(x - 22, y - 86 + k * 6, x + 22, y - 86 + k * 6); ctx.fillStyle = INK; ctx.fillRect(x + 22, y - 50, 5, 14); text('OPEN', x, y - 20, 14, FD, INK, 'center'); }
+    else if (o.kind === 'teacher') {
+      ctx.beginPath(); ctx.roundRect(x - 24, y - 70, 48, 72, 8); ctx.fillStyle = '#9b7fd1'; ctx.fill(); ctx.stroke();
+      circ(x, y - 86, 18, '#e6b38a'); ctx.fillStyle = INK; ctx.beginPath(); ctx.arc(x - 6, y - 88, 2, 0, 7); ctx.arc(x + 6, y - 88, 2, 0, 7); ctx.fill();
+      line(x - 8, y - 78, x + 8, y - 78); line(x - 10, y - 95, x - 2, y - 93); line(x + 10, y - 95, x + 2, y - 93);
+      wrect(x + 12, y - 56, 22, 28, 3, '#c49a62'); text('LATE?', x, y - 118, 16, FD, '#d4302a', 'center');
+    } else if (o.kind === 'bucket') {
+      ctx.beginPath(); ctx.moveTo(x - 24, y - 34); ctx.lineTo(x + 24, y - 34); ctx.lineTo(x + 18, y); ctx.lineTo(x - 18, y); ctx.closePath(); ctx.fillStyle = '#b8b8b8'; ctx.fill(); ctx.stroke();
+      ctx.lineWidth = 4; line(x + 4, y - 34, x + 26, y - 80); ctx.lineWidth = 2.5; ctx.fillStyle = '#dfe9f3'; ctx.beginPath(); ctx.ellipse(x, y - 34, 22, 5, 0, 0, 7); ctx.fill(); ctx.stroke();
+    } else {
+      ctx.beginPath(); ctx.moveTo(x - 22, y); ctx.lineTo(x, y - 52); ctx.lineTo(x + 22, y); ctx.closePath(); ctx.fillStyle = '#ffd84a'; ctx.fill(); ctx.stroke(); text('WET', x, y - 16, 13, FD, INK, 'center');
+    }
+  },
+  render() {
+    ctx.fillStyle = '#efe9da'; ctx.fillRect(0, 0, VW, VH);
+    const L = VW / 2 - 230, R = VW / 2 + 230;
+    // lockers on both walls, scrolling down
+    ctx.strokeStyle = INK; ctx.lineWidth = 2;
+    for (let y = -96 + this.scroll; y < VH + 96; y += 96) {
+      for (const side of [0, 1]) {
+        const x0 = side ? R + 10 : 20, w = side ? VW - R - 30 : L - 30;
+        ctx.fillStyle = '#8fa8c8'; ctx.fillRect(x0, y, w, 92); ctx.strokeRect(x0, y, w, 92);
+        for (let k = 0; k < 3; k++) line(x0 + 14, y + 10 + k * 6, x0 + w - 14, y + 10 + k * 6);
+        ctx.fillStyle = INK; ctx.fillRect(side ? x0 + 10 : x0 + w - 16, y + 44, 5, 14);
+      }
+    }
+    ctx.fillStyle = '#fbf7ee'; ctx.fillRect(L, 0, R - L, VH);
+    ctx.strokeStyle = INK; ctx.lineWidth = 3; line(L, 0, L, VH); line(R, 0, R, VH);
+    ctx.strokeStyle = '#cadcea'; ctx.lineWidth = 2; ctx.setLineDash([26, 22]); ctx.lineDashOffset = -this.scroll;
+    line(VW / 2 - 75, 0, VW / 2 - 75, VH); line(VW / 2 + 75, 0, VW / 2 + 75, VH); ctx.setLineDash([]); ctx.lineDashOffset = 0;
+    const sorted = this.rows.slice().sort((a, b) => a.y - b.y);
+    for (const o of sorted) if (o.y < this.py) this.drawThing(o);
+    const jh = this.jump > 0 ? Math.sin((1 - this.jump / .6) * Math.PI) * 60 : 0;
+    ctx.fillStyle = 'rgba(0,0,0,.14)'; ctx.beginPath(); ctx.ellipse(this.x, this.py, 20 - jh * .1, 6, 0, 0, 7); ctx.fill();
+    P.grow = 0; drawKid(this.x - 13, this.py - 58 - jh, 26, 58, 1, 1, this.run, jh > 4, aState === 'over', 0);
+    for (const o of sorted) if (o.y >= this.py) this.drawThing(o);
+    if (aState === 'play' && this.t < 2.5) text('Swipe or ← → to switch lanes', VW / 2, 90, 24, FD, '#1d6bd0', 'center');
+  }
+};
+
+/* ---------- Picker + views ---------- */
+function paintPicker() {
+  const cleared = save.cleared.length;
+  $('#picker').innerHTML = PICK.map(p => {
+    const best = p.id === 'dash' ? `${cleared}/16 levels cleared` : (ABEST[p.id] ? `Best: ${ABEST[p.id]}` : 'Not played yet');
+    return `<button type="button" class="pick${p.id === ACTIVE ? ' on' : ''}" data-g="${p.id}" aria-pressed="${p.id === ACTIVE}"><b>${p.name}</b><span>${p.tag}</span><small>${best}</small></button>`;
+  }).join('');
+}
+function switchGame(id) {
+  if (id === ACTIVE) return;
+  if (ACTIVE === 'dash' && ['play', 'card', 'dying', 'clear'].includes(G.state)) G.paused = true;
+  Music.stop();
+  ACTIVE = id; aState = 'ready'; for (const k in AK) AK[k] = false; for (const k in held) held[k] = false; AP.down = false;
+  $('#start').hidden = !(id === 'dash' && G.state === 'title');
+  $('#keys').innerHTML = PICK.find(p => p.id === id).help;
+  $('#dashGuide').hidden = id !== 'dash';
+  paintPicker(); cv.focus({ preventScroll: true });
+}
+$('#picker').addEventListener('click', e => { const b = e.target.closest('[data-g]'); if (b) switchGame(b.dataset.g); });
+function setView(v) {
+  VIEW = v;
+  $('#gamesView').hidden = v !== 'games'; $('#diaryView').hidden = v !== 'diary';
+  document.querySelectorAll('.navtab').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.view === v)));
+  if (v !== 'games') { Music.stop(); if (ACTIVE === 'dash' && ['play', 'card', 'dying', 'clear'].includes(G.state)) G.paused = true; if (ACTIVE !== 'dash' && aState === 'play') { aState = 'ready'; } }
+  try { history.replaceState(null, '', '#' + v); } catch (e) {}
+}
+document.querySelectorAll('.navtab').forEach(b => b.addEventListener('click', () => setView(b.dataset.view)));
+paintPicker(); $('#keys').innerHTML = PICK[0].help;
+setView(location.hash === '#diary' ? 'diary' : 'games');
+
+/* ================= LOOP ================= */
+let last = performance.now(), acc = 0;
+function frame(now) {
+  const dt = Math.min(.1, (now - last) / 1000); last = now;
+  if (VIEW === 'games') {
+    if (ACTIVE === 'dash') { acc += dt; while (acc >= STEP) { update(STEP); acc -= STEP; } render(); }
+    else { acc = 0; arcadeFrame(dt); }
+  }
+  requestAnimationFrame(frame);
+}
+if (document.fonts && document.fonts.load) Promise.all([document.fonts.load(`20px ${FD}`), document.fonts.load(`20px ${FH}`)]).catch(() => {});
+requestAnimationFrame(frame);
+})();
+</script>
+<script>
+const BOOK1 = [
+["2 February", "I turned 10 last week and Nan gave me this diary. She said “write down everything, it gets funnier later.” So here goes. Tomorrow I start Year 4 at Wobbleton Primary. I have new shoes. They squeak. Everyone is going to know when I'm coming.", "pencil"],
+["3 February", "First day of Year 4! Our teacher is Mr Grindlewald. He has one eyebrow that goes up on its own. He said “we will be learning our times tables, and we will be learning them well.” Then the eyebrow went up. I am scared of the eyebrow."],
+["4 February", "I sit next to Chase Vandermint. He has gel in his hair and says “obviously” before everything. “Obviously I'm the fastest.” “Obviously my lunch is better.” His lunch was a squashed sandwich. Obviously."],
+["4 February, night", "Tater asked why I have homework and he doesn't. I said because I'm in Year 4. He said “then I'm never going to Year 4.” Mum said everyone goes to Year 4 eventually. He cried a bit. Then he had ice cream and forgot."],
+["5 February", "My little brother Tater started kinder today. He's 4. He wore his backpack on his front “so he could see it.” When Mum picked him up he said kinder was great because “there's a whole bucket of sand and nobody said no.”", "heart"],
+["6 February", "My best friend is Pickles. Her real name is Priya but she ate six pickles in a row at her birthday party in Prep and now that's her name forever. She wants to be a scientist. She already has goggles. She wears them at lunch."],
+["7 February", "Meatball ate one of my new squeaky shoes. Just one. Now I have one squeaky shoe and one quiet shoe. Dad said “at least you're only half as loud now.” Mum did not think that was funny. I did a little bit.", "dog"],
+["10 February", "Our class has a CLASS PET. A hamster called Sir Squeaks! Mr Grindlewald said “he is not a toy, he is a responsibility.” Sir Squeaks then climbed out of his cage and sat on the eyebrow ruler. Mr Grindlewald said “see? Responsibility.”", "hamster"],
+["11 February", "Benji is in my class too. He always has a plan. Today's plan was to become the fastest kid in Year 4 by eating only bananas. He ate four bananas at recess. He was not faster. He was just full."],
+["12 February", "Benji's new plan: start a BAND for the end-of-term school concert. Me, Pickles, Benji and Dizzy. I said we can't play anything. Benji said “that's what practice is for.” Pickles said she has had piano lessons since she was five. Oh."],
+["13 February", "Band jobs! Pickles: keyboard. Dizzy: drums, because he already bangs on everything. Benji: “manager and tambourine.” Me: I want to play the ukulele. I do not have a ukulele. A ukulele costs $49. I have $8.50 and a lollipop.", "music", "Ukulele fund: $8.50"],
+["14 February", "Plan to get money: chores! Mum made me a chart. Feeding Meatball: 50 cents. Tidying my room: $1. Helping Dad wash the car: $2. Being nice to Tater all day: $3. Being nice to Tater all day is the hardest job in the world."],
+["15 February", "Saturday. Washed the car with Dad. Meatball helped by drinking out of the bucket and then shaking himself on Dad. Dad said “that's the car-wash spin cycle.” I got $2 AND a bonus 50 cents for laughing at his joke.", "car"],
+["17 February", "Went to Scoops, the ice-cream shop on the corner, with Nan. The lady who owns it is Mrs Figgins. Her bun is so tight her eyebrows are always up. She asked my name and wrote TULLY on my cup. I didn't fix it. Tully is fun.", "icecream"],
+["18 February", "Sir Squeaks escaped again. We found him inside Mr Grindlewald's lunchbox, sitting on a cheese sandwich. Mr Grindlewald just said “I suppose I'm having an apple today.” I think he secretly likes Sir Squeaks."],
+["19 February", "Dizzy's real name is Diego but he spins around so much he's always dizzy. He did 30 spins at lunch and then walked into the bubbler. He was fine. The bubbler was fine. Everyone clapped anyway."],
+["20 February", "First band practice in Dizzy's garage. He has a toy drum kit and a saucepan lid. I played an invisible ukulele. Benji shook the tambourine so hard a jingle flew off and hit Pickles' goggles. Good thing she was wearing them.", "music"],
+["21 February", "Marigold is also in our class. She has a giant bow in her hair and a clipboard. A real one. Today she made a list of everyone who forgot their hat. I was on it. She wrote my name very neatly, which made it worse."],
+["24 February", "Ukulele fund: $17.00! I was nice to Tater for a whole day. He wanted to play “restaurant” and he made me soup from grass and a sock. I said it was delicious. He charged me $100. I paid in pretend money. That's allowed."],
+["25 February", "Swimming lessons with school. The water was SO cold. Coach B blew her whistle and said “in you get!” and I said “no thank you” and she said “that wasn't a question.” I got in. My teeth are still chattering."],
+["26 February", "Mum was on a work video call when Tater walked in wearing only a cape and yelled “I AM THE FLOOR KING!” Her camera was on. Her whole work saw. Mum laughed, then closed the laptop and lay on the couch for a while."],
+["27 February", "Times tables test. I know my 2s, 5s and 10s. The 7s are my enemy. 7 x 8 is a mystery nobody can solve. I wrote “a lot” and drew a sad 7. Mr Grindlewald gave me a tick for the drawing and a cross for “a lot.”", "pencil"],
+["28 February", "The answer is 56. Pickles taught me a trick: 5, 6, 7, 8. 56 = 7 x 8. I said it 100 times on the way home. Tater now says it too. He doesn't know what it means. He just yells “FIVE SIX SEVEN EIGHT” at the dog."],
+["3 March", "Band name meeting. Ideas: The Hamsters, Four Kids in a Garage, Dizzy and the Others (Dizzy's idea, no). Then Dizzy dropped his waffle on the floor and Benji screamed “THE SOGGY WAFFLES!” Everyone agreed. That's us now.", "music"],
+["4 March", "Marigold made us a band logo. It's a waffle wearing sunglasses. It's REALLY good. She also made 12 band rules. Rule 7 is “no tambourine near faces.” That one's because of Pickles' goggles."],
+["5 March", "Mr Grindlewald read us a book about a lighthouse keeper and did ALL the voices. Even the seagulls. Nobody knew he could do voices. His seagull was the best seagull I have ever heard. The eyebrow went up for the scary part.", "book"],
+["6 March", "Tater learned the word “actually.” Now he says it all the time. “Actually, I'm not tired.” “Actually, broccoli is a tiny tree.” “Actually, Tilly, your face is a bit wonky today.” Thank you, Tater."],
+["7 March", "Ukulele fund: $24.50! Almost halfway! Dad said he'd give me a bonus if I learn my 7 times tables. I've never wanted to learn the 7s more in my whole life."],
+["10 March", "Year 4 excursion to the zoo on Friday! Mum packed my bag already. It has a hat, sunscreen, three spare socks and a note that says “be good, love Mum” with a heart. I'm taking the note out. Actually I'm keeping it."],
+["12 March", "Today at assembly Principal Nutley talked for SO long. She does big pauses. Like: “Students… … … the zoo… … … is not… … … a playground.” Dizzy counted her longest pause. Nine seconds. A new record."],
+["14 March", "ZOO DAY! A goat ate Benji's worksheet. A real goat! He held it out and the goat just took it. Benji said “that's the best thing that's ever happened to me.” He had to do the worksheet again on the bus.", "bus"],
+["14 March, later", "More zoo: the monkeys threw bits of banana at Chase. Only Chase. He said “obviously they like me.” Pickles said “that's not what that means.” The giraffe licked Marigold's clipboard. She had to wipe it with a tissue. She was very calm about it."],
+["15 March", "I slept for 12 hours. Meatball slept on my feet the whole time. I think he missed me. Or he likes my feet. Either one is fine.", "dog"],
+["17 March", "Toast is a boy in our class who hardly ever talks. He always has a piece of toast. Nobody knows where he gets it. Today he said his first word of the year: “Pudding.” Then he walked away. WHAT DOES IT MEAN."],
+["18 March", "I asked Big Doreen at the canteen about pudding. She went quiet and said “you mean the Pudding Incident?” Then she said “I've said too much” and gave me a free sausage roll. There is a MYSTERY at this school.", "pudding", "MYSTERY FILE #1"],
+["19 March", "Pickles and I asked around. Big kids in Year 6 say that a long time ago, 200 pudding cups got spilled all down the main hallway. Nobody knows who did it. The teachers go funny when you ask. We are going to find out."],
+["20 March", "Mr Quill the librarian whispers everything. I asked him about the Pudding Incident. He whispered “some things are best left on the shelf.” Then he stamped my library book really hard. That's a clue. Probably."],
+["21 March", "Harmony Day! Everyone wore orange. Chase wore orange sunglasses and said they were “orange enough.” Toast wore an orange shirt and ate orange toast. It had marmalade on it. That counts."],
+["22 March", "Nan came for dinner and brought her famous apple crumble. Meatball stole a whole spoonful off the bench while nobody was looking. Nan said “that dog has taste.” Dad said “that dog has crumble on his nose.” He did.", "dog"],
+["24 March", "Ukulele fund: $31.00! I found $2 in the couch. Mum said it was hers. I said finders keepers. She said “Mum keepers.” We split it. $1 each. Fair."],
+["25 March", "Meatball is scared of the vacuum cleaner. When Dad turns it on, Meatball hides behind Tater. Tater is 4 and very small. It doesn't work. You can see all of Meatball. He thinks he's invisible."],
+["26 March", "Parent-teacher interviews. Dad told Mr Grindlewald a joke about triangles. The eyebrow did not go up. Dad told another one. Still nothing. Dad said “I'll get him one day.” It's a mission now."],
+["27 March", "Mr Grindlewald told Mum I “try very hard” and “draw beautiful sevens.” Mum stuck that on the fridge. It's next to Tater's drawing of me with eight arms. I don't have eight arms. I'm not sure what he saw."],
+["28 March", "Sir Squeaks escaped AGAIN. We found him in the principal's office, asleep in her pen cup. Principal Nutley brought him back and said “Mr Grindlewald… … … your hamster… … … has been to see me.” The whole class laughed.", "hamster"],
+["31 March", "Easter hat parade on Thursday! Mum and I are making mine. It's a bunny made from a paper plate and cotton balls. Meatball ate three cotton balls. The bunny has patches now. We're calling it “brave bunny.”"],
+["1 April", "April Fools! Pickles stuck googly eyes on EVERYTHING in our classroom. The whiteboard. The bin. The hamster's water bottle. Mr Grindlewald didn't notice until lunch. Then he laughed so hard he had to sit down. We have never seen him laugh like that.", "star"],
+["2 April", "EASTER HAT PARADE. Chase's hat had real sunglasses on it. Marigold's hat had a timetable on it. Dizzy's hat fell off 11 times. Mine won “Most Loved Bunny” because of the patches! I got a certificate AND a chocolate egg!", "trophy"],
+["3 April", "I KNOW MY 7 TIMES TABLES. I said them to Dad at dinner with no mistakes. He gave me the $5 bonus and did a little dance. Tater danced too. Meatball barked. Ukulele fund: $38.00!"],
+["4 April", "Last day of Term 1! Principal Nutley's assembly had a pause SO long before the word “holidays” that everybody cheered in the middle of it. She looked very happy. I think she did it on purpose."],
+["7 April", "Holidays! Nan took me and Tater to the park. Tater went down the slide 42 times. I counted. Then he said “one more” 15 more times. Nan fell asleep on the bench. I don't blame her."],
+["9 April", "Rainy day. Built a blanket fort with Tater. We watched a movie inside. He fell asleep in the first 10 minutes, then woke up at the end and said “what happened?” I told him the dragon became a teacher. He believed me.", "rain"],
+["11 April", "Easter! Tater hid his OWN chocolate eggs so nobody else could find them. Then he forgot where he hid them. We found one in Dad's slipper. There are still two missing. The hunt continues."],
+["12 April", "UKULELE FUND: $49.00!!! Nan gave me $5 for Easter and Aunty Jo gave me $6. I have EXACTLY $49. I counted it four times. Then I made Pickles count it on the phone. She said “confirmed.”", "", "$49!!!!!"],
+["14 April", "I HAVE A UKULELE. It's yellow with a little sticker of a shark on it. The man at the music shop said “that's a good one for a beginner.” I'm going to play it every day forever. Meatball already howls when I strum it. He's a fan.", "music", "BEST DAY EVER"],
+["15 April", "I can play one chord. It's called C. You only use one finger. I play it SO well. I played it for Mum, Dad, Tater, Meatball, Nan on the phone and the lady next door over the fence. She said “lovely, dear.”"],
+["17 April", "I learned a second chord! It's called A minor. Now I can play C and A minor, and Pickles says that's enough for “basically half of all songs.” I think she's exaggerating. But I'm happy."],
+["21 April", "Term 2! Mr Grindlewald said “welcome back” and did a small smile. A SMALL SMILE. The whole class gasped. Then the eyebrow went back to normal and he said “spelling test on Friday.” Ruined."],
+["22 April", "Benji wrote our band song. It's called “My Lunchbox Won't Open (And Neither Will My Heart).” It has a bit where the song suddenly goes up higher. Pickles says that's called a key change. Nobody knows how to do a key change."],
+["23 April", "Pickles explained the key change. You go up a bit and everyone points at the sky. You don't HAVE to point at the sky, she says. Dizzy says “you do if you mean it.” So now we point at the sky."],
+["24 April", "Marigold is running to be our class rep for the Junior School Council. Her poster has a graph. The graph shows people liking her more every week. Pickles said you can't make a graph of the future. Marigold said “watch me.”"],
+["28 April", "Chase is running too. His poster just says VOTE CHASE. OBVIOUSLY. In glitter. His speech was him putting on sunglasses really slowly. Everybody cheered. Marigold's speech had 14 points. I'm worried for her."],
+["29 April", "Class vote! Marigold won by 3 votes! She hugged her clipboard. Then she hugged Chase, and he looked SO surprised, and then he said “good job” in a normal voice. Not a cool voice. A normal one. Weird.", "trophy"],
+["30 April", "Sir Squeaks project: we each have to watch him for a week and write what he does. Day 1: he looked at me. I looked at him. He won. He's very good at looking.", "hamster"],
+["1 May", "Squeaks project Day 2: he ran on his wheel for ages and went nowhere. Mr Grindlewald said “like some of your homework.” That was a joke! He made a JOKE! I'm telling Dad. Dad will be so jealous."],
+["2 May", "Squeaks project Day 3: he escaped. Of course. We found him in the music room inside the big drum. Ms Twinkle, the music teacher, said he was “keeping the beat.” She lets us practise in the music room at lunch now!"],
+["5 May", "First practice in the real music room. Ms Twinkle clapped at EVERYTHING. Even when Benji dropped the tambourine. She said “that's percussion!” She wants to sing backing vocals in our song. She's already warming up. Loudly.", "music"],
+["6 May", "Tater lost his first tooth! He put it under his pillow with a note: “Tooth fairy pleese giv $100.” He got $2 and a note back that said “inflation.” He doesn't know what inflation is. He is VERY cross about it."],
+["7 May", "Big Test Week is next week. All of Year 4 does reading, writing and maths tests. Mr Grindlewald said “it's not scary, it's just a chance to show what you know.” Then the eyebrow went up. So it's a bit scary."],
+["8 May", "Pickles made me a study timetable. Green is practice, blue is band, pink is snacks, and yellow is “Tilly will be doing something else.” She knows me too well. There is a lot of yellow."],
+["12 May", "Mother's Day was yesterday. Tater made Mum breakfast in bed: one banana, still in its skin, and a flower from next door's garden. Mum said it was the best breakfast ever. We said sorry to next door.", "heart"],
+["13 May", "TEST WEEK, DAY 1. Writing. We had to write a story about “a surprising day.” I wrote about a goat eating a worksheet. It was a true story so it was easy. Benji said I should have made the goat a pirate."],
+["14 May", "TEST WEEK, DAY 2. Reading. There was a story about a hamster! I read it super carefully because I'm basically a hamster expert now. Sir Squeaks, I owe you."],
+["15 May", "TEST WEEK, DAY 3. Maths. There was a question about 7 x 8. I KNEW IT. 56! Five, six, seven, eight! I nearly cheered out loud. Pickles saw my face across the room and gave me a thumbs up."],
+["16 May", "Test Week is DONE. Mr Grindlewald gave everyone a sticker that said “Superstar.” He picked the stickers himself. Imagine Mr Grindlewald in a sticker shop choosing sparkly stars. I can't stop imagining it.", "star"],
+["19 May", "Mystery update: in the library there's a big old photo book of the school. One photo shows the hallway covered in pudding! And in the corner is a blurry grown-up in a suit holding a clipboard. Mr Quill closed the book and whispered “home time.” It was 11 o'clock.", "pudding", "MYSTERY FILE #2"],
+["20 May", "Pickles looked at the photo with her magnifying glass. She said the clipboard person has “very dramatic standing.” She said that's not a clue, it's “a feeling.” But she wrote it in her notebook. She's interested."],
+["21 May", "Chase asked if the Soggy Waffles need “a style person.” Benji said yes before anyone could stop him. Chase's first idea: sunglasses for everyone. His second idea: a smoke machine. We are not allowed a smoke machine. We are allowed sunglasses."],
+["22 May", "Chase drew where we should all stand on the stage. He put me in the middle. He said “the ukulele is the happy part.” I didn't know what to say, so I said “thanks.” Then I tripped over my own shoe. The quiet one."],
+["23 May", "Dizzy broke his drumstick. Then his other drumstick. Now he uses two wooden spoons from the canteen. Big Doreen said he can borrow them “as long as they come back clean.” They will not come back clean."],
+["26 May", "It rained all week. My school shoes squelch. Tater thinks puddles are “free swimming pools.” He jumped in every single one on the way to kinder. Mum said “at least he's happy.” He was VERY happy.", "rain"],
+["27 May", "Worst day. I tripped UP the stairs at assembly in front of the WHOLE school. My ukulele case went bump bump bump down the steps. A Year 6 girl picked it up and said “don't worry, happens to everyone.” She is my hero now."],
+["28 May", "Still thinking about The Stairs. Pickles says everyone forgets in a week. Benji says a month. Dizzy says “I'll never forget, it was AWESOME.” Thanks, Dizzy."],
+["29 May", "Band practice. WE DID THE KEY CHANGE. All together at the same time! Everybody pointed at the sky, even Pickles! Ms Twinkle cried happy tears. Benji threw the tambourine up and caught it. Best practice EVER.", "star"],
+["30 May", "Tater's kinder had Dress As Your Hero day. He went as ME. He wore my jumper down to his feet, carried his toy guitar and told everyone “I play the shark ukulele.” I'm not crying. You're crying.", "heart"],
+["2 June", "Mum's big work presentation went really well. She came home and did a dance in the kitchen. Dad joined in. Tater joined in. I joined in. Meatball barked at all of us. We danced for no reason. More families should do that."],
+["3 June", "Spelling test. The word was “necessary.” I spelled it “nessessary.” Mr Grindlewald wrote “nearly!” with a little smiley face. A SMILEY FACE. From Mr Grindlewald. I'm keeping this test forever."],
+["4 June", "Sleepover at Pickles' house! Her mum made SO many samosas. We stayed up until 10:30 (very late) talking about the pudding mystery. Pickles thinks it was a teacher. I think it was a grown-up with a clipboard. That's what the photo says!"],
+["5 June", "Benji told us his big theory: Toast is actually three small kids stacked up under a big jumper. Pickles said that's “not possible.” Benji said “then how does he always have toast?” Nobody could answer. It's a good point."],
+["6 June", "Found out Mr Grindlewald's first name! It was on a letter on his desk. It's HORACE. Pickles guessed right. I owe her an ice cream. Mrs Figgins will write TULLY on the cup again."],
+["7 June", "Practised ukulele in the backyard. A bird sat on the fence and listened to the whole song. When I finished it flew away. Pickles says that means it liked it. Benji says it means it didn't. I'm going with Pickles."],
+["10 June", "Concert is next week! Chase bought everyone sunglasses from the $2 shop. Marigold made a plan of the whole show with times. Benji wrote a speech to say before our song. The speech is longer than the song."],
+["12 June", "Dress rehearsal. EVERYTHING went wrong. My ukulele strap broke. One of Dizzy's spoons flew into the audience seats. We did the key change too early. Ms Twinkle said “bad rehearsal means a great show!” I hope that's true."],
+["13 June", "Dad fixed my ukulele strap with an old belt and some tape. He said “it's a strap-tacular fix.” I didn't even groan. I just hugged him. He was so surprised he didn't make another joke all night."],
+["16 June", "Can't sleep. What if I forget the chords? What if I trip on the stage? What if my face goes red? Pickles called and said “hypothesis: you'll be amazing. I'm 94% sure.” I'll take 94%."],
+["17 June", "Tater made us a good luck card. It's four waffles with legs. One is holding a shark. The shark is holding a microphone. It's the best drawing he's ever done. It's going on my wall FOREVER.", "heart"],
+["18 June", "CONCERT DAY. We were act 9. Marigold stopped Benji's speech after 20 seconds with a very polite hand wave. Lights on! Chase flicked his sunglasses on. I strummed the first C. The whole hall went quiet.", "star"],
+["18 June, later", "WE DID THE KEY CHANGE AND THE WHOLE HALL POINTED AT THE SKY. Even the parents! Even Principal Nutley! Ms Twinkle sang so high a window shook. Dizzy threw a spoon in the air and CAUGHT it. Everyone screamed!", "", "!!!!!!!!!"],
+["18 June, even later", "We came SECOND! A Year 5 kid who juggles oranges while saying his times tables came first. Fair enough. But the Year 6 girl from The Stairs came up and said “your ukulele was the best part.” I'm keeping those words forever.", "trophy"],
+["19 June", "At school everyone kept saying “Soggy Waffles!” to me. Even Big Doreen said “the ukulele girl!” and gave me extra sauce on my pie. I didn't want extra sauce. I took the extra sauce. You don't say no to Big Doreen."],
+["23 June", "Mystery update! At assembly Principal Nutley said “and remember… … … no food… … … in the hallways.” And she looked RIGHT at the spot where the pudding was in the old photo. For a really long time. Pickles grabbed my arm. We both saw it.", "pudding", "MYSTERY FILE #3: a suspect?"],
+["25 June", "Report card! Reading: “excellent.” Maths: “great improvement, especially the 7s.” Music: “a joy.” PE: “please stop saying sorry to the ball.” Mum said that's a great report. Dad said “the ball deserves an apology sometimes.”"],
+["27 June", "Last day of Term 2 and this diary is nearly full! This term I got a ukulele, joined a band, learned my 7s, came second in the concert and found a mystery. I did NOT become cool. That's okay. Book Two starts tomorrow! — Tilly, age 10", "star"]
+];
+const BOOK2 = [
+["28 June", "New diary! Nan bought me another one. It has a cat on the front. She said “you filled the last one so fast!” I said I have a lot to say. She said “I know, love.” Then she winked. Did Nan read my diary?? She says she only read the cover.", "cat"],
+["30 June", "School holidays and it is FREEZING. Tater wears his winter coat inside, zipped up to his nose. Only his eyes stick out. He calls it “turtle mode.” Meatball won't move away from the heater. He growls if you stand in front of it.", "snow"],
+["2 July", "Went to Scoops with Nan. Mrs Figgins is selling hot soup in winter because nobody wants ice cream. She serves the soup in a cone. Cone soup! Nan said “that's brave.” Mrs Figgins wrote TULLY on my cone. Still Tully."],
+["4 July", "Band practice in Dizzy's garage. It was so cold Pickles played keyboard in her gloves. Dizzy wore a beanie with a pom-pom that bounced every time he hit the drum. Benji wrote a new song called “Winter Is My Enemy.” It's mostly yelling.", "music"],
+["7 July", "Tater decided he doesn't eat meat anymore because of a cow he met at the farm. He named the cow Moo Gary. Dad was cooking sausages. Tater lasted until the sausages were ready. He said sorry to his drawing of Moo Gary first."],
+["9 July", "Rainy day. Tater and I made a cardboard boat and sailed it down the gutter. It sank in two seconds. Tater said “that was the best two seconds ever.” He's 4 and he's very wise.", "rain"],
+["11 July", "I practised ukulele every day this holidays. I can play C, A minor, F and G now! That's FOUR chords. Pickles says with four chords you can play “about a million songs.” I'm going to learn all of them."],
+["14 July", "Last day of holidays. I made a timetable for Term 3 using Pickles' colours. Half of it is yellow (doing something else). It's important to be honest in a timetable."],
+["15 July", "Term 3! Mr Grindlewald said “Year 4, this term you will be working towards… … … your PEN LICENCE.” EVERYONE GASPED. A pen licence means you're allowed to write in pen instead of pencil. It's the biggest thing in Year 4.", "pencil", "PEN LICENCE!!!"],
+["16 July", "To get a pen licence you need neat running writing, joined up, on the lines, every day. My writing is… not neat. Mr Grindlewald said my letters “go on adventures.” My g's especially. My g's go everywhere."],
+["17 July", "Pickles' writing is perfect already. It looks like a computer did it. Marigold's writing is so neat she uses a ruler for the lines under the lines. Chase's writing is huge and loopy. He says it's “a signature style.”"],
+["18 July", "Practised running writing at home. Tater wanted to practise too. He wrote a whole page of wiggly lines and said it was a letter to Meatball. Meatball ate the letter. So I guess he read it."],
+["21 July", "Chase gave a talk in class about ancient Rome. He wore a bedsheet over his uniform like a toga. He took it SO seriously. At the end everyone clapped, he bowed and the sheet fell off. Uniform underneath. He was fine. It was the best talk ever."],
+["22 July", "Sir Squeaks is sick! He won't eat his food. Mr Grindlewald is taking him to the vet after school. Everyone was very quiet all day. Mr Grindlewald kept looking at the cage. He really does love that hamster.", "hamster"],
+["23 July", "Sir Squeaks is OKAY! The vet said he had a tummy ache from eating “something he shouldn't have.” Pickles and I looked at each other. What has he been eating on his escapes? Where does he GO?"],
+["24 July", "Pickles and I followed Sir Squeaks' escape route. It goes under the classroom door, down the hall, and into the cleaners' cupboard. There's a mop in there with a name tag. It says GERALD. Mr Quill appeared behind us and whispered “back to class.” He's like a ghost."],
+["25 July", "Coach B started lunchtime dodgeball for Year 4! Teams are named after foods. We are, obviously, the Soggy Waffles. First game on Monday. I'm practising by getting Tater to throw socks at me. He throws them at my head. Every time.", "ball"],
+["28 July", "Dodgeball game 1: we lost to the Spicy Nuggets. I dodged two balls and then walked right into the third. Coach B said I have “good dodging but no sense of direction.” Same, Coach B. Same."],
+["29 July", "Chase joined our dodgeball team. He's REALLY good. He catches the ball like he's getting a prize. We won game 2! Benji said “Chase is on our team now, that's the plan.” It was not the plan. But it worked."],
+["30 July", "It rained so hard the canteen roof dripped right onto the pies. Big Doreen held an umbrella over the pies all through lunch. She saved every single pie. She's a hero. Everyone clapped when the bell rang.", "rain"],
+["1 August", "My writing is getting better! Mr Grindlewald wrote “your g's are coming home from their adventures.” That's the nicest thing a teacher has ever written to me. I stuck it inside my pencil case."],
+["4 August", "Our class started a WORM FARM for science. It's a big box of dirt and worms and old veggie scraps. Pickles is in charge because she's the only one who wants to hold the worms. She named them all. There are 200."],
+["5 August", "Pickles says the worms' names are Worm 1 to Worm 200. Except one. That one is called Kevin. She says Kevin is “different.” Kevin looks exactly like the other worms. We don't ask."],
+["5 August, later", "Kevin the worm is missing! Pickles searched the whole worm farm. She found him under a banana peel, “resting.” She said “Kevin needs his space.” She put a tiny sign next to him that says DO NOT DISTURB."],
+["6 August", "Meatball had to go to the vet for his check-up. I got to go too! The vet, Dr Amira, let me hold the stethoscope on his tummy. I could hear his heart going thump thump. And his tummy going grumble grumble. He was hungry.", "dog", "future vet??"],
+["7 August", "There was a parrot at the vet who says “hello gorgeous” to everybody who walks in. He said it to me! Then he said it to Meatball. Meatball barked. The parrot said “rude.” I laughed so much I had to sit on the floor."],
+["8 August", "Dr Amira said if I like animals this much, maybe I could be a vet one day. I've decided. I'm going to be a vet. Or a parrot. I'm still deciding between those two."],
+["11 August", "Book Week is coming! We have to dress up as a book character. Chase is going as “a king.” Marigold is going as “a librarian with a very organised library.” Benji is going as a pirate from a book he hasn't read yet."],
+["12 August", "Tater's kinder is doing Book Week too. He's going as “a book.” Not a character. A BOOK. He's wearing a cardboard box with a title on the front: TATER: THE BOOK. He says it's all about himself.", "book"],
+["13 August", "Book Week parade! I went as the girl from the lighthouse book Mr Grindlewald read us. I carried a torch and a paper seagull. Mr Grindlewald saw me and did his seagull voice, just a little bit, just for me. I'll never forget it."],
+["14 August", "Science Fair is coming! Pickles and I are partners. Our idea: “Which ice cream melts fastest?” Mrs Figgins said she'll give us little cups of all the flavours if we put Scoops on our poster! We said yes SO fast.", "icecream"],
+["15 August", "Experiment day. We put a scoop of every flavour on a plate in the sun. Results: Rocky Road melts the SLOWEST. It barely melted at all. Pickles says it's “basically a rock.” Then we ate the rest for “science.”"],
+["18 August", "Our Science Fair poster is called “MELT DOWN!” Pickles wrote the science part. I did the drawings. Chase added a border of tiny flames because “it needs drama.” It looks like a movie poster. I LOVE it."],
+["19 August", "Tater's wobbly tooth fell out at dinner. It came out in a potato. He screamed “THE POTATO BIT ME!” We laughed so much. Mum had to go into the other room. Dad laughed so hard he snorted. Then Tater laughed too."],
+["20 August", "Science Fair! A kid in Year 5 made a volcano out of tuna. It smelled terrible. Our table had ice cream samples. The line went all the way out the door. Even the tuna volcano kid came and asked for Rocky Road.", "trophy"],
+["21 August", "WE WON THE YEAR 4 SCIENCE FAIR!!! Pickles did one small fist pump. Then she hugged me so hard I squeaked. Mrs Figgins put our poster up in the shop window. I'm famous! On one corner of one street!"],
+["22 August", "Mystery update! Mr Quill called me into the library. He whispered: “If you want to solve your pudding mystery… … look at the dates.” Then he gave me a biscuit. What dates? Why a biscuit? He's the most confusing grown-up I know.", "pudding", "MYSTERY FILE #4"],
+["25 August", "Pickles found the date. The Pudding Incident happened on 14 March, six years ago. She checked the old school newsletters in the library. That same week it said: “Welcome to our NEW principal, Dr Nutley!” PICKLES. PICKLES!!!"],
+["26 August", "Big writing day. We had to write a whole page in running writing. I went slow. I kept every letter on the line. Even my g's stayed home. Mr Grindlewald held my page up and said “this is what I mean, everyone.” ME!", "star"],
+["27 August", "Dodgeball semi-final! The Soggy Waffles against the Cheesy Chips. Chase caught the last ball diving sideways like a superhero. WE'RE IN THE FINAL! Coach B blew her whistle so hard she had to have a drink of water.", "ball"],
+["1 September", "Spring! The first warm day! Scoops started selling ice cream again. Mrs Figgins stopped the cone soup and said “goodbye soup, you tried your best.” We all stood quietly for a second. Then we got ice cream.", "sun"],
+["2 September", "DODGEBALL FINAL! It came down to me. Just me, against their last player. She threw. I DODGED. Properly! Then I threw the ball and it bonked her shoe. WE WON!!! I have never won anything sporty in my WHOLE LIFE.", "trophy"],
+["3 September", "Coach B called me “Tilly the Dodge Machine” in PE. That's my new name now. Dizzy made a video on his mum's phone of my big dodge. It's four seconds long. He added explosion sounds. It's amazing."],
+["4 September", "Father's Day was Sunday. Tater gave Dad a card that said “YOU ARE THE BEST DAD IN THIS HOUSE.” Dad said “I'm the only dad in this house.” Tater said “exactly.” Dad is still thinking about it.", "heart"],
+["5 September", "BIG NEWS. The Year 4 School Disco is next term! Marigold is in charge of decorations. She has a big plan. It's called “Enchanted Garden.” She has already ordered 3,000 fairy lights. Where do you even PUT 3,000 fairy lights?"],
+["8 September", "I asked Marigold where the fairy lights will go. She said “everywhere, Tilly. Everywhere.” Then she wrote something on her clipboard. I think it was my name. I think I'm helping now."],
+["9 September", "Ms Twinkle asked the Soggy Waffles to play TWO songs at the disco! Marigold said yes as long as we “do not point at the sky near the fairy lights.” We have to learn a whole new song!", "music"],
+["10 September", "Benji wrote the new song. It's called “The Enchanted Garden of My Heart.” Pickles fixed the words. Chase fixed the chorus. I added a ukulele bit with ALL FOUR of my chords. That's growth."],
+["11 September", "Mr Grindlewald flipped a coin to teach us about chance. It landed on its EDGE. It stood up on the desk! Everyone went silent. He picked it up, put it in his pocket and said “that didn't happen.” It happened, Horace."],
+["12 September", "Pen licence update. Mr Grindlewald said the first pen licences will be given out “when you are ready, and not before.” The eyebrow went up. Pickles is definitely ready. I am 80% ready. Chase is 20% ready. His loops are too big."],
+["15 September", "Mystery plan: Pickles found an old newsletter with a photo of Principal Nutley's welcome morning tea. There's a trolley COVERED in pudding cups. We counted 198. The other 2 could be hiding behind the teapot.", "pudding", "MYSTERY FILE #5"],
+["16 September", "Our theory: Principal Nutley ordered 200 puddings for her welcome party, something went VERY wrong in the hallway, and she's been keeping it a secret ever since. Pickles said “we need proof.” Benji said “we need a PLAN.” Oh no."],
+["17 September", "Benji's plan: we ask her at the end-of-year assembly. In front of the WHOLE school. Pickles said “absolutely not.” I said “absolutely not.” Benji said “so that's a maybe.” It is NOT a maybe, Benji."],
+["18 September", "Last week of Term 3. We cleaned out the worm farm. The worms are fine. Kevin is fine. Pickles checked on Kevin first. She said he looked “proud of us.” He looked like a worm."],
+["19 September", "Report card! Writing: “huge improvement, the g's have settled down.” Maths: “great.” Science: “excellent (and delicious).” PE: “Dodge Machine.” Dad ran around the house. Mum took a photo. Tater drew on the photo.", "star"],
+["22 September", "Holidays! It's warm and Scoops is SO busy. Mrs Figgins let me make up my own flavour! I made “Homework”: chocolate, caramel and crunchy biscuit bits “because it's hard but you get through it.” She put it on the menu!", "icecream", "HOMEWORK FLAVOUR!!"],
+["24 September", "Babysat Tater with Nan. He wanted to play restaurant again. He made me a plate of leaves and a sock. He charged me $400. Nan paid with a button. He was very happy with the button."],
+["26 September", "Band practice! The new song sounds GOOD. Like, really good. Dizzy got real drumsticks for his birthday. Chase is doing backup singing and does a little shoulder wiggle every time. Pickles rolled her eyes but she was smiling.", "music"],
+["27 September", "Grand final day! Dad made pies shaped like footballs. They were shaped like potatoes. Tater cheered for BOTH teams the whole game. Whoever had the ball, he yelled “GO!” He had the best time.", "ball"],
+["29 September", "Chase came to Scoops and got vanilla. He said “thanks for not laughing when my toga fell off.” I said “I did laugh.” He said “yeah, but in a nice way.” Okay. That's true. It was a nice laugh."],
+["1 October", "Nan is teaching me to knit. I made a scarf. It is very short. It's more of a necklace. Meatball wears it now. He looks very handsome. Nan said “it's perfect for a dog-sized neck.”"],
+["2 October", "Nan and I made pancakes. I flipped one so high it stuck to the ceiling. We both stared at it. Then it fell on Meatball. He ate it in one bite. Nan said “ten points.”"],
+["6 October", "Term 4! The last term of Year 4. Mr Grindlewald said “this term, some of you will earn your pen licence.” He looked at the class. The eyebrow went up. I sat up SO straight."],
+["7 October", "Pickles got her pen licence! FIRST in the class! It's a real certificate with a gold star and her name written in fancy writing. She got a blue pen. She held it like it was made of glass. I'm so proud of her. And a bit jealous."],
+["8 October", "EMERGENCY. The disco fairy lights arrived. Marigold ordered 30,000, not 3,000. There's an extra zero! The boxes filled up the whole storeroom. Marigold said “I'm fine.” Marigold was not fine."],
+["9 October", "We spent lunch untangling fairy lights. Toast untangled more than anybody. He did it silently, in perfect circles, like a wizard. When he finished he said one word: “Patience.” Then he ate some toast. Nobody knows where the toast came from."],
+["10 October", "Sir Squeaks got tangled in the fairy lights and turned into a glowing hamster for about one minute. Mr Grindlewald said “we will not be telling anyone about this.” I'm only telling my diary. He looked like a tiny party.", "hamster"],
+["13 October", "Marigold, Chase and Toast got their pen licences today! Benji and Dizzy got theirs yesterday. I'm the only one in our group without one. I tried not to cry. I cried a little bit in the toilets. Pickles came and found me."],
+["14 October", "Pickles said “hypothesis: you'll get it this week.” I said “what if I don't?” She said “then next week. Your writing is good now, Tilly. You just rush when you're nervous.” She's right. I rush."],
+["15 October", "Practised writing at home, SLOWLY. Mum sat with me. She said “pretend every letter is a little person, and you're walking them home carefully.” I walked every letter home. Even the g's."],
+["16 October", "I GOT MY PEN LICENCE!!! Mr Grindlewald handed it to me and said “well earned, Tilly.” He SMILED. A real one. My certificate has a gold star and my pen is PURPLE. I wrote my name ten times in pen. Then I wrote it on Tater.", "trophy", "PEN LICENCE!!!!!!"],
+["17 October", "I use my pen for everything. I wrote a shopping list for Mum in pen. I wrote “I love you” on a note for Dad in pen. I wrote this diary page in pen! It feels very grown-up. I'm basically an adult now."],
+["20 October", "Sad news. Pickles might be moving to a different school next year. Her mum got a new job on the other side of the city. They haven't decided yet. I went home and lay on the floor for a long time."],
+["21 October", "Lay on the floor again. Meatball lay on me. Then Mum lay on the floor too. She said “big changes are scary, even when they're good.” Then Tater lay on top of all of us. A floor pile. It helped a bit.", "heart"],
+["22 October", "Told Pickles that if she has to move, we'll still be best friends forever. She said “hypothesis: we will be best friends until we are 100.” I said “how sure?” She said “100%. That's not even science, that's just true.”", "heart"],
+["23 October", "The disco is TOMORROW! I'm wearing my sparkly green top and my comfy sneakers. Pickles says dancing in fancy shoes is “a science disaster.” Dad is driving us. He's been cleaning the car for three days. He even vacuumed the roof."],
+["24 October", "THE DISCO! When we walked into the hall, it was 30,000 fairy lights. It looked like being inside a star. Marigold stood in the middle, holding her clipboard, just looking. She did it. It was the most beautiful thing I've ever seen.", "star"],
+["24 October, later", "The Soggy Waffles played! When we did the key change, we pointed at the FLOOR instead of the sky (because of the lights). Now that's our new thing! Everyone sang the chorus. Chase did his shoulder wiggle. Dizzy didn't throw anything. Proud of him."],
+["24 October, even later", "Mr Grindlewald danced at the disco. Just once. A tiny side-to-side dance during the last song. Everyone saw. Nobody said anything. We will protect this memory forever."],
+["27 October", "The disco photos came out. In EVERY photo, Toast is standing in the background, eating toast. Even in two photos taken at the same time on different sides of the hall. HOW. Benji's theory about three kids in a jumper is looking stronger."],
+["30 October", "Halloween at Scoops! Mrs Figgins dressed as a giant ice-cream cone. She couldn't fit through the door, so she served people through the window. Best costume ever. She wrote TULLY on my cup in orange.", "ghost"],
+["31 October", "Tater went trick-or-treating as Moo Gary the cow. He mooed at every door. He came home with SO many lollies and tried to share them with Meatball. Mum said no. Chocolate is bad for dogs, Tater!"],
+["3 November", "Our class wrote letters to Principal Nutley about “something we want to know about our school.” Pickles and I wrote ours together, IN PEN. We asked her, very politely, if she would tell us the true story of the Pudding Incident.", "pudding", "MYSTERY FILE #6: letter sent"],
+["4 November", "No answer yet. But Principal Nutley walked past me in the hall and stopped. She did a LONG pause. Even for her. Then she said “Miss Marsh.” And walked away. WHAT DOES THAT MEAN?"],
+["7 November", "Swimming carnival! I swam in the 25 metre freestyle. I came fourth out of six. Fourth is good! Dizzy came first in his race and then jumped back in the pool to celebrate. Coach B blew her whistle at him for a full minute."],
+["10 November", "Spelling test with ALL the hardest words. “Necessary” was one of them. This time I got it right! Mr Grindlewald drew a tiny smiley face again. Two smiley faces in one year. That might be a school record."],
+["12 November", "Our class did a Kindness Week. We had to do one kind thing every day. Today Chase gave me a keyring shaped like a little ukulele. He said “saw it and thought of the band.” Pickles raised one eyebrow at me for the whole day. I don't know why."],
+["14 November", "Tater asked me how old I'll be “when I'm a grown-up.” I said I'm 10. He said “so you're nearly old?” Mum laughed so hard she spilled her tea. I think he meant it nicely."],
+["17 November", "Mrs Figgins named “Homework” flavour the Flavour of the Month! There's a little sign that says “Invented by Tully.” She will never spell my name right. I love her."],
+["20 November", "Dad taught me to ride my bike with no hands for one whole second. Then I got scared and grabbed the handlebars. Dad said “that's one second more than me!” Meatball ran next to me the whole time, barking like a coach.", "car"],
+["24 November", "PICKLES IS STAYING!!! Her mum found a way to work from home some days, so Pickles doesn't have to change schools! She told me at recess. I screamed. She screamed. Mr Grindlewald came out and said “is everything alright?” We said “YES!” and hugged.", "heart", "STAYING!!!"],
+["27 November", "Cleaning out our trays at school. Mine had: 31 pencils, a very old banana, one fairy light, and the good luck card Tater made for the concert. I kept the card. I did not keep the banana."],
+["1 December", "Christmas craft day! We made paper chains. Ours is so long it goes around the whole classroom twice. Sir Squeaks tried to climb it. Mr Grindlewald said “not today, sir.” To the hamster. He calls the hamster “sir.”"],
+["2 December", "Tater's kinder concert! He was a star in the nativity play. His only job was to stand still and shine. He waved at us the whole time and yelled “HI TILLY!” in the middle of a song. Best star ever.", "star"],
+["4 December", "End-of-year assembly awards! Marigold got “Leadership.” Pickles got “Science Star.” Dizzy got “Most Improved in PE” (he cried). I got “Kindness Award” for helping with the disco lights. Benji got “Most Plans.” It's a brand new award. He earned it.", "trophy"],
+["4 December, later", "And THEN. Principal Nutley went to the microphone and said “I have… … … a confession.” The whole hall went silent. “Six years ago… … … on my very first day… … … I tripped over a mop named Gerald… … … while pushing a trolley… … … of two hundred puddings.” THE WHOLE SCHOOL GASPED.", "pudding"],
+["4 December, even later", "She said she was so embarrassed that she never told anyone. She said “thank you to the students who asked so kindly.” Then she said “honestly… it was a very delicious hallway.” Everyone laughed! Even Mr Quill laughed OUT LOUD! MYSTERY SOLVED!", "", "CASE CLOSED!!!"],
+["8 December", "Pickles and I went to Scoops to celebrate solving the mystery. Mrs Figgins gave us free sprinkles. She NEVER gives free sprinkles. Her eyebrows went up even higher than normal. It was a very special day.", "icecream"],
+["11 December", "Last day of Year 4! We signed each other's shirts. Mine says “Dodge Machine” (Coach B), “100%” (Pickles), “obviously cool” (Chase), “Step one: summer” (Benji), “SOGGY WAFFLES FOREVER” (Dizzy), and “Well done, Tilly. — Mr G.” And Toast drew a tiny piece of toast.", "star"],
+["12 December", "Mr Grindlewald gave everyone a card. Mine said “Keep walking your letters home carefully. You'll go far.” I don't know how he knew about Mum's trick. Maybe teachers just know things. I'm going to miss him and his eyebrow."],
+["19 December", "Christmas holidays! Tater has already asked Santa for “a real cow named Moo Gary.” Dad said Santa's sleigh isn't big enough. Tater said “Santa will find a way.” He's very confident."],
+["20 December", "Summer! Two diaries, both full. A year ago I couldn't play anything, didn't know my 7s and wrote in pencil. Now I play the ukulele, I'm a Dodge Machine, I have my pen licence and I solved a pudding mystery. Next year: Year 5! — Tilly Marsh, age 10 (and a bit)", "sun"]
+];
+
+(() => {
+'use strict';
+const $ = s => document.querySelector(s);
+const store = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+};
+const INK = '#1e1d1b';
+const D = (inner) => `<svg viewBox="0 0 100 100" aria-hidden="true" fill="none" stroke="${INK}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">${inner}</svg>`;
+const DOODLES = {
+  pencil: D('<path d="M20 80 L68 22 L80 32 L32 90 Z" fill="#f2c94c"/><path d="M20 80 L16 94 L32 90" fill="#e8c28e"/><path d="M16 94 l3-7 5 4z" fill="#1e1d1b"/><path d="M68 22 l6-7 12 10-6 7" fill="#f5a3b5"/>'),
+  heart: D('<path d="M50 84 C10 58 14 22 36 22 C46 22 50 32 50 36 C50 32 54 22 64 22 C86 22 90 58 50 84 Z" fill="#f08a8a"/><path d="M30 36 q4-6 10-6" stroke="#fff"/>'),
+  dog: D('<ellipse cx="50" cy="70" rx="32" ry="20" fill="#d9a56a"/><path d="M28 36 q-12 8-6 26 q8-4 10-16z" fill="#8a5a33"/><path d="M72 36 q12 8 6 26 q-8-4-10-16z" fill="#8a5a33"/><circle cx="50" cy="44" r="20" fill="#d9a56a"/><circle cx="43" cy="40" r="2.5" fill="#1e1d1b"/><circle cx="57" cy="40" r="2.5" fill="#1e1d1b"/><ellipse cx="50" cy="49" rx="5" ry="3.5" fill="#1e1d1b"/><path d="M84 66 q10-6 8-16"/>'),
+  music: D('<ellipse cx="30" cy="74" rx="11" ry="8" fill="#1e1d1b" transform="rotate(-20 30 74)"/><ellipse cx="72" cy="66" rx="11" ry="8" fill="#1e1d1b" transform="rotate(-20 72 66)"/><path d="M40 72 V22 L82 14 V64"/><path d="M40 30 L82 22" stroke-width="7"/>'),
+  icecream: D('<path d="M34 50 L50 94 L66 50 Z" fill="#e8c28e"/><path d="M38 60 l24-6 M42 70 l18-5" stroke-width="2"/><circle cx="50" cy="40" r="17" fill="#f5a3b5"/><circle cx="38" cy="50" r="12" fill="#fff6d6"/><circle cx="62" cy="50" r="12" fill="#8a5a33"/><circle cx="50" cy="20" r="5" fill="#d4302a"/>'),
+  hamster: D('<ellipse cx="50" cy="62" rx="32" ry="24" fill="#e8c28e"/><circle cx="30" cy="40" r="8" fill="#f5a3b5"/><circle cx="70" cy="40" r="8" fill="#f5a3b5"/><circle cx="41" cy="56" r="3" fill="#1e1d1b"/><circle cx="59" cy="56" r="3" fill="#1e1d1b"/><path d="M47 64 q3 3 6 0"/><path d="M34 64 h-12 M34 68 h-10 M66 64 h12 M66 68 h10" stroke-width="1.5"/><ellipse cx="50" cy="72" rx="12" ry="8" fill="#fff6d6" stroke="none"/>'),
+  ball: D('<circle cx="50" cy="50" r="34" fill="#e05a4f"/><path d="M16 50 h68 M50 16 q-22 34 0 68 M50 16 q22 34 0 68" stroke-width="2.5"/>'),
+  tent: D('<path d="M10 86 L50 18 L90 86 Z" fill="#8ccf7a"/><path d="M50 18 L50 86 M50 86 L38 60 L50 50" /><path d="M6 86 h88"/><path d="M50 18 l-8-8 M50 18 l8-8"/>'),
+  bus: D('<rect x="8" y="30" width="84" height="44" rx="8" fill="#f2c94c"/><rect x="16" y="38" width="16" height="14" fill="#fff"/><rect x="38" y="38" width="16" height="14" fill="#fff"/><rect x="60" y="38" width="16" height="14" fill="#fff"/><circle cx="28" cy="76" r="9" fill="#1e1d1b"/><circle cx="72" cy="76" r="9" fill="#1e1d1b"/><path d="M8 60 h84" stroke-width="2"/>'),
+  ghost: D('<path d="M22 88 V44 C22 24 36 12 50 12 C64 12 78 24 78 44 V88 L68 80 L59 88 L50 80 L41 88 L32 80 Z" fill="#fff"/><ellipse cx="41" cy="42" rx="4" ry="6" fill="#1e1d1b"/><ellipse cx="59" cy="42" rx="4" ry="6" fill="#1e1d1b"/><ellipse cx="50" cy="58" rx="5" ry="6"/>'),
+  pudding: D('<path d="M22 44 h56 l-6 44 h-44 z" fill="#fff"/><ellipse cx="50" cy="44" rx="28" ry="8" fill="#8a5a33"/><path d="M58 40 L80 10" stroke-width="5"/><path d="M28 60 h44" stroke="#d4302a" stroke-width="2"/><text x="50" y="80" font-family="Permanent Marker, cursive" font-size="12" text-anchor="middle" fill="#d4302a" stroke="none">PUDDING</text>'),
+  book: D('<path d="M50 28 C38 20 22 20 10 24 V82 C22 78 38 78 50 86 C62 78 78 78 90 82 V24 C78 20 62 20 50 28 Z" fill="#fff"/><path d="M50 28 V86"/><path d="M18 36 h22 M18 46 h22 M18 56 h18 M60 36 h22 M60 46 h22 M60 56 h16" stroke-width="2"/>'),
+  star: D('<path d="M50 10 L61 38 L91 40 L67 58 L76 88 L50 70 L24 88 L33 58 L9 40 L39 38 Z" fill="#ffd84a"/>'),
+  sun: D('<circle cx="50" cy="50" r="20" fill="#ffd84a"/><path d="M50 8 v12 M50 80 v12 M8 50 h12 M80 50 h12 M20 20 l9 9 M71 71 l9 9 M80 20 l-9 9 M29 71 l-9 9"/><path d="M42 48 h2 M56 48 h2 M42 56 q8 6 16 0" stroke-width="2.5"/>'),
+  rain: D('<path d="M22 56 a14 14 0 0 1 6-26 a20 20 0 0 1 38-4 a14 14 0 0 1 12 30 z" fill="#dfe9f3"/><path d="M30 68 l-4 10 M46 68 l-4 10 M62 68 l-4 10 M38 82 l-3 8 M54 82 l-3 8" stroke="#1d6bd0"/>'),
+  trophy: D('<path d="M30 16 h40 v22 c0 14-9 24-20 24 s-20-10-20-24 z" fill="#ffd84a"/><path d="M30 24 h-12 c0 14 8 18 14 18 M70 24 h12 c0 14-8 18-14 18"/><path d="M50 62 v14 M34 90 h32 v-12 h-32 z" fill="#e8c28e"/><path d="M44 30 l6 -4 v18" stroke-width="2.5"/>'),
+  cat: D('<path d="M22 40 L26 12 L42 28 H58 L74 12 L78 40 C84 70 70 88 50 88 C30 88 16 70 22 40 Z" fill="#b8b8b8"/><circle cx="40" cy="50" r="4" fill="#1e1d1b"/><circle cx="60" cy="50" r="4" fill="#1e1d1b"/><path d="M47 60 l3 3 3-3 M50 63 v4 q-5 5-9 0 M50 67 q5 5 9 0 M30 60 h-18 M30 66 h-16 M70 60 h18 M70 66 h16" stroke-width="2"/>'),
+  snow: D('<path d="M50 10 V90 M15 30 L85 70 M15 70 L85 30" /><path d="M42 18 l8 8 8-8 M42 82 l8-8 8 8 M18 40 l10-2 -4-10 M82 60 l-10 2 4 10 M18 60 l10 2 -4 10 M82 40 l-10-2 4-10" stroke="#1d6bd0"/>'),
+  pizza: D('<path d="M14 22 Q50 6 86 22 L50 92 Z" fill="#f2c94c"/><path d="M14 22 Q50 6 86 22 L82 30 Q50 16 18 30 Z" fill="#e8a45a"/><circle cx="44" cy="42" r="6" fill="#e05a4f"/><circle cx="60" cy="52" r="6" fill="#e05a4f"/><circle cx="50" cy="68" r="5" fill="#e05a4f"/>'),
+  car: D('<path d="M10 66 V52 L24 50 L34 32 H68 L80 50 L92 54 V66 Z" fill="#8fb3d9"/><path d="M38 36 h12 v14 h-20 z M56 36 h10 l8 14 h-18 z" fill="#fff" stroke-width="2"/><circle cx="30" cy="68" r="10" fill="#1e1d1b"/><circle cx="74" cy="68" r="10" fill="#1e1d1b"/><circle cx="30" cy="68" r="3" fill="#fff" stroke="none"/><circle cx="74" cy="68" r="3" fill="#fff" stroke="none"/>'),
+  cake: D('<rect x="18" y="52" width="64" height="34" rx="4" fill="#f5a3b5"/><rect x="26" y="34" width="48" height="20" rx="4" fill="#fff6d6"/><path d="M40 34 v-12 M50 34 v-14 M60 34 v-12"/><path d="M40 18 q-3-5 0-8 q3 3 0 8 M50 16 q-3-5 0-8 q3 3 0 8 M60 18 q-3-5 0-8 q3 3 0 8" fill="#f2c94c" stroke-width="2"/><path d="M18 66 q8 6 16 0 t16 0 t16 0 t16 0" stroke-width="2"/>')
+};
+const TILLY = `<svg viewBox="0 0 200 235" role="img" aria-label="Doodle of Tilly Marsh waving and holding an ice-cream cone" fill="none" stroke="${INK}" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M168 34 c-4 -8 -14 -4 -10 4 l10 10 l10 -10 c4 -8 -6 -12 -10 -4z" fill="#f08a8a" stroke-width="2.5"/>
+  <path d="M26 58 l3 -9 3 9 9 3 -9 3 -3 9 -3 -9 -9 -3z" fill="#ffd84a" stroke-width="2"/>
+  <path d="M176 150 l2 -6 2 6 6 2 -6 2 -2 6 -2 -6 -6 -2z" fill="#9fd3ff" stroke-width="2"/>
+  <path d="M142 66 C170 62 186 92 176 124 C170 110 160 100 148 96 Z" fill="#6b3e26"/>
+  <circle cx="145" cy="70" r="7" fill="#ffd84a"/>
+  <path d="M60 152 Q100 138 140 152 L152 232 H48 Z" fill="#3fa7a0"/>
+  <ellipse cx="100" cy="150" rx="30" ry="10" fill="#2f8a84"/>
+  <path d="M92 156 v22 M108 156 v22" stroke-width="2.5"/><circle cx="92" cy="181" r="3" fill="#fff"/><circle cx="108" cy="181" r="3" fill="#fff"/>
+  <path d="M78 204 h44 v14 q-22 8 -44 0 z" fill="#2f8a84" stroke-width="2.5"/>
+  <path d="M66 162 Q44 150 38 126" stroke-width="20"/><path d="M66 162 Q44 150 38 126" stroke="#3fa7a0" stroke-width="13"/>
+  <circle cx="36" cy="116" r="11" fill="#f0c7a0"/>
+  <path d="M18 104 q-6 8 -2 18 M22 96 q-10 12 -6 30" stroke-width="2.5"/>
+  <path d="M134 162 Q146 178 130 192" stroke-width="20"/><path d="M134 162 Q146 178 130 192" stroke="#3fa7a0" stroke-width="13"/>
+  <path d="M114 176 L138 176 L126 214 Z" fill="#e8c28e"/><path d="M118 186 l16 -3 M121 196 l10 -2" stroke-width="2"/>
+  <circle cx="119" cy="168" r="11" fill="#f5a3b5"/><circle cx="133" cy="165" r="11" fill="#bfe8c9"/>
+  <circle cx="127" cy="152" r="5" fill="#d4302a"/><path d="M127 147 q2 -6 7 -7" stroke-width="2"/>
+  <path d="M115 164 l3 1 M122 170 l2 -2 M131 160 l2 2 M137 167 l-2 2" stroke="#fff" stroke-width="2"/>
+  <circle cx="126" cy="194" r="9" fill="#f0c7a0"/>
+  <circle cx="100" cy="96" r="50" fill="#f0c7a0"/>
+  <path d="M50 100 C44 56 74 42 100 42 C130 42 156 58 150 100 C143 82 128 72 112 70 C100 86 78 90 58 86 C54 91 52 95 50 100 Z" fill="#6b3e26"/>
+  <path d="M70 60 q10 -8 22 -8" stroke="#8a5536" stroke-width="3"/>
+  <ellipse cx="82" cy="106" rx="7.5" ry="9.5" fill="${INK}"/><ellipse cx="118" cy="106" rx="7.5" ry="9.5" fill="${INK}"/>
+  <circle cx="84.5" cy="102" r="3" fill="#fff" stroke="none"/><circle cx="120.5" cy="102" r="3" fill="#fff" stroke="none"/>
+  <circle cx="80" cy="110" r="1.4" fill="#fff" stroke="none"/><circle cx="116" cy="110" r="1.4" fill="#fff" stroke="none"/>
+  <path d="M73 90 q8 -5 16 -1 M111 89 q8 -4 16 1" stroke-width="2.5"/>
+  <ellipse cx="68" cy="122" rx="8" ry="5" fill="#f5a3b5" stroke="none"/><ellipse cx="132" cy="122" rx="8" ry="5" fill="#f5a3b5" stroke="none"/>
+  <path d="M91 124 q9 10 18 0 z" fill="#e0736a" stroke-width="3"/>
+</svg>`;
+
+const BOOKS = [
+  { id: 'b1', title: 'Book One', sub: 'Ten and Totally Doomed', months: 'February to June', cover: '#5b8fd1', doodle: 'music', pages: BOOK1 },
+  { id: 'b2', title: 'Book Two', sub: 'Worms, Discos and Pen Licences', months: 'June to December', cover: '#e0875a', doodle: 'pudding', pages: BOOK2 }
+];
+BOOKS.forEach(b => { b.all = [{ cover: true }].concat(b.pages.map(p => ({ date: p[0], text: p[1], doodle: p[2] || '', note: p[3] || '' }))); });
+
+$('#tillyPortrait').innerHTML = TILLY;
+const marks = store.get('dd-diary-marks', {});
+function renderShelf() {
+  $('#bookshelf').innerHTML = BOOKS.map(b => {
+    const at = marks[b.id];
+    return `<button class="book" type="button" data-book="${b.id}" style="--cover:${b.cover}">
+      <span class="book-label"><b>${b.title}</b><span>${b.sub}</span></span>
+      <span class="book-doodle">${DOODLES[b.doodle]}</span>
+      <span class="book-meta">${b.all.length} pages · ${b.months}</span>
+      <span class="book-open">${at ? 'Keep reading from page ' + (at + 1) : 'Open the diary'}</span>
+    </button>`;
+  }).join('');
+}
+renderShelf();
+
+let book = null, idx = 0;
+const spread = $('#spread'), slider = $('#pageSlider');
+const wide = () => window.matchMedia('(min-width: 820px)').matches;
+function esc(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
+function pageHTML(p, n) {
+  if (!p) return '<article class="page blank"></article>';
+  if (p.cover) return `<article class="page title-page"><div class="tp-inner">
+      <p class="tp-small">This diary belongs to</p><p class="tp-name">Tilly Marsh</p><p class="tp-small">Age 10 · Year 4 · Wobbleton Primary</p>
+      <div class="tp-doodle">${DOODLES[book.doodle]}</div>
+      <p class="tp-title">${book.title}: ${book.sub}</p>
+      <p class="tp-warn">PRIVATE!!! If you are not Tilly, STOP READING. (That means you, Tater.)</p>
+    </div><div class="pnum">${n + 1}</div></article>`;
+  return `<article class="page">
+    <div class="pdate">${esc(p.date)}</div>
+    ${p.doodle ? `<div class="pdoodle">${DOODLES[p.doodle] || ''}</div>` : ''}
+    <p class="ptext">${esc(p.text)}</p>
+    ${p.note ? `<div class="pnote">${esc(p.note)}</div>` : ''}
+    <div class="pnum">${n + 1}</div>
+  </article>`;
+}
+function render(dir) {
+  const per = wide() ? 2 : 1;
+  if (per === 2 && idx % 2 === 1) idx--;
+  const a = book.all[idx], b = per === 2 ? book.all[idx + 1] : null;
+  spread.innerHTML = pageHTML(a, idx) + (per === 2 ? pageHTML(b, idx + 1) : '');
+  spread.classList.toggle('single', per === 1);
+  if (dir) { spread.classList.remove('turn-l', 'turn-r'); void spread.offsetWidth; spread.classList.add(dir > 0 ? 'turn-r' : 'turn-l'); }
+  const last = Math.min(book.all.length, idx + per);
+  $('#pageInfo').textContent = per === 2 && b ? `Pages ${idx + 1}–${last} of ${book.all.length}` : `Page ${idx + 1} of ${book.all.length}`;
+  slider.max = book.all.length - 1; slider.value = idx;
+  $('#prevPage').disabled = idx === 0; $('#nextPage').disabled = idx + per >= book.all.length;
+  marks[book.id] = idx; store.set('dd-diary-marks', marks);
+}
+function openBook(id) {
+  book = BOOKS.find(b => b.id === id); idx = marks[id] || 0;
+  $('#readerTitle').textContent = `${book.title}: ${book.sub}`;
+  $('#shelfArea').hidden = true; $('#reader').hidden = false;
+  render(); $('#reader').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+function closeBook() { $('#reader').hidden = true; $('#shelfArea').hidden = false; renderShelf(); }
+function turn(d) { const per = wide() ? 2 : 1, n = clampI(idx + d * per, 0, book.all.length - 1); if (n !== idx) { idx = n; render(d); } }
+const clampI = (v, a, b) => Math.max(a, Math.min(b, v));
+$('#bookshelf').addEventListener('click', e => { const b = e.target.closest('[data-book]'); if (b) openBook(b.dataset.book); });
+$('#backToShelf').addEventListener('click', closeBook);
+$('#prevPage').addEventListener('click', () => turn(-1));
+$('#nextPage').addEventListener('click', () => turn(1));
+$('#randomPage').addEventListener('click', () => { idx = 1 + Math.floor(Math.random() * (book.all.length - 1)); render(1); });
+slider.addEventListener('input', () => { idx = +slider.value; render(); });
+document.addEventListener('keydown', e => {
+  if ($('#diaryView').hidden || $('#reader').hidden || e.target.matches('input')) return;
+  if (e.key === 'ArrowRight') { e.preventDefault(); turn(1); }
+  if (e.key === 'ArrowLeft') { e.preventDefault(); turn(-1); }
+});
+let sx = null;
+spread.addEventListener('pointerdown', e => { sx = e.clientX; });
+spread.addEventListener('pointerup', e => { if (sx == null) return; const dx = e.clientX - sx; sx = null; if (Math.abs(dx) > 50) turn(dx < 0 ? 1 : -1); });
+window.addEventListener('resize', () => { if (book && !$('#reader').hidden) render(); });
+})();
+
+</script>
+
+</body>
+</html>
